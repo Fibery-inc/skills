@@ -1,0 +1,14 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "fibery",
+  "version": "1.0.0",
+  "description": "Design and build Fibery Spaces for any process, write the recipes they start from, and health-check your workspace's structure and data. Connects to the Fibery MCP server.",
+  "author": {
+    "name": "Fibery",
+    "url": "https://fibery.com"
+  },
+  "homepage": "https://fibery.com",
+  "repository": "https://github.com/Fibery-inc/skills",
+  "license": "MIT",
+  "keywords": ["fibery", "workspace", "process", "space", "recipe", "cookbook", "templates", "structure", "health", "audit"]
+}
