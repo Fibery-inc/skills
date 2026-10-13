@@ -174,4 +174,4 @@ Anywhere else, give this recipe to your AI assistant and name your tool, or buil
 
 ---
 
-*From the Fibery Process Cookbook, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/): copy, adapt and build it anywhere, crediting the cookbook.*
+*From the Fibery Process Cookbook (https://github.com/Fibery-inc/process-cookbook), licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/): copy, adapt and build it anywhere, crediting the cookbook.*

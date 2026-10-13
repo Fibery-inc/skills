@@ -1,13 +1,28 @@
 import json
+import os
 import pathlib
 import re
 import sys
+import urllib.request
 
 import yaml
 
 ALLOWED = {"name", "description", "license", "compatibility", "metadata", "allowed-tools"}
 NAME = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 MANIFESTS = ["plugin.json", ".claude-plugin/plugin.json", "gemini-extension.json"]
+COOKBOOK = "https://raw.githubusercontent.com/Fibery-inc/process-cookbook/main/"
+FORMAT = pathlib.Path("skills/recipe-writer/references/recipe-format.md")
+EXAMPLES = pathlib.Path("skills/recipe-writer/examples")
+
+
+def fetch(url):
+    with urllib.request.urlopen(url, timeout=30) as response:
+        return response.read()
+
+
+def warn(path, message):
+    print(f"::warning file={path}::{message}" if os.environ.get("GITHUB_ACTIONS") else f"warning: {path}: {message}")
+
 
 errors = []
 
@@ -33,6 +48,17 @@ for skill in sorted(pathlib.Path("skills").glob("*/SKILL.md")):
 versions = {path: json.loads(pathlib.Path(path).read_text(encoding="utf-8")).get("version") for path in MANIFESTS}
 if len(set(versions.values())) > 1:
     errors.append("manifest versions differ: " + ", ".join(f"{path} {version}" for path, version in versions.items()))
+
+try:
+    raw = {recipe["id"]: recipe["raw"] for recipe in json.loads(fetch(COOKBOOK + "index.json"))["recipes"]}
+    copies = {FORMAT: COOKBOOK + "FORMAT.md"} | {path: raw.get(path.stem) for path in sorted(EXAMPLES.glob("*.md"))}
+    for path, url in copies.items():
+        if not url:
+            warn(path, "the cookbook has no recipe by this name")
+        elif fetch(url) != path.read_bytes():
+            warn(path, f"differs from the cookbook's copy; refresh it with curl -sSfL {url} -o {path}")
+except OSError as e:
+    print(f"the cookbook couldn't be reached ({e}), so the bundled recipes weren't compared")
 
 for error in errors:
     print(error)

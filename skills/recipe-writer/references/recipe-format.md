@@ -196,7 +196,7 @@ Then a horizontal rule and the footer, one italic paragraph. For a named method 
 ```markdown
 ---
 
-*Shape Up is Basecamp's method, from Ryan Singer's book* Shape Up *(2019), free at basecamp.com/shapeup. This recipe describes it in its own words and isn't affiliated with Basecamp. From the Fibery Process Cookbook, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/): copy, adapt and build it anywhere, crediting the cookbook.*
+*Shape Up is Basecamp's method, from Ryan Singer's book* Shape Up *(2019), free at basecamp.com/shapeup. This recipe describes it in its own words and isn't affiliated with Basecamp. From the Fibery Process Cookbook (https://github.com/Fibery-inc/process-cookbook), licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/): copy, adapt and build it anywhere, crediting the cookbook.*
 ```
 
 The credit travels with every copy, because the license asks for it.

@@ -1,6 +1,6 @@
 # Designing from a recipe: the delta
 
-The recipe may ship with the plugin or come as an attached file, a link or the prompt itself (SKILL.md §1 says how to get its text and where to save a supplied one); from here on the source makes no difference. Recipes are tool-neutral: they say what the process needs in words any tool can follow, and the build guide turns those words into Fibery. Its "Details for building" is the spec (databases, the Views table, the app, the reports, the sample story) and its story (The idea through What must stay true) is the guide document, adapted as the build guide §6 says. Its header is read too: `summary` is the card's first line, `for: solo` means one person runs it, so the sample story's people are `me` and nothing gets a "My …" view, and `for: community` means most members never open Fibery: they are records in a database, the organizers are the people fields, and members come in through a form. Don't rewrite either: every transcription is a chance to decide something the recipe already decided. The design is a one-page delta, and this file is all you need before the yes; the design guide is for designs from scratch.
+The recipe may come from the cookbook or as an attached file, a link or the prompt itself (SKILL.md §1 says how to get its text and where to save it); from here on the source makes no difference. Recipes are tool-neutral: they say what the process needs in words any tool can follow, and the build guide turns those words into Fibery. Its "Details for building" is the spec (databases, the Views table, the app, the reports, the sample story) and its story (The idea through What must stay true) is the guide document, adapted as the build guide §6 says. Its header is read too: `summary` is the card's first line, `for: solo` means one person runs it, so the sample story's people are `me` and nothing gets a "My …" view, and `for: community` means most members never open Fibery: they are records in a database, the organizers are the people fields, and members come in through a form. Don't rewrite either: every transcription is a chance to decide something the recipe already decided. The design is a one-page delta, and this file is all you need before the yes; the design guide is for designs from scratch.
 
 ## 1. Ask, then read the workspace
 
@@ -22,7 +22,7 @@ The recipe may ship with the plugin or come as an attached file, a link or the p
 <the card, below>
 
 **Spaces:** Shape Up
-**Recipe:** recipe-writer/examples/shape-up.md
+**Recipe:** recipe.md (Shape Up, version 2, from the cookbook)
 
 | Recipe asks | Answer | Effect |
 |---|---|---|
