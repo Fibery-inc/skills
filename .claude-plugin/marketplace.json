@@ -1,0 +1,15 @@
+{
+  "name": "fibery",
+  "owner": {
+    "name": "Fibery",
+    "url": "https://fibery.com"
+  },
+  "description": "Fibery skills for AI agents",
+  "plugins": [
+    {
+      "name": "fibery",
+      "source": "./",
+      "description": "Design and build Fibery Spaces for any process, write the recipes they start from, and health-check your workspace's structure and data."
+    }
+  ]
+}
