@@ -1,0 +1,10 @@
+{
+  "name": "fibery",
+  "version": "1.0.0",
+  "description": "Design and build Fibery Spaces for any process, write the recipes they start from, and health-check your workspace's structure and data.",
+  "mcpServers": {
+    "fibery": {
+      "httpUrl": "https://mcp.fibery.io/mcp"
+    }
+  }
+}
