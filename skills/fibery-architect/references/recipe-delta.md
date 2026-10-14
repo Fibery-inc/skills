@@ -6,7 +6,7 @@ The recipe may come from the cookbook or as an attached file, a link or the prom
 
 - **Ask every "Making it yours" question** (older recipes split it into "Before you set it up" and "Adapting") before designing, in one message, as a table with the defaults, and wait for the answers: the defaults are what a shrug gets, not a reason to skip the question. A short request ("set up Shape Up") is not "just build it"; only those words take the defaults, listed as assumptions on the card, and leave out a Making it yours bullet that has no default, which the card names as an option. A question the workspace already answers (an existing product database) is stated as answered, not asked.
 - **Read the workspace**, reading only: `schema` for every Space and database, `schema_detailed` for the databases the recipe would link to, and `schema_detailed` for `fibery/user`. Four things come from the workspace, never from the recipe:
-  - No new Space's name may exist yet. A recipe builds one Space, named after its title, unless its Who sees what line sets databases apart (some people must not open them, or several processes will share them): then each group gets a Space of its own, as the design guide §4 says. Older recipes name their Spaces in a Spaces line; keep those. If a name is taken, ask whether they meant that Space, or choose a free one ("Shape Up 2") and say so: the build addresses every database as `<Space>/<Database>`, and an existing name routes it into the existing Space.
+  - No new Space's name may exist yet. A recipe builds one Space, named after its title, unless its Who sees what line sets databases apart (some people must not open them, or several processes will share them): then each group gets a Space of its own, as the design guide §4 says. Older recipes name their Spaces in a Spaces line; keep those. If a name is taken, ask whether they meant that Space, or, after "just build it", choose the first free "<name> 2", "<name> 3" and say so on the card: the build addresses every database as `<Space>/<Database>`, and an existing name routes it into the existing Space.
   - Link targets are spelled exactly as `schema` shows them; a near miss lands the inverse field on the wrong database. Link to the workspace's system of record for a noun the recipe's questions ask about (products, customers, people as records) and create what is specific to the process; name each link's inverse the way that database's owners would, and keep the inverse free on the target. A database is the system of record only when it plainly serves the whole workspace or this team (a Customers or Products Space, a database other Spaces already link to); one inside another process's Space, or in another build of this recipe, is not. When unsure and the person said "just build it", don't link: create the database and list the link as an assumption on the card.
   - People-field names are workspace-wide: a `user/<name>` that exists already gets numbered ("Owned scopes 2"); note it in the delta.
   - The workspace's vocabulary (Customer or Account, Task or To-do) is a rename, applied everywhere.
@@ -47,7 +47,7 @@ Everything not listed above is built exactly as the recipe's Details for buildin
 
 ### The card
 
-Shorter than a design's (SKILL.md §4), since the person chose the recipe: its parts as counts, after the delta, then only what changes, one clause per answer or Change row. Outside the Space, By hand and the assumptions (every default taken) are as SKILL.md §4 says, and the yes is the same yes.
+Shorter than a design's (SKILL.md §4), since the person chose the recipe: its parts as counts, after the delta, then only what changes, one clause per answer or Change row. Outside the Space, By hand and the assumptions (every default taken) are as SKILL.md §4 says, By hand naming every default and range the recipe gives ("Date: today by default", "0 to 100"), and the yes is the same yes.
 
 ```
 **Shape Up** — a new Space "Shape Up" in <workspace>, from the recipe Shape Up, for <team>.
@@ -65,19 +65,21 @@ Estimate: about 13 minutes after your yes, the app included.
 Build it? Nothing is created until you say yes.
 ```
 
-Its sample count is what the story's moments need, 25–40 in all (build guide §4), and the estimate for a recipe's Space is about 10 minutes after the yes, a few more with an app.
+Its sample count is what the story's moments need, 25–40 in all and up to 50 when its promises need more (build guide §4), and the estimate for a recipe's Space is about 10 minutes after the yes, a few more with an app.
 
 ### Translations that change the recipe
 
 The build guide turns each of the recipe's words into Fibery's calls, and most translations change nothing. These can, and when they do, each is a Change row or an assumption on the card:
 
-- **A role with a "My …" view** is a people field even when one person holds it, since only people fields filter on me.
+- **A role with a "My …" view** is a people field even when one person holds it, since only people fields filter on me. Walk the recipe's Views table for every "My …" view before writing the card: script 1 makes the field, and its cardinality can't change afterwards without recreating it.
 - **Money** is in the currency of the workspace's existing money fields, or the one the person names, or USD as an assumption.
+- **A report that keeps only some linked records** (only key results whose objective is Active, only runs of strats that aren't Retired) gets a true-or-false formula on its source, built with the other formulas, since a report filters on its source's own fields.
+- **A view that shows a linked record's field** (the customer's Phone on My calls) gets a formula on its database that reads it, since a view shows its database's own fields only.
 - **A grouping Fibery can't do**, a board's rows by a text, a number or a date, becomes a select.
 - **A whole-number formula** stays whole when it starts with its 0 case: a day count reads one date field and is 0 without it, with the rule that stamps the date also firing on creation; a share is 0 when there is nothing to count. Otherwise it comes back decimal, with its number format By hand.
 - **A view that only adds a filter to another view** isn't built, since people filter; the daily view and "My …" views stay. Each dropped view is a Change row.
 - **A custom view** is a custom app: a view app for a page of its own, a layout app for a tab on every record.
-- **A rule or button** is native actions only (build guide §5): one that needs more (email, a comment on a linked record, a check before acting) is dropped and reported as not built, and the guide names the step as done by hand.
+- **A rule or button** is native actions only (build guide §5): an action that needs more (email, a comment on a linked record, a notification to the people of linked records, a check before acting) is left out and reported as not built, the rest of the rule is built when it still does its job, and the guide names the left-out step as done by hand; a rule whose point is that action isn't built at all.
 - **Who sees what** makes a Space per group it names, the first keeping the recipe's title; who may open each is By hand.
 - **`for: community`** makes members records in a database and organizers people fields, with intake through a form shared outside the workspace By hand.
 
