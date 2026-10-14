@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1 — 2026-10-14
+
+The recipe format says a rule comments on its own record and notifies the people in that record's own fields, never through a linked record, which most tools can't do and fibery-architect leaves out. To remind someone named on a linked record, a recipe gives the record the rule runs on a person field of its own.
+
 ## 1.2.0 — 2026-10-14
 
 The guide every build writes, How to run <process>, now fits on one screen, under 500 words, for recipe builds too: the promise, the loop in up to ten lines that say who acts and in which view, where to look, what stays true, and a line of requests to make it yours. Recipe builds used to copy the recipe's whole story into it, 1,600–2,400 words that people skip; now its last line links the recipe's cookbook page for the why. The recipe format and the bundled recipes say so in What people look at and the Views table.
