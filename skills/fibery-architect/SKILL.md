@@ -54,7 +54,7 @@ Design and write it as `references/design-guide.md` prescribes: a one-screen sum
 
 Save it as `design.md` in the working folder when you can write files; otherwise it lives in the conversation, summary first.
 
-**With a recipe, the design is a delta.** The recipe's "Details for building" is the spec and its story is the guide, so don't rewrite them: `design.md` holds only the card and what the answers, the workspace or Fibery change, as `references/recipe-delta.md` §2 says. It's a page, not a document, and it's what makes recipe builds fast.
+**With a recipe, the design is a delta.** The recipe's "Details for building" is the spec, so don't rewrite it: `design.md` holds only the card and what the answers, the workspace or Fibery change, as `references/recipe-delta.md` §2 says. It's a page, not a document, and it's what makes recipe builds fast. The guide is written at build time, one screen from the recipe's story that links back to the recipe (build guide §6).
 
 ## 4. The design card, and a yes
 

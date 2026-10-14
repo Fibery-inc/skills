@@ -4,7 +4,7 @@ A recipe has two readers and one text. A person reads it to understand how the p
 
 Every recipe goes into the **Fibery Process Cookbook**, an open library under CC BY 4.0 that people and agents use with any tool. So a recipe is tool-neutral: it names no tool to run the process in, Fibery included, outside its fixed texts (the italic line, Build it and the footer), and how a particular tool delivers what the recipe asks is that tool's builder's business.
 
-One Markdown file, `<process>.md`, as long as the process needs: a metadata header, then the sections below in this order; their names are fixed so a builder finds things where they expect them. Sections 1–8 are the human half, in the order a newcomer wants them: how it works, what to look at, the rules, what must stay true, then how to make it theirs; sections 1–6 and For AI agents double as the guide a builder puts next to the work. Section 9 is the model's half, an appendix: no database, role, state, view or rule starts there, and nothing meant for the builder alone appears before it. Build it and the footer close the file.
+One Markdown file, `<process>.md`, as long as the process needs: a metadata header, then the sections below in this order; their names are fixed so a builder finds things where they expect them. Sections 1–8 are the human half, in the order a newcomer wants them: how it works, what to look at, the rules, what must stay true, then how to make it theirs; from them a builder writes the guide it puts next to the work, one screen that links back here for the why. Section 9 is the model's half, an appendix: no database, role, state, view or rule starts there, and nothing meant for the builder alone appears before it. Build it and the footer close the file.
 
 **Names.** Every name the build will use (the things, the roles, the key fields, the states, the meetings, the views, the rules) appears in bold at its first mention, with what it is in the same sentence ("every piece of work is a **Pitch**, a problem with a rough solution"). After that it's plain text, spelled the same; bold returns only on the name a bullet is about (a rule in The rules, a view in What people look at, a case in Making it yours). Italics mark values (states, options). The bold names are the names the build uses, so the first mention is where a newcomer learns the word and where the builder learns the database list. Letters, digits and spaces only in every name ("Cool down", not "Cool-down"), so it works in any tool. A name the story introduces gets its moment later, or isn't introduced; a field a rule stamps, a date, a secondary attribute or a helper formula may appear for the first time in Details for building, where its Why says what uses it.
 
@@ -98,7 +98,7 @@ After the table, bullets: small teams, other vocabularies, the common variations
 
 ## 8. For AI agents
 
-`## For AI agents`. Up to five bullets on what an AI agent working where the team runs the process, the tool's own or one connected to it, should do (checks, summaries, flags, drafts) and never do (the decisions that belong to people). Write them as instructions to the agent that will read the team's records every day: this section is what makes the setup run itself, and builders copy the gist into the guide's section of the same name. For a solo recipe it addresses the person's assistant. The last bullet starts "Try asking:" and gives three prompts a person can give the agent, in quotes, each something the agent can answer or do from the team's records.
+`## For AI agents`. Up to five bullets on what an AI agent working where the team runs the process, the tool's own or one connected to it, should do (checks, summaries, flags, drafts) and never do (the decisions that belong to people). Write them as instructions to the agent that will read the team's records every day: this section is what makes the setup run itself. For a solo recipe it addresses the person's assistant. The last bullet starts "Try asking:" and gives three prompts a person can give the agent, in quotes, each something the agent can answer or do from the team's records.
 
 ## 9. Details for building
 
@@ -158,7 +158,7 @@ Then, after the databases:
 | View | Type | Of | Grouping | Shows | Filter | Sort |
 |---|---|---|---|---|---|---|
 | Current cycle | board | Scope | columns State, rows Pitch | Owner, Hill position, Tasks done; Nice to have grey | Pitch is Building | |
-| How to run Shape Up | document | | | the story, through What must stay true | | |
+| How to run Shape Up | document | | | the process on one screen, linking to this recipe | | |
 ```
 
 - **App**: name; where it lives (a page of its own, or a tab on every record of one database); what it shows and what people do on it, in under 120 words; **reads** and **writes**, as fields by name; the fallback view, for a tool that can't draw it. The build decides the rest. Or "None needed" with the reason the views cover the central moment.

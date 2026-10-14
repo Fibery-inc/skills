@@ -194,7 +194,15 @@ A rule is native actions only, its condition the filter: never a script. Trigger
 
 ### Documents
 
-The guide is `How to run <process>`, named after the process the way the team says it ("How to run the hiring pipeline"): a document view whose content is the story of the Space, 150–450 words. A one-line promise in bold, "How it runs here" steps that name the views, fields and automations doing the work, "What stays true" (the promises, each with what keeps it), "Make it yours", the parts left out on purpose as requests, and "For AI agents" when there's something an agent should watch for or never do. In the built Space every view, report and app the guide names is a link to it, and nothing else is: rules, databases, fields and records stay plain names. The guide is the Space's front door: a newcomer reads it and clicks through to the views. The process document is for the part of the process that is written, not tracked (an interview guide, a definition of done), named the way the team names it, with its content in Markdown.
+The guide is `How to run <process>`, named after the process the way the team says it ("How to run the hiring pipeline"): a document view, the Space's front door. A newcomer reads it in two minutes and clicks through to the views, so it fits on one screen, under 500 words, and teaches this Space, not the method. In this order:
+
+- A one-line promise in bold, then a sentence or two on what the process is and who runs it here, with a plain gloss for the method's own words.
+- **How it runs here**: the loop in up to ten numbered lines, each opening with its moment in bold ("**Leadership bets.**") and saying who acts, what they do and in which view. A step a rule or button does names it; a step nothing reminds anyone of says so.
+- **Where to look**: the views by cadence (every morning, every week, at the meeting, any time), the daily view first and the reports last, a few words each.
+- **What stays true**: the promises the process can't do without, one line each, with what keeps one only when a person must act on it ("bet only with Bet on it: a card dragged to *Bet* gets no cycle").
+- **Make it yours**: one line of up to three requests for the parts left out on purpose ("Add a Take-home stage").
+
+The why behind each step and the rare cases stay out; the views, the rules and the sample records show them. In the built Space every view, report and app the guide names is a link to it, and nothing else is: rules, databases, fields and records stay plain names. The process document is for the part of the process that is written, not tracked (an interview guide, a definition of done), named the way the team names it, with its content in Markdown.
 
 ### Apps
 

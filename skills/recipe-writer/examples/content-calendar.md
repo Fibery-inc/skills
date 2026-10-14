@@ -38,7 +38,7 @@ Follow one post, *Onboarding in half the time*, from idea to link.
 - **Every morning** — the authors of today's posts get the Publish reminder; the editor opens **Pipeline**, every post in its state, cards red when a post is late: where is every post, and in its *In review* column, what's waiting for approval.
 - **Every week** — **This week**: what's due in the next seven days, and how many days each has left. **Calendar**: what goes out when, for the month.
 - **Any time** — **My posts** for your own work; **Campaigns**, a timeline, for whether the launches are on track, red when one is at risk; **Campaign posts** for what's in each campaign; **Archive** for everything that went out, with its link; **New post**, a form, for intake from outside the team; and the **Output by channel** report for what actually went out, month by month.
-- **How to run the content calendar** — this story, kept where the team works.
+- **How to run the content calendar** — this process on one screen, kept where the team works.
 
 ## The rules
 
@@ -152,7 +152,7 @@ Formulas:
 | Campaign posts | grid | Campaign | Posts nested: State, Publish date, Channels | State, Dates, Progress, Published posts, Late posts | | |
 | Archive | grid | Post | | Publish date, Channels, Link, Campaign, Authors | State is Published | Publish date desc |
 | New post | form | Post | | Name (required), Channels (required), Publish date, Authors, Campaign, Description | | |
-| How to run the content calendar | document | | | the story, through What must stay true | | |
+| How to run the content calendar | document | | | the process on one screen, linking to this recipe | | |
 
 ### App
 

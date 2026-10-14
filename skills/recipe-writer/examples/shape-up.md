@@ -41,7 +41,7 @@ Follow one pitch, *Faster search*, through a cycle.
 - **While shaping** — **Shaping board**: what's being shaped, and by whom.
 - **At the betting table** — **Bets**: the pitches on the table, by appetite, with their shaper, problem and area. Afterwards, **Cycles**: what's planned, building and done.
 - **Any time** — **My tasks** for your own to-dos; **All pitches** for the whole picture, every pitch with its scopes, filtered to *Shipped* for what got done or to *Not bet* and *Stopped* for what wasn't bet or didn't ship; **New idea**, a form, for ideas from anyone; the **Cycle review** report for how many bets shipped, per betting table; and **Where cycles go**, a report of which parts of the product each cycle built.
-- **How to run Shape Up** — this story, kept where the team works.
+- **How to run Shape Up** — this process on one screen, kept where the team works.
 
 ## The rules
 
@@ -180,7 +180,7 @@ Only when asked for: Name and a description. Its pitches come through the invers
 | My tasks | list | Scope | Tasks nested: Nice to have | Pitch, State | Pitch is Building; tasks: Assignees is me, Done is false | |
 | All pitches | grid | Pitch | Scopes nested: Hill position, Nice to have, Owner | Appetite, Area, Shaper, Cycle, Progress, Hammer time, State, Shipped on | | State |
 | New idea | form | Pitch | | Name (required), Problem (required), Area, Description | | |
-| How to run Shape Up | document | | | the story, through What must stay true | | |
+| How to run Shape Up | document | | | the process on one screen, linking to this recipe | | |
 
 ### App
 

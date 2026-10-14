@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0 — 2026-10-14
+
+The guide every build writes, How to run <process>, now fits on one screen, under 500 words, for recipe builds too: the promise, the loop in up to ten lines that say who acts and in which view, where to look, what stays true, and a line of requests to make it yours. Recipe builds used to copy the recipe's whole story into it, 1,600–2,400 words that people skip; now its last line links the recipe's cookbook page for the why. The recipe format and the bundled recipes say so in What people look at and the Views table.
+
 ## 1.1.2 — 2026-10-14
 
 The bundled Shape Up and Content calendar recipes and the recipe format follow the cookbook's fixes from the nine-recipe test: Shape Up's sample story, the format's example too, keeps the two-week cool down, and Content calendar's Stage changed rule also runs when a post is created, so Days in stage counts from one date.

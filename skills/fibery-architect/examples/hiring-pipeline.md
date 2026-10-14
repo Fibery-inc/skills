@@ -68,7 +68,7 @@ Written the same way in the full design: a one-line description and settings, th
 | Jobs | grid | Job | | Department, Priority, Hiring manager, Openings, Hired count, Openings left, State; children: Candidate via Candidates showing State, Source, Days in stage | | Priority asc | Every job with its pipeline |
 | Closed | grid | Candidate | | Job, State, Source, Rejection reason, Applied on, Stage changed on | State is any of Hired, Rejected, Withdrawn | Stage changed on desc | Who joined, who we lost, and why |
 | New candidate | form | Candidate | | Name (required), Email (required), Job (required), Phone, LinkedIn, Source (default: Inbound), Resume | | | Intake |
-| How to run the hiring pipeline | document | | | the story | | | |
+| How to run the hiring pipeline | document | | | the guide, one screen | | | |
 
 ## Reports
 
@@ -86,7 +86,7 @@ Left out on purpose: a weekly "stuck candidates" reminder (red cards on Pipeline
 
 ## Documents
 
-**How to run the hiring pipeline**: the story, 150–450 words. A bold one-line promise; "How it runs here" in five steps (Capture through the New candidate form or the board; Screen, with Days in stage kept honest by Stage dates; Interview, with My interviews, which also lists the scorecards owed; Offer, through the Make offer button and Offers out; Close, with Job filled and the two reports); "Make it yours" ("Add a Take-home stage" · "Remind me about stuck candidates on Mondays" · "A scorecard comparison screen"); "For AI agents" (summarize a candidate before the decision meeting; never move a candidate to Hired or Rejected yourself).
+**How to run the hiring pipeline**: one screen, under 500 words. A bold one-line promise; "How it runs here" in five steps (Capture through the New candidate form or the board; Screen, with Days in stage kept honest by Stage dates; Interview, with My interviews, which also lists the scorecards owed; Offer, through the Make offer button and Offers out; Close, with Job filled and the two reports); "Where to look" (Pipeline every morning; My candidates and My interviews for your own; Offers out, Jobs and Closed any time; the two reports); "What stays true" (every stage change is dated; a job is Filled once its openings are hired; every offer has a deadline); "Make it yours" ("Add a Take-home stage" · "Remind me about stuck candidates on Mondays" · "A scorecard comparison screen").
 
 ## Apps
 
