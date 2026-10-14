@@ -1,7 +1,7 @@
 {
   "name": "fibery",
   "displayName": "Fibery",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Design and build Fibery Spaces for any process, write the recipes they start from, and health-check your workspace's structure and data. Works with the Fibery connector.",
   "author": {
     "name": "Fibery",

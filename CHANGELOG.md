@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2 — 2026-10-14
+
+The bundled Shape Up and Content calendar recipes and the recipe format follow the cookbook's fixes from the nine-recipe test: Shape Up's sample story, the format's example too, keeps the two-week cool down, and Content calendar's Stage changed rule also runs when a post is created, so Days in stage counts from one date.
+
 ## 1.1.1 — 2026-10-14
 
 fibery-architect, from building all nine cookbook recipes at once and re-testing three: every script now stops before Fibery's one-minute cut-off and logs "time is up, run this script again", and every one, the sample records included, runs again as it is, doing only what's missing and logging what was there before. Script 1 logs every id an app needs, and finds the right app, on any run. A rerun of script 3 repairs a report whose chart was rejected, and reports take the documented conditions and historical sources. The build guide adds what the builds measured: when a formula comes back decimal or whole, no `Now()` in formulas, people fields for every "My …" view, a formula for a report or view that reads a linked record, the Create action and `update_automation`'s shape, prompts that name the triggering record, and rules built without the one action Fibery can't do.

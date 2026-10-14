@@ -4,7 +4,7 @@ summary: "A content calendar for a marketing team: every blog post, newsletter a
 domain: marketing
 for: team
 keywords: [content calendar, editorial calendar, blog posts, newsletter, social media, campaigns, publishing schedule, marketing content]
-version: 2
+version: 3
 license: CC-BY-4.0
 ---
 
@@ -26,7 +26,7 @@ Follow one post, *Onboarding in half the time*, from idea to link.
 
 1. **An idea is captured.** Someone adds a post in *Idea*, through the **New post** form or straight on the board: "Onboarding in half the time". They tag its **Channels**, where it goes out: *Blog*, *Newsletter*, *LinkedIn*, *X*, or the team's own list; one post often goes to several, and this one is *Blog* and *LinkedIn*. If it belongs to one, they link it to a campaign, here the Spring launch. No date yet; ideas are cheap.
 2. **It gets planned.** The editor, who owns the calendar, gives it a **Publish date**, the day it goes out, its authors, the one or several people who write it, and a rough **Word count**. It appears on the **Calendar**, every post by publish date, and, once the date is within seven days, in **This week**.
-3. **It gets written.** An author moves it to *Drafting*, writes in its description and attaches its **Images**, the cover and any visuals it goes out with. When the draft is ready, they move it to *In review*. The **Stage changed** rule notes the day of every move, so every post shows **Days in stage**, how long it has sat where it is.
+3. **It gets written.** An author moves it to *Drafting*, writes in its description and attaches its **Images**, the cover and any visuals it goes out with. When the draft is ready, they move it to *In review*. The **Stage changed** rule notes the day a post is added and the day of every move, so every post shows **Days in stage**, how long it has sat where it is.
 4. **It gets approved.** The editor, or whoever approves, finds it in the *In review* column of **Pipeline**, the board of every post in its state, reads it and presses **Ready to schedule**, a button on the post: it moves to *Scheduled*, and a comment records who approved it and for which date. A post scheduled without a date turns red on Pipeline until someone gives it one.
 5. **The morning it goes out**, the **Publish reminder** rule tells its authors it goes out today, with the post's channels; nobody has to ask.
 6. **It gets published.** The author publishes on each channel, pastes the **Link**, where the published post now lives, and moves the post to *Published*. A post published without a publish date gets today from the **Publish date on publish** rule, so the calendar and the reports stay true.
@@ -47,7 +47,7 @@ These are all the automations; everything else in the story is done by people.
 - **Ready to schedule** (a button on a post): moves the post to *Scheduled* and adds a comment that it was approved for its publish date; the comment carries the approver's name, because they pressed it. It checks nothing: a post scheduled with no date is red on Pipeline. Approval is a click that leaves a trace.
 - **Publish reminder**: every day at 08:00, the authors of every post that is *Scheduled* with a publish date of today are notified, with the post's channels.
 - **Publish date on publish**: when a post moves to *Published* and has no publish date, the publish date is set to today.
-- **Stage changed**: when a post moves to another state, its Stage changed on is set to today, which is what Days in stage counts from.
+- **Stage changed**: when a post is created or moves to another state, its Stage changed on is set to today, which is what Days in stage counts from.
 
 No automations in your tool? Then a person does each of these at the same moment, and the promises they keep below become practices.
 
@@ -115,14 +115,14 @@ One record per piece of content, whatever its channel. The description holds the
 | Word count | integer | Rough length, set when the editor plans the post; for planning writing time |
 | Images | files | The cover and any visuals the post goes out with; attached by its authors, so nobody asks in chat where the image is |
 | Link | url | Where the published post lives |
-| Stage changed on | date | The day the post last changed state; set by Stage changed, read by Days in stage |
+| Stage changed on | date | The day the post was added or last changed state; set by Stage changed, read by Days in stage |
 
 States: Idea → Drafting → In review → Scheduled → Published (finished) · Dropped (finished). Default: Idea. Source of truth: **Publish date**, set by people; Publish date on publish fills it only when it's empty, and a post that went out on another day gets its date corrected by hand.
 
 Formulas:
 - **Days to publish** — days from today to the publish date, a whole number, negative once the date has passed, 0 with no date; on This week.
 - **Late** — yes when the publish date has passed and the post is neither *Published* nor *Dropped*, no otherwise and no with no date; colors the Pipeline cards red and is counted by Late posts on Campaign.
-- **Days in stage** — days from Stage changed on to today, or from the day the post was created when it has never moved, a whole number; on the Pipeline cards.
+- **Days in stage** — days from Stage changed on to today, a whole number, 0 with no date; on the Pipeline cards.
 
 ### Campaign
 
