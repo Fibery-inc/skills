@@ -26,7 +26,7 @@ On Claude Code older than 2.1.275, run `claude plugin marketplace add Fibery-inc
 ## What you need
 
 - **Fibery MCP** (`https://mcp.fibery.io/mcp`), connected to the workspace you want to work in. The Codex, Copilot, VS Code, Cursor, Gemini CLI and Kiro installs add it for you and ask you to sign in to Fibery. In Claude, connect the Fibery connector; in Claude Code without it, run `claude mcp add --transport http fibery https://mcp.fibery.io/mcp`. fibery-architect needs a role that can create Spaces; recipe-writer uses it only to read a Space it turns into a recipe; fibery-health sees only what your role can see, so run it as a workspace admin for full coverage (applying its fixes needs Creator or Admin).
-- For builds, Fibery MCP's `execute_code` tool and a strong reasoning model (Sonnet 5.5 or better): the model writes a handful of scripts from the design, and each makes a whole step's calls inside Fibery.
+- Fibery MCP's `execute_code` tool. fibery-architect writes a handful of scripts from the design, each making a whole step's calls inside Fibery, and needs a strong reasoning model (Sonnet 5.5 or better); fibery-health gathers all its evidence with one script.
 
 ## What it changes in your workspace
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.0 — 2026-10-20
+
+fibery-health gathers its evidence with one `execute_code` script instead of dozens of separate calls. Part 1 reads, for every database in scope, its fields and how often each is filled, workflow states and select options with their counts, and its rules and buttons with their last run, trigger, filter and actions; part 2, added for the data pass, reads duplicates, empty links, stuck and overdue work, and deletions from the history. The script stops before Fibery's one-minute cut-off, or before its output gets too long to read in one piece, and its last line says how to run it again for what's left. In tests, a full check of a 15-database Space took under 4 minutes and 12 tool calls instead of 6 minutes and 97, and a structure check of a 43-database workspace about 4 minutes and 14 calls instead of 6 minutes and 175. fibery-health now needs `execute_code`.
+
 ## 1.4.1 — 2026-10-20
 
 The Claude plugin manifest drops five keys Claude doesn't read (`icon`, `documentationUrl`, `supportUrl`, `privacyPolicyUrl`, `termsOfServiceUrl`), which made the Claude app warn when the plugin was installed. The support, privacy and terms links move to the README.
