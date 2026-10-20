@@ -12,11 +12,11 @@ license: CC-BY-4.0
 
 *A recipe from the Fibery Process Cookbook: the process in plain words, and the model to build it in any tool.*
 
-**Fixed time, flexible scope, no backlog.** For a product team of five to fifty. Basecamp's way of building software, set up so the rules enforce themselves. Source: https://basecamp.com/shapeup
+**Fixed time, flexible scope, no backlog.** For a product team of five to fifty. Basecamp's way of building software, set up so the rules enforce themselves.
 
 ## The idea
 
-Most projects don't slip because teams are slow. They slip because nobody decided how much the problem was worth. Shape Up decides that first. Every piece of work is a **Pitch**: a problem with a rough solution, written at fat-marker level: rough on purpose, no fine detail. Every pitch gets an **Appetite**, a fixed amount of time, a *Small batch* of two weeks or a *Big batch* of six, and the scope flexes to fit it, never the other way round. Pitches are bet on at a **Betting table**, not scheduled. The **Team** behind a bet gets a whole **Cycle**, six weeks of building and then two of *Cool down*, with full autonomy. When the cycle ends, unfinished work stops instead of quietly stretching into next month.
+Most projects don't slip because teams are slow. They slip because nobody decided how much the problem was worth. Shape Up decides that first. Every piece of work is a **Pitch**: a problem with a rough solution, written at fat-marker level: rough on purpose, no fine detail. Every pitch gets an **Appetite**, a fixed amount of time, a *Small batch* of one or two weeks or a *Big batch* of six, and the scope flexes to fit it, never the other way round. Pitches are bet on at a **Betting table**, not scheduled. The **Team** behind a bet gets a whole **Cycle**, six weeks of building and then two of *Cool down*, with full autonomy. When the cycle ends, unfinished work stops instead of quietly stretching into next month.
 
 In any work tool, this becomes a few kinds of linked records: pitches whose workflow runs from *Raw idea* to *Shipped*, scopes under each pitch with a hill position the owner moves every week, a board for the betting table, and a rule that stops unfinished work when the cycle ends. It's an operating system, not a task tracker: it works when the rules are fields and automations, not memory.
 
@@ -187,6 +187,10 @@ Only when asked for: Name and a description. Its pitches come through the invers
 ### Sample story
 
 Cycle 13 is two weeks in, four to go. Faster search is building: Index rebuild is done, Query parser is just over the top of the hill, Result ranking is still uphill, and Search box polish, a nice to have, hasn't started. A second big batch builds beside it, a little behind. Cycle 12 went into cool down four weeks ago with one pitch shipped and one stopped by the circuit breaker. The betting table for Cycle 14 is in five weeks, and three pitches already sit on it, one still without an appetite. Two ideas are being shaped, two more came in through the form, and one pitch from the last table wasn't bet.
+
+## Sources
+
+- [Shape Up: Stop Running in Circles and Ship Work that Matters](https://basecamp.com/shapeup), Ryan Singer, Basecamp, 2019: the method itself, its words and its rules.
 
 ## Build it
 

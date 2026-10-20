@@ -158,6 +158,12 @@ None needed. The central moment is the weekly look at what goes out when, and th
 
 The Spring launch is a week in, three weeks to go. Three of its posts went out this week, one goes out today and another in four days, and Onboarding in half the time is being drafted for next week; one launch post slipped and is still in drafting, three days past its date. Customer stories ends in five days with one of its four posts published, so it shows at risk. Holiday hub starts next month with its posts still ideas, and Summer themes ended two months ago, one of its posts dropped. Around them sit a few loose ideas, one undated, and posts waiting in review for a day to a week.
 
+## Sources
+
+- [7 Steps to a More Strategic Editorial Calendar](https://contentmarketinginstitute.com/content-optimization/7-steps-to-a-more-strategic-editorial-calendar), Kelsey Raymond, Content Marketing Institute, 2022: the path from topic to author, draft, edit, approval and publish date.
+- [Editorial Calendar Tools and Templates To Help You Master Your Content To-Do List](https://contentmarketinginstitute.com/ai-content-creation-tools/editorial-calendar-tools-and-templates-to-help-you-master-your-content-to-do-list), Jodi Harris, Content Marketing Institute, 2022: what each entry records, from publish date and author to status and approver.
+- [Blog Handbook](https://handbook.gitlab.com/handbook/marketing/blog), GitLab: an editor who approves every post and gives it its date on the calendar.
+
 ## Build it
 
 In Fibery, open Claude with the Fibery plugin, attach this recipe and say "set up the content calendar". You'll see a one-screen design first; nothing is created until you say yes, and the build takes about ten minutes.

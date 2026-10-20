@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.0 — 2026-10-20
+
+Every recipe ends with Sources, the one to three published sources it was written from, the main one first; a named method's source moves there from the promise line. recipe-writer reads one to three sources for every recipe, whatever it starts from, and lists them, and the two bundled recipes carry theirs.
+
 ## 1.3.0 — 2026-10-20
 
 Recipes have no For AI agents section any more: the recipe format, its checks and the two bundled recipes drop it, and recipe-writer no longer writes agent behaviours. The guide fibery-architect writes already left it out.

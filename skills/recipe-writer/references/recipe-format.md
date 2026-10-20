@@ -4,7 +4,7 @@ A recipe has two readers and one text. A person reads it to understand how the p
 
 Every recipe goes into the **Fibery Process Cookbook**, an open library under CC BY 4.0 that people and agents use with any tool. So a recipe is tool-neutral: it names no tool to run the process in, Fibery included, outside its fixed texts (the italic line, Build it and the footer), and how a particular tool delivers what the recipe asks is that tool's builder's business.
 
-One Markdown file, `<process>.md`, as long as the process needs: a metadata header, then the sections below in this order; their names are fixed so a builder finds things where they expect them. Sections 1–7 are the human half, in the order a newcomer wants them: how it works, what to look at, the rules, what must stay true, then how to make it theirs; from them a builder writes the guide it puts next to the work, one screen that links back here for the why. Section 8 is the model's half, an appendix: no database, role, state, view or rule starts there, and nothing meant for the builder alone appears before it. Build it and the footer close the file.
+One Markdown file, `<process>.md`, as long as the process needs: a metadata header, then the sections below in this order; their names are fixed so a builder finds things where they expect them. Sections 1–7 are the human half, in the order a newcomer wants them: how it works, what to look at, the rules, what must stay true, then how to make it theirs; from them a builder writes the guide it puts next to the work, one screen that links back here for the why. Section 8 is the model's half, an appendix: no database, role, state, view or rule starts there, and nothing meant for the builder alone appears before it. Sources, Build it and the footer close the file.
 
 **Names.** Every name the build will use (the things, the roles, the key fields, the states, the meetings, the views, the rules) appears in bold at its first mention, with what it is in the same sentence ("every piece of work is a **Pitch**, a problem with a rough solution"). After that it's plain text, spelled the same; bold returns only on the name a bullet is about (a rule in The rules, a view in What people look at, a case in Making it yours). Italics mark values (states, options). The bold names are the names the build uses, so the first mention is where a newcomer learns the word and where the builder learns the database list. Letters, digits and spaces only in every name ("Cool down", not "Cool-down"), so it works in any tool. A name the story introduces gets its moment later, or isn't introduced; a field a rule stamps, a date, a secondary attribute or a helper formula may appear for the first time in Details for building, where its Why says what uses it.
 
@@ -28,7 +28,7 @@ license: CC-BY-4.0
 ---
 ```
 
-`summary` is one sentence under 160 characters, unique to this recipe: what the process is and for whom; it is what a search snippet and a skimming agent see first. `domain` is one of the cookbook's domains below. `for` is `solo`, `team`, `company` or `community`. `keywords` are the words someone would search for, including the method's own and the plain ones ("betting", "six week cycles"). `version` starts at 1 and goes up by one whenever the model changes (a database, a field, a state, a rule), never for wording. `license` is always `CC-BY-4.0`. The file name is the recipe's id; the source stays in the promise line.
+`summary` is one sentence under 160 characters, unique to this recipe: what the process is and for whom; it is what a search snippet and a skimming agent see first. `domain` is one of the cookbook's domains below. `for` is `solo`, `team`, `company` or `community`. `keywords` are the words someone would search for, including the method's own and the plain ones ("betting", "six week cycles"). `version` starts at 1 and goes up by one whenever the model changes (a database, a field, a state, a rule), never for wording. `license` is always `CC-BY-4.0`. The file name is the recipe's id; its sources are listed in Sources.
 
 **Domains.** software, product, design, marketing, sales, support, operations, management, finance, hr, legal, compliance, security, education, research, healthcare, nonprofit, community, faith, events, sports, esports, music, arts, media, hospitality, retail, manufacturing, construction, farming, household, personal. A process that fits two takes the one its people would name; a domain the list lacks is added here first, never invented in a header.
 
@@ -36,17 +36,17 @@ license: CC-BY-4.0
 
 ## 1. Title and promise
 
-`# <Process name>`, then the same italic line in every recipe saying what a recipe is, then one bold line on what changes for whoever runs it, who it's for in a few words, and the source when there is one:
+`# <Process name>`, then the same italic line in every recipe saying what a recipe is, then one bold line on what changes for whoever runs it and who it's for in a few words:
 
 ```markdown
 # Shape Up
 
 *A recipe from the Fibery Process Cookbook: the process in plain words, and the model to build it in any tool.*
 
-**Fixed time, flexible scope, no backlog.** For a product team of five to fifty. Basecamp's way of building software, set up so the rules enforce themselves. Source: https://basecamp.com/shapeup
+**Fixed time, flexible scope, no backlog.** For a product team of five to fifty. Basecamp's way of building software, set up so the rules enforce themselves.
 ```
 
-The italic line is fixed; a reader who lands on the file from anywhere learns in one line what it is. The promise is what the team gets, not what the build contains.
+The italic line is fixed; a reader who lands on the file from anywhere learns in one line what it is. The promise is what the team gets, not what the build contains, and it names no source: those are in Sources.
 
 ## 2. The idea
 
@@ -104,7 +104,7 @@ After the table, bullets: small teams, other vocabularies, the common variations
 Each kind of record (Pitch, Scope, Task) is a database or a table, depending on the tool, or a tab in a spreadsheet. A relation links two kinds; its inverse is the name it has on the other side. A state is a step in a workflow, and a finished state ends it. A rule is an automation, a button is an automation someone presses, and a formula is a field the tool computes. A nested view shows each record's children beneath it; where a tool can't nest, group the children by their parent instead.
 ```
 
-No database, role, state, view people open or rule starts here; a field or formula that first appears here is used by a view, a report, a rule or a formula the story named, or is filled by a named role every time, and its Why says which. Most of the ordinary parts (§10) live here: the dates, the contact details, the classification a report groups by. Then, in this order:
+No database, role, state, view people open or rule starts here; a field or formula that first appears here is used by a view, a report, a rule or a formula the story named, or is filled by a named role every time, and its Why says which. Most of the ordinary parts (§11) live here: the dates, the contact details, the classification a report groups by. Then, in this order:
 
 **Relations.** Two or three sentences on how the databases link, then a Mermaid diagram of them: one line per relation, cardinality marks on both sides, a short verb as the label. Diagram names take hyphens instead of spaces (`Betting-table`), because not every renderer draws a name with a space; it is the one place a name changes.
 
@@ -173,7 +173,17 @@ Then, after the databases:
 Cycle 13 is two weeks in, four to go. Faster search is building: Index rebuild is done, Query parser is just over the top of the hill, Result ranking is still uphill, and Search box polish, a nice to have, hasn't started. A second big batch builds beside it, a little behind. Cycle 12 went into cool down four weeks ago with one pitch shipped and one stopped by the circuit breaker. The betting table for Cycle 14 is in five weeks, and three pitches already sit on it, one still without an appetite. Two ideas are being shaped, two more came in through the form, and one pitch from the last table wasn't bet.
 ```
 
-## 9. Build it and the footer
+## 9. Sources
+
+`## Sources`, between Details for building and Build it: the published sources the recipe was written from, one to three, the main one first. A named method's own book, site or standard comes first; a domain process lists the guides, standards or practitioners' write-ups whose way of running it the recipe follows. One bullet each: the title as a link, who wrote or published it and the year when it's known, then what the recipe took from it, in a few words. A source is listed only when the recipe was written from it, never to look thorough, and every recipe has at least one: a process nobody has written up is written from the closest published practice, and Sources names that. Free, stable pages beat paywalled ones, and a book is linked through its author's or publisher's page. A guide by a tool's maker is a fine source when it describes the process rather than the tool.
+
+```markdown
+## Sources
+
+- [Shape Up: Stop Running in Circles and Ship Work that Matters](https://basecamp.com/shapeup), Ryan Singer, Basecamp, 2019: the method itself, its words and its rules.
+```
+
+## 10. Build it and the footer
 
 `## Build it`, the last section, the same two paragraphs in every recipe, with only the process's name changed:
 
@@ -197,7 +207,7 @@ Then a horizontal rule and the footer, one italic paragraph. For a named method 
 
 The credit travels with every copy, because the license asks for it.
 
-## 10. Sizing
+## 11. Sizing
 
 A recipe is deep but not complete: the setup a team would have after a month of running the process, about 80% of what a mature one ends up with, and never the whole of it. It holds the core and the ordinary parts a team adds in its first month, the dates, owners, contact details and classifications every team in the domain records and the intake form; the rest is the team's to add, named in Making it yours so they know where to take it. Dozens of views and rules cost the people who run a process more than they give, and a setup a team finishes itself is one it owns. No number fits every process, so the table gives ceilings for a typical one, never targets: you decide what goes in and what's left out, fewer is always fine, and a bigger process may pass a ceiling with its reason in one sentence. A recipe is written once and built many times, so this judgment is made here, and a builder adds only what a team's answers or its own tool require. The table bounds the model, not the prose: a recipe is as long as its process needs.
 
@@ -216,17 +226,19 @@ A recipe is deep but not complete: the setup a team would have after a month of 
 | Reports | up to 2; none when no question needs a chart |
 | Documents | the guide is implied; up to one named process document |
 | Sample story | one paragraph, under 120 words; the builder decides the records |
+| Sources | one to three, the main one first; never none |
 
-## 11. Checks
+## 12. Checks
 
 The writer's last read is this list:
 
 1. **Header**: every field present, `domain` from the list, `license` CC-BY-4.0.
 2. **Fixed texts**, word for word: the italic line, the opening lines of The rules, What must stay true, Making it yours and Details for building with its paragraph, the closing line of The rules, Build it, and the footer's credit line.
-3. **Neutral**: no tool to run the process in is named, Fibery included, and no Workspace or Space appears, outside the fixed texts (the italic line, Build it and the footer). Crediting a named method's originator, or naming the channels a process publishes to, is not naming a tool.
+3. **Neutral**: no tool to run the process in is named, Fibery included, and no Workspace or Space appears, outside the fixed texts (the italic line, Build it and the footer) and Sources. Crediting a named method's originator, citing a source, or naming the channels a process publishes to, is not naming a tool.
 4. **Size**: no view that only adds a filter to another, the daily view and "My …" views aside; a part past its ceiling says why in one sentence; what the recipe leaves for later is in Making it yours. The sample story is one paragraph, with no table.
 5. **Names**: one name for one thing across states, views and rules; letters, digits and spaces only; bold at the first mention.
 6. **The cookbook rule**: every database, role, state, view and rule in Details appears in the story, and every field or formula that doesn't is used by something the story named or filled by a named role every time, or is cut.
 7. **The rules**: each does exactly what the story says, uses what the model already holds before it searches, is present for every step a person would otherwise repeat for every record at one moment, and is made of simple rules only (a condition as its filter, two rules rather than one with two conditions, no branching, no refusing, no comparing fields with each other, no comment or notification through a linked record, never a script), with any step simple rules can't do turned into a shown promise or a practice.
 8. **What must stay true**: every promise names what keeps it and that thing exists in The rules or Details, and a promise nothing keeps is a practice or gets its check.
 9. **As a reader**: sections 1–7 read once as the person who'll run the process: every act has a named role, every number its scale and every method word its gloss, nothing before Details addresses the builder, no idiom built on the recipe's words, and nothing that tells an agent to do anything but run or set up this process.
+10. **Sources**: one to three, each one the recipe was written from and linked, with who wrote or published it, the year when known and what the recipe took from it; the main one first, and none in the promise line.
