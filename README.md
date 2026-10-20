@@ -38,6 +38,10 @@ fibery-health is read-only until you approve a specific fix, and asks again for 
 
 fibery-architect looks processes up in the [Fibery Process Cookbook](https://github.com/Fibery-inc/process-cookbook) by itself: say "set up OKRs" and it builds from the cookbook's recipe. Any other recipe in the same format works the same way: attach it, or paste it or its link. Shape Up and Content calendar are copied into `skills/recipe-writer/examples/`: the models recipe-writer writes from, and what fibery-architect uses when it can't reach the cookbook.
 
+## Support
+
+Ask on the [Fibery community](https://community.fibery.io). Fibery's [privacy policy](https://fibery.com/privacy-policy) and [terms](https://fibery.com/terms) cover the workspace data these skills read and write through Fibery MCP.
+
 ## License
 
 MIT, see [LICENSE](LICENSE). The recipes in `skills/recipe-writer/examples/` are copies from the [Fibery Process Cookbook](https://github.com/Fibery-inc/process-cookbook), licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).

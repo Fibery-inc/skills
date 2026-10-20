@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.1 — 2026-10-20
+
+The Claude plugin manifest drops five keys Claude doesn't read (`icon`, `documentationUrl`, `supportUrl`, `privacyPolicyUrl`, `termsOfServiceUrl`), which made the Claude app warn when the plugin was installed. The support, privacy and terms links move to the README.
+
 ## 1.4.0 — 2026-10-20
 
 Every recipe ends with Sources, the one to three published sources it was written from, the main one first; a named method's source moves there from the promise line. recipe-writer reads one to three sources for every recipe, whatever it starts from, and lists them, and the two bundled recipes carry theirs.
