@@ -81,14 +81,6 @@ Decide these before you set it up; each has a default if you shrug.
 - **Agencies and freelancers** who don't use your tool: a Writer database linked from Post, so an outside writer is still a name on the post; Authors stays for the team's own people.
 - **Distribution checklists** (repost on day 3, add to the newsletter, update the hub page): headings in the post's description first; a Task database only when the steps need owners and dates. Past that, the calendar has become a task tracker for writers, and the editor's view of what goes out gets buried.
 
-## For AI agents
-
-- Every Monday, list the posts with a publish date this week that aren't *Scheduled* yet, and ask their authors what's blocking them.
-- For every campaign that is At risk, list its posts that aren't *Scheduled* yet, so the editor can decide what to move or cut.
-- Draft briefs into a post's description from its name, channels and campaign goal when asked; never draft the post itself into the description unasked.
-- Never move a post to *Published* yourself; publishing is a person's call.
-- Try asking: "What goes out this week, and what's still in Drafting?", "Which campaigns are at risk, and which of their posts aren't scheduled yet?", "Draft a brief for Onboarding in half the time from its channels and campaign goal".
-
 ## Details for building
 
 What follows is what the process is built from, in words any tool can follow; the story above is enough to run it.

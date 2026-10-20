@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0 — 2026-10-20
+
+Recipes have no For AI agents section any more: the recipe format, its checks and the two bundled recipes drop it, and recipe-writer no longer writes agent behaviours. The guide fibery-architect writes already left it out.
+
 ## 1.2.1 — 2026-10-14
 
 The recipe format says a rule comments on its own record and notifies the people in that record's own fields, never through a linked record, which most tools can't do and fibery-architect leaves out. To remind someone named on a linked record, a recipe gives the record the rule runs on a person field of its own.

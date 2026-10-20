@@ -4,7 +4,7 @@ A recipe has two readers and one text. A person reads it to understand how the p
 
 Every recipe goes into the **Fibery Process Cookbook**, an open library under CC BY 4.0 that people and agents use with any tool. So a recipe is tool-neutral: it names no tool to run the process in, Fibery included, outside its fixed texts (the italic line, Build it and the footer), and how a particular tool delivers what the recipe asks is that tool's builder's business.
 
-One Markdown file, `<process>.md`, as long as the process needs: a metadata header, then the sections below in this order; their names are fixed so a builder finds things where they expect them. Sections 1–8 are the human half, in the order a newcomer wants them: how it works, what to look at, the rules, what must stay true, then how to make it theirs; from them a builder writes the guide it puts next to the work, one screen that links back here for the why. Section 9 is the model's half, an appendix: no database, role, state, view or rule starts there, and nothing meant for the builder alone appears before it. Build it and the footer close the file.
+One Markdown file, `<process>.md`, as long as the process needs: a metadata header, then the sections below in this order; their names are fixed so a builder finds things where they expect them. Sections 1–7 are the human half, in the order a newcomer wants them: how it works, what to look at, the rules, what must stay true, then how to make it theirs; from them a builder writes the guide it puts next to the work, one screen that links back here for the why. Section 8 is the model's half, an appendix: no database, role, state, view or rule starts there, and nothing meant for the builder alone appears before it. Build it and the footer close the file.
 
 **Names.** Every name the build will use (the things, the roles, the key fields, the states, the meetings, the views, the rules) appears in bold at its first mention, with what it is in the same sentence ("every piece of work is a **Pitch**, a problem with a rough solution"). After that it's plain text, spelled the same; bold returns only on the name a bullet is about (a rule in The rules, a view in What people look at, a case in Making it yours). Italics mark values (states, options). The bold names are the names the build uses, so the first mention is where a newcomer learns the word and where the builder learns the database list. Letters, digits and spaces only in every name ("Cool down", not "Cool-down"), so it works in any tool. A name the story introduces gets its moment later, or isn't introduced; a field a rule stamps, a date, a secondary attribute or a helper formula may appear for the first time in Details for building, where its Why says what uses it.
 
@@ -32,7 +32,7 @@ license: CC-BY-4.0
 
 **Domains.** software, product, design, marketing, sales, support, operations, management, finance, hr, legal, compliance, security, education, research, healthcare, nonprofit, community, faith, events, sports, esports, music, arts, media, hospitality, retail, manufacturing, construction, farming, household, personal. A process that fits two takes the one its people would name; a domain the list lacks is added here first, never invented in a header.
 
-**For whom.** `for` changes the model, not just the words. `solo`: one person runs it, so there are no roles and no people fields, no "My …" views (every view is theirs), reminders go to the person, the sample story's people are the person who sets it up, and For AI agents addresses their assistant. `team`: a few people with roles; a role is a person or people field by how many people hold it, and meetings are views. `company`: several teams, approvals and hand-offs, links to the departments, products or people the company already tracks, and questions about what that is. `community`: a club, a congregation, a volunteer group, a league, where most members never open the tool: members, volunteers and players are records in a database rather than person fields, the few organizers are the person and people fields, and members come in through a form.
+**For whom.** `for` changes the model, not just the words. `solo`: one person runs it, so there are no roles and no people fields, no "My …" views (every view is theirs), reminders go to the person, and the sample story's people are the person who sets it up. `team`: a few people with roles; a role is a person or people field by how many people hold it, and meetings are views. `company`: several teams, approvals and hand-offs, links to the departments, products or people the company already tracks, and questions about what that is. `community`: a club, a congregation, a volunteer group, a league, where most members never open the tool: members, volunteers and players are records in a database rather than person fields, the few organizers are the person and people fields, and members come in through a form.
 
 ## 1. Title and promise
 
@@ -96,11 +96,7 @@ Two conventions keep this half honest for the builder without marking up the pro
 
 After the table, bullets: small teams, other vocabularies, the common variations, what the method loses when pushed too far ("below three weeks it's a sprint"), and what teams add once it runs, the parts this recipe leaves out on purpose (a second report, a checklist, a reminder), so the team knows where to take it. Each speaks to the team: what changes for them, then the change in those same words; types belong to Details. No bullet may break a ★ promise, and none restates them: the stars already say what survives.
 
-## 8. For AI agents
-
-`## For AI agents`. Up to five bullets on what an AI agent working where the team runs the process, the tool's own or one connected to it, should do (checks, summaries, flags, drafts) and never do (the decisions that belong to people). Write them as instructions to the agent that will read the team's records every day: this section is what makes the setup run itself. For a solo recipe it addresses the person's assistant. The last bullet starts "Try asking:" and gives three prompts a person can give the agent, in quotes, each something the agent can answer or do from the team's records.
-
-## 9. Details for building
+## 8. Details for building
 
 `## Details for building`, opening with the line "What follows is what the process is built from, in words any tool can follow; the story above is enough to run it." and then a fixed paragraph that says what the recipe's words mean in any tool, with the recipe's own main databases in the brackets:
 
@@ -108,7 +104,7 @@ After the table, bullets: small teams, other vocabularies, the common variations
 Each kind of record (Pitch, Scope, Task) is a database or a table, depending on the tool, or a tab in a spreadsheet. A relation links two kinds; its inverse is the name it has on the other side. A state is a step in a workflow, and a finished state ends it. A rule is an automation, a button is an automation someone presses, and a formula is a field the tool computes. A nested view shows each record's children beneath it; where a tool can't nest, group the children by their parent instead.
 ```
 
-No database, role, state, view people open or rule starts here; a field or formula that first appears here is used by a view, a report, a rule or a formula the story named, or is filled by a named role every time, and its Why says which. Most of the ordinary parts (§11) live here: the dates, the contact details, the classification a report groups by. Then, in this order:
+No database, role, state, view people open or rule starts here; a field or formula that first appears here is used by a view, a report, a rule or a formula the story named, or is filled by a named role every time, and its Why says which. Most of the ordinary parts (§10) live here: the dates, the contact details, the classification a report groups by. Then, in this order:
 
 **Relations.** Two or three sentences on how the databases link, then a Mermaid diagram of them: one line per relation, cardinality marks on both sides, a short verb as the label. Diagram names take hyphens instead of spaces (`Betting-table`), because not every renderer draws a name with a space; it is the one place a name changes.
 
@@ -177,7 +173,7 @@ Then, after the databases:
 Cycle 13 is two weeks in, four to go. Faster search is building: Index rebuild is done, Query parser is just over the top of the hill, Result ranking is still uphill, and Search box polish, a nice to have, hasn't started. A second big batch builds beside it, a little behind. Cycle 12 went into cool down four weeks ago with one pitch shipped and one stopped by the circuit breaker. The betting table for Cycle 14 is in five weeks, and three pitches already sit on it, one still without an appetite. Two ideas are being shaped, two more came in through the form, and one pitch from the last table wasn't bet.
 ```
 
-## 10. Build it and the footer
+## 9. Build it and the footer
 
 `## Build it`, the last section, the same two paragraphs in every recipe, with only the process's name changed:
 
@@ -201,7 +197,7 @@ Then a horizontal rule and the footer, one italic paragraph. For a named method 
 
 The credit travels with every copy, because the license asks for it.
 
-## 11. Sizing
+## 10. Sizing
 
 A recipe is deep but not complete: the setup a team would have after a month of running the process, about 80% of what a mature one ends up with, and never the whole of it. It holds the core and the ordinary parts a team adds in its first month, the dates, owners, contact details and classifications every team in the domain records and the intake form; the rest is the team's to add, named in Making it yours so they know where to take it. Dozens of views and rules cost the people who run a process more than they give, and a setup a team finishes itself is one it owns. No number fits every process, so the table gives ceilings for a typical one, never targets: you decide what goes in and what's left out, fewer is always fine, and a bigger process may pass a ceiling with its reason in one sentence. A recipe is written once and built many times, so this judgment is made here, and a builder adds only what a team's answers or its own tool require. The table bounds the model, not the prose: a recipe is as long as its process needs.
 
@@ -221,7 +217,7 @@ A recipe is deep but not complete: the setup a team would have after a month of 
 | Documents | the guide is implied; up to one named process document |
 | Sample story | one paragraph, under 120 words; the builder decides the records |
 
-## 12. Checks
+## 11. Checks
 
 The writer's last read is this list:
 
@@ -233,4 +229,4 @@ The writer's last read is this list:
 6. **The cookbook rule**: every database, role, state, view and rule in Details appears in the story, and every field or formula that doesn't is used by something the story named or filled by a named role every time, or is cut.
 7. **The rules**: each does exactly what the story says, uses what the model already holds before it searches, is present for every step a person would otherwise repeat for every record at one moment, and is made of simple rules only (a condition as its filter, two rules rather than one with two conditions, no branching, no refusing, no comparing fields with each other, no comment or notification through a linked record, never a script), with any step simple rules can't do turned into a shown promise or a practice.
 8. **What must stay true**: every promise names what keeps it and that thing exists in The rules or Details, and a promise nothing keeps is a practice or gets its check.
-9. **As a reader**: sections 1–8 read once as the person who'll run the process: every act has a named role, every number its scale and every method word its gloss, nothing before Details addresses the builder, no idiom built on the recipe's words, and nothing that tells an agent to do anything but run or set up this process.
+9. **As a reader**: sections 1–7 read once as the person who'll run the process: every act has a named role, every number its scale and every method word its gloss, nothing before Details addresses the builder, no idiom built on the recipe's words, and nothing that tells an agent to do anything but run or set up this process.

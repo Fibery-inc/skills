@@ -83,14 +83,6 @@ Decide these before you set it up; each has a default if you shrug.
 - **Four-week cycles:** fine; keep the reasoning in How to run Shape Up (long enough to finish something real, short enough to feel the deadline from day one). Refuse to go below three.
 - **What teams add once it runs:** a My scopes list for each owner, a report of how scopes moved up the hill over a cycle, a reminder for pitches waiting in *Pitched*. Each is small, and left out so the first cycles stay simple.
 
-## For AI agents
-
-- Flag scopes that have stayed *Uphill* for two weeks or more; that's an unsolved unknown, and the shaper should look.
-- Before a betting table, summarize every pitch in *Pitched* on one page: problem, appetite, rabbit holes, shaper. Never rank them; betting is a human decision.
-- When a pitch is behind with under two weeks left, list its nice-to-have scopes and tasks and propose cutting them.
-- When the circuit breaker trips, don't offer to extend the cycle. Offer to help re-shape.
-- Try asking: "Summarize the pitches in Pitched for the next betting table", "Which scopes have been uphill for more than two weeks?", "List the nice-to-have scopes and tasks of Faster search".
-
 ## Details for building
 
 What follows is what the process is built from, in words any tool can follow; the story above is enough to run it.
