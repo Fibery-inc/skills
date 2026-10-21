@@ -25,7 +25,8 @@ Two passes, like a car inspection. The **structure pass** is the walk-around eve
 Decide from the request, before any call:
 
 - **Structure** is the default: a request to health-check, audit, clean up or review a workspace or space gets the structure pass, automations included. It covers the whole workspace unless the person names spaces; copies of an in-scope space are reported wherever they are.
-- **Data** runs only when the person asks for it: the data pass by name, a full or deep check, or a question about records (unused fields, missing links, whether records can be trusted). A full check runs both. Scope: the spaces the person names; otherwise every database when there are about 30 or fewer. With more and no space named, run the structure pass first, then propose the 3–5 spaces with the most records and ask once.
+- **A big workspace starts with an overview.** For the whole workspace, first count its databases with one short `execute_code`: `const c = await display_schema_capabilities({}), s = Object.keys(c.accessInfo.spaces), a = (await display_schema_capabilities({spaces: s})).accessInfo; log(Object.keys(a.databases).filter(d => s.includes(d.slice(0, d.indexOf("/")))).length + " databases");`. Over about 40, a full check would take many runs: follow `references/overview.md` instead, one line per Space, and the Spaces the person then picks are the scope for everything else, the question they asked included.
+- **Data** runs only when the person asks for it: the data pass by name, a full or deep check, or a question about records (unused fields, missing links, whether records can be trusted). A full check runs both. Scope: the spaces the person names; otherwise every database when there are about 30 or fewer. With more and no space named, the structure pass or the overview comes first, then propose 3–5 spaces and ask once.
 - A question about one area (broken automations, missing descriptions, unused fields) gets just that area's checks, from the same script.
 - With more than one Fibery connector and no workspace named, ask which one.
 
@@ -83,7 +84,7 @@ By area, one line each. Questions for the person (does a parking state mean paus
 The pass not run; spaces the person can't read; fields the script couldn't read; formula results; stuck, overdue or duplicate records and deletions; permissions, view usage, field descriptions, automation runs before the last one.
 ```
 
-A number from a sample keeps "of the newest 1,000" wherever it appears, and the summary says what the findings say. Summary, scorecard and top fixes go in chat; offer to save the full report as a document in the person's Private space (load `get_fibery_skill` with `documents` first). After a structure-only check, offer the data pass in one line, naming the spaces you'd check.
+A number from a sample keeps "of the newest 1,000" wherever it appears, and the summary says what the findings say. An overview has its own report, in `references/overview.md`. Summary, scorecard and top fixes go in chat; offer to save the full report as a document in the person's Private space (load `get_fibery_skill` with `documents` first). After a structure-only check, offer the data pass in one line, naming the spaces you'd check.
 
 ## 6. Safe fixes
 

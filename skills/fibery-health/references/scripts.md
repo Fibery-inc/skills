@@ -1,6 +1,6 @@
 # The facts script
 
-SKILL.md §2 sends it. Copy it whole and change only the first line: `SCOPE`, the spaces the person named, spelled as in Fibery (`[]` for the whole workspace); `DATA`, `true` for the data pass; `SKIP`, `[0, 0]` unless the last run's final line gave other numbers. The script only reads and calls every Fibery tool it needs itself. It reads the schema once, then reads each database in scope and its rules and buttons at the same time.
+SKILL.md §2 sends it, after the overview in `references/overview.md` on a big workspace. Copy it whole and change only the first line: `SCOPE`, the spaces the person named, spelled as in Fibery (`[]` for the whole workspace); `DATA`, `true` for the data pass; `SKIP`, `[0, 0]` unless the last run's final line gave other numbers. The script only reads and calls every Fibery tool it needs itself. It reads the schema once, then reads each database in scope and its rules and buttons at the same time.
 
 It stops starting new work after 35 seconds or about 32,000 characters of output, whichever comes first, so a run never times out and its output stays readable in one piece. Its last line then says what's left and gives the `SKIP` for the next run, which prints only what's left.
 
