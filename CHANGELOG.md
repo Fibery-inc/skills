@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.11 — 2026-10-23
+
+fibery-architect's build guide drops what Fibery MCP already tells the model or what the guide said twice, and catches up with today's MCP: 51.7K characters down to 48.2K. Gone: what `execute_code`'s own description says (tools as functions, `log`, no variable named after a tool), the evidence behind the scripts' time budget, the bullet describing the templates' `run`, the reasoning behind the app lookup, most formula-typing examples (one per rule stays), the builders' definitions (the template has them), the second `get_reports_list` warning, restated mention and empty-paragraph behaviour, the custom-apps-dev guide's own rules in §7 (token lifetime, local build, helpers, React Query, theme tokens, errors), the `query` and `get_me` result rows, and three troubleshooting rows. Fixed: `replace_document_blocks` now works inside scripts, so script 4 fills a new Description by replacing its empty paragraph in one call instead of inserting and deleting; the reason file fields stay empty (a sample file could be uploaded now, but would have to be a real one); `display_automations_schema` costs about 17K characters, not 15K tokens; `query_views` returns `config` by default, a document's secret only when asked by id, and its `viewType: "report"` filter finds nothing. The custom-apps-dev guide no longer overrides the build's three app rules (build only what "how it works" says, look names up by id, change only the fields in Writes and add no packages).
+
 ## 1.8.10 — 2026-10-23
 
 fibery-architect writes a sample record's location as an object with its coordinates, address and `addressParts`, which Fibery MCP rejects a create without; the parts can be `{}`. Sample places sit in one real city, since Fibery doesn't look an address up and the coordinates are the pin. A TNR program build was rejected on its colonies' Location.

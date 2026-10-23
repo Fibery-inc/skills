@@ -344,13 +344,11 @@ const lost = dbs.flatMap(db => fresh[db].filter(r => !ids[db][r.Name + X]).map(r
 if (lost.length) { fails.forEach(x => log("FAIL " + x)); throw new Error("not created: " + lost.join(", ")); }
 const ref = (db, key, name, who) => { const id = (ids[target(db, key)] || {})[name + X]; if (!id) fails.push(`${who}: no ${key} named ${name}`); return id; };
 const blank = doc => { const t = String((doc && doc.document) || ""), n = Number((t.match(/rootBlockIds\[(\d+)\]/) || [])[1] || 0); return n === 0 || (n === 1 && /,""|content: ""/.test(t)); };
-// A new document holds one empty paragraph: write before it, then delete it, or the text opens with a blank line.
-const fill = (who, secret, content) => run(who, read_document({secret})).then(async d => {
+// A new document holds one empty paragraph: replace it, or the text opens with a blank line.
+const fill = (who, secret, content) => run(who, read_document({secret})).then(d => {
   if (!d || !blank(d)) return null;
   const empty = (String(d.document).match(/rootBlockIds\[1\]: (\S+)/) || [])[1];
-  const r = await run(who, insert_document_blocks({secret, inserts: [{parent: {blockId: null, position: "start"}, content}]}));
-  if (r && empty) await run(who + " empty line", delete_document_blocks({secret, deletions: [{blockId: empty}]}));
-  return add("texts")(r);
+  return run(who, empty ? replace_document_blocks({secret, blocks: [{blockId: empty, content}]}) : insert_document_blocks({secret, inserts: [{parent: {blockId: null, position: "end"}, content}]})).then(add("texts"));
 });
 const writes = [];
 for (const db of dbs) {
