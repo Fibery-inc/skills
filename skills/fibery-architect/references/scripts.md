@@ -7,10 +7,10 @@ The templates of the build guide's five scripts, under the same numbers, for a s
 ```js
 const S = "Hiring"; const f = n => `${S}/${n}`;
 const C = f("Candidate"), J = f("Job");
-const SPACES = [{name: S, color: "#159789", description: "Candidates from application to offer. Built by fibery-architect from the design Hiring pipeline, 2026-10-12."}];
+const SPACES = [{name: S, color: "#2978FB", description: "Candidates from application to offer. Built by fibery-architect from the design Hiring pipeline, 2026-10-12."}];
 const DATABASES = [
-  {name: C, color: "#159789", description: "One record per person applying for a job."},
-  {name: J, color: "#4FAF54", description: "One record per open role."}
+  {name: C, color: "#2978FB", description: "One record per person applying for a job."},
+  {name: J, color: "#B04E31", description: "One record per open role."}
 ];
 const PRIMITIVE = [
   {database: C, name: f("Email"), fieldType: "fibery/text", meta: {"ui/type": "email"}, description: "Where the recruiter writes to the candidate"},

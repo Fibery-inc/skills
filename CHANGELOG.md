@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.2 — 2026-10-23
+
+fibery-architect colors every database by what its name brings to mind, the color a person would pick for it: a Cat light gray, a Clinic day bright red, an Invoice green. The main database picks first; no two databases share a color or take near twins such as Orange and Red-orange, and a name that suggests nothing gets a free color far from the others, never a grey. Each Space takes the color of its first database. Before, every Space was Teal and its databases walked the palette from there, so the TNR program and OKRs came out in the same Teal, Green, Yellow-green, Orange, Red-orange sequence, three of them shades of orange.
+
 ## 1.8.1 — 2026-10-23
 
 fibery-architect puts a table's columns in the order a person reads a row, whatever order the spec or recipe lists them in: what the record is part of, where it stands (the state and what measures it), who (the people fields together), what kind (the selects), when (dates in the order they happen), how much, then contact details, other links and text. A formula sits right after the field it reads, and pairs such as Salary min and Salary max sit side by side. Lists, nested items and board cards follow the same order. The TNR program's In care list used to end with the state, and its nested trappings split Coordinator and Trappers with Planned cats between them; by the rule they read Trapping, State, Age, Sex, Fixed on, Return on, and Colony, State, Coordinator, Trappers, Trap night, Planned cats.
