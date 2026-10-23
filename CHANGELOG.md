@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.3 — 2026-10-23
+
+fibery-architect gives a select an emoji on every option when people tell its options apart at a glance: priorities (High `:fire:`, Low `:snowflake:`), health, channels, kinds and sizes. A select that reads fine as words gets none, and workflow states can't take one. Fibery MCP takes an option's icon as a shortcode with colons, and a probe showed that an unknown shortcode, a raw emoji or an empty string is stored as a random emoji rather than rejected (`:not_a_real_emoji_xyz:` became `:notebook:`, 🔥 became `:shamrock:`), so script 1 reads the icons back and logs every one stored differently; an alias, `:thumbsup:` stored as `:+1:`, is fine. Of 58 common shortcodes, 51 came back as sent and 7 as their aliases.
+
 ## 1.8.2 — 2026-10-23
 
 fibery-architect colors every database by what its name brings to mind, the color a person would pick for it: a Cat light gray, a Clinic day bright red, an Invoice green. The main database picks first; no two databases share a color or take near twins such as Orange and Red-orange, and a name that suggests nothing gets a free color far from the others, never a grey. Each Space takes the color of its first database. Before, every Space was Teal and its databases walked the palette from there, so the TNR program and OKRs came out in the same Teal, Green, Yellow-green, Orange, Red-orange sequence, three of them shades of orange.

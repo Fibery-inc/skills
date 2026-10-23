@@ -20,7 +20,7 @@ const PRIMITIVE = [
   {database: J, name: f("Openings"), fieldType: "fibery/int", description: "How many people this role hires"},
   {database: J, name: f("Hiring window"), fieldType: "fibery/date-range", description: "When the role should be filled"}
 ];
-const SINGLE = [{database: C, name: f("Source"), defaultOption: "Website", options: [{name: "Referral", color: "#4FAF54"}, {name: "Job board", color: "#2978FB"}, {name: "Website", color: "#99A2AB"}]}];
+const SINGLE = [{database: C, name: f("Source"), defaultOption: "Website", options: [{name: "Referral", color: "#4FAF54", icon: ":handshake:"}, {name: "Job board", color: "#2978FB", icon: ":clipboard:"}, {name: "Website", color: "#99A2AB", icon: ":globe_with_meridians:"}]}];
 const MULTI = [{database: C, name: f("Skills"), options: [{name: "Design", color: "#E72065"}, {name: "Engineering", color: "#2978FB"}, {name: "Sales", color: "#FBA32F"}]}];
 const FILES = [{database: C, name: f("Resume"), allowMultipleFiles: false, description: "The CV the candidate sent"}];
 const RELATIONS = [{database: C, name: f("Job"), relationDatabase: J, relationFieldName: f("Candidates"), cardinality: "many-to-one", description: "The role the candidate applied for"}];
@@ -108,11 +108,15 @@ if (APPS.length) {
     log(`app ${a.name}: ${app ? "id " + app.id : "not made yet"}${view ? ", " + view.url : ""}`);
   }
 }
+const iconsSent = [...SINGLE, ...MULTI].filter(s => s.options.some(o => o.icon)), icons = {};
+await Promise.all(iconsSent.map(s => query({query: {"q/from": `${s.name}_${s.database}`, "q/select": {n: ["enum/name"], i: ["enum/icon"]}, "q/limit": "q/no-limit"}}).then(r => r.result.forEach(x => { icons[`${s.name}|${x.n}`] = x.i; }), () => {})));
+const iconsOff = iconsSent.flatMap(s => s.options.filter(o => o.icon && icons[`${s.name}|${o.name}`] && icons[`${s.name}|${o.name}`] !== `:${o.icon.replace(/:/g, "")}:`).map(o => `${s.name.split("/").pop()}.${o.name} ${o.icon} → ${icons[`${s.name}|${o.name}`]}`));
 const fix = results.flatMap(r => (r && r.fixLogs) || []).filter(x => !/default format|Added field title/.test(x));
 log(`made: ${made.join(", ") || "nothing"}; there before: ${before}`);
 if (calls.length > results.length) log(`time is up with ${calls.length - results.length} calls left: run this script again, as it is, to finish`);
 if (renamed.length) log("people fields renamed: " + renamed.join("; "));
 if (fix.length) log("fixLogs: " + JSON.stringify(fix));
+if (iconsOff.length) log("icons stored differently, resend any that isn't the same emoji: " + iconsOff.join("; "));
 log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 ```
 
