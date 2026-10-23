@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.9 — 2026-10-23
+
+fibery-architect gives every select an emoji on every option by default. A TNR program build put none on any of its seven selects, Sex and Age among them, since under the old rule short options "read fine as words" and none was always a defensible choice. The exceptions are options that are names (clinics, places, people, products, departments, countries), where any emoji would be arbitrary, and lists longer than about eight; workflow states still can't take one.
+
 ## 1.8.8 — 2026-10-23
 
 fibery-architect's report after a build is a few lines for the person who runs the Space: that it's ready, with the guide and the first view linked; Your turn, what they set by hand (who may open the Space, forms to share, Description templates, a field's default or range); Not built, when something was dropped; Worth a look, what the build couldn't check itself, usually the app, and why; and that the examples are marked "(example)". The block of counts, the list of views, the assumptions, what reaches outside the Space, how the build was checked, the notes for the recipe and every offer are gone from it, and the Space icon is no longer asked for. What left the report is in `design.md` for when the person asks: the Assumptions at its top, and Build notes at its end with the counts, the scripts and minutes, what reaches outside the Space, what was checked and the notes for the recipe.
