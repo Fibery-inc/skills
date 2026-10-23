@@ -32,6 +32,7 @@ const WORKFLOWS = [
 ];
 const COMMENTS = [C, J];
 const ICONS = [], AVATARS = [], NO_DESCRIPTION = [];
+const GUIDE = {viewType: "document", name: "How to run hiring", description: "The process, and how this Space runs it."};
 
 const fails = [], made = [], t0 = Date.now();
 const run = async (label, p) => { try { const r = await p; made.push(label); return r; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
@@ -55,6 +56,9 @@ if (newDbs.length) pre.push(await run("databases", create_databases({databases: 
 if (pre.some(r => !r)) { fails.forEach(x => log("FAIL " + x)); throw new Error("a Space or database wasn't created"); }
 const moved = pre.flatMap(r => r.fixLogs || []);
 if (moved.length) { log("STOP, a name went elsewhere: " + JSON.stringify(moved)); throw new Error("fixLogs on a Space or database"); }
+// A Space lists its views in the order they were made, so the guide is made before any other.
+const hasGuide = (await query_views({space: S, withConfig: false})).views.some(v => v.name === GUIDE.name);
+if (!hasGuide) await run("guide", create_view({space: S, ...GUIDE}));
 const dbs = DATABASES.map(d => d.name), has = await fieldsOf([...dbs, "fibery/user"]);
 const missing = list => list.filter(x => !has[x.database].has(x.name));
 const renamed = [], people = missing(PEOPLE).map(p => {
@@ -64,7 +68,7 @@ const renamed = [], people = missing(PEOPLE).map(p => {
   return {...p, relationDatabase: "fibery/user", relationFieldName: inv};
 });
 const fieldList = [PRIMITIVE, SINGLE, MULTI, FILES, RELATIONS, PEOPLE, LINKS].flat();
-const before = `Spaces ${SPACES.length - newSpaces.length}, databases ${dbs.length - newDbs.length}, fields ${fieldList.length - missing(fieldList).length}, workflows ${WORKFLOWS.filter(w => has[w.database].has("workflow/state")).length}`;
+const before = `Spaces ${SPACES.length - newSpaces.length}, databases ${dbs.length - newDbs.length}, fields ${fieldList.length - missing(fieldList).length}, workflows ${WORKFLOWS.filter(w => has[w.database].has("workflow/state")).length}, guide ${hasGuide ? 1 : 0}`;
 const calls = [], call = (label, list, fn) => { if (list.length) calls.push([label, () => fn(list)]); };
 const desc = db => `${db.split("/")[0]}/Description`;
 NO_DESCRIPTION.filter(db => has[db].has(desc(db))).forEach(db => call("no description " + db, [db], () => delete_fields({fields: [{database: db, field: desc(db)}]})));
@@ -162,8 +166,7 @@ const VIEWS = () => [
   {viewType: "timeline", name: "Hiring windows", description: "When should each role be filled?", config: {y: [], oneItemPerLane: false, items: [
     {database: J, fields: [fld("Name"), fld("Open seats")], startDate: f("Hiring window"), endDate: f("Hiring window"), colorCoding: byState(J, {Open: "#2978FB", Filled: "#4FAF54", Closed: "#99A2AB"})}]}},
   {viewType: "form", name: "New candidate", description: "Add someone who applied.", config: {database: C, fields: [
-    {field: f("Name"), displayName: "Name", required: true}, {field: f("Email"), required: true}, fld("Job"), {field: f("Source"), defaultValue: {id: opts[C].Source.Website}}, fld("Resume")]}},
-  {viewType: "document", name: "How to run hiring", description: "The process, and how this Space runs it."}
+    {field: f("Name"), displayName: "Name", required: true}, {field: f("Email"), required: true}, fld("Job"), {field: f("Source"), defaultValue: {id: opts[C].Source.Website}}, fld("Resume")]}}
 ];
 const REPORTS = [
   {title: "Hiring funnel", database: C, tab: {type: "stacked-bar", x: [{expression: "[State]"}], y: [{expression: "COUNT([Id])", title: "Candidates"}], color: {expression: "[Source]"}, fieldConditions: [{field: "Job", operator: "exists", value: null}], palette: "fibery2.0"}}
@@ -403,7 +406,8 @@ const before = await read(), todo = list.filter(a => !before[key(a)]), made = []
 for (let i = 0, last = 15000; i < todo.length; i += 4) {
   if (made.length && Date.now() - t0 + last > 35000) break;
   const s0 = Date.now();
-  made.push(...await Promise.all(todo.slice(i, i + 4).map(a => run(a.name, create_automation(a)))));
+  // A rule starts off, so none fires on the sample records written beside this script; script 6 turns them on.
+  made.push(...await Promise.all(todo.slice(i, i + 4).map(a => run(a.name, create_automation(a)).then(r => r && a.automationType === "rule" ? run(a.name + " off", update_automation({automationType: "rule", id: r.automation.id, enabled: false})).then(() => r) : r))));
   last = Math.max(Date.now() - s0, 15000);
 }
 const stored = made.length ? await read() : before;
@@ -418,14 +422,14 @@ const when = t => {
 };
 for (const a of list) {
   const s = stored[key(a)];
-  if (s) log(`${a.name}${todo.includes(a) ? "" : " (there before)"}: ${(s.triggers || []).map(when).join(" + ") || "button"}${s.filter ? "; if " + condition(s.filter) : ""}; ${readable((s.actions || []).map(x => [x.name, x.args]))}`.slice(0, 900));
+  if (s) log(`${a.name}${todo.includes(a) ? "" : " (there before)"}${s.enabled === false ? " (off)" : ""}: ${(s.triggers || []).map(when).join(" + ") || "button"}${s.filter ? "; if " + condition(s.filter) : ""}; ${readable((s.actions || []).map(x => [x.name, x.args]))}`.slice(0, 900));
 }
 log(`automations: ${made.filter(Boolean).length} made, ${list.length - todo.length} there before`);
 if (made.length < todo.length) log(`time is up with ${todo.length - made.length} automations left: run this script again, as it is, to finish`);
 log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 ```
 
-## 6. The last checks
+## 6. The last checks and the rules on
 
 ```js
 const S = "Hiring"; const f = n => `${S}/${n}`;
@@ -434,6 +438,7 @@ const CHECKS = [
   {label: "Stuck while finished", from: C, select: {state: ["workflow/state", "enum/name"], stuck: f("Stuck")}, bad: r => r.stuck && ["Hired", "Rejected"].includes(r.state)},
   {label: "the story's stuck candidate shows red", from: C, select: {stuck: f("Stuck")}, bad: r => r.n === "Ben Okafor (example)" && !r.stuck}
 ];
+const RULES = [C];
 
 const fails = [];
 for (const c of CHECKS) {
@@ -442,6 +447,11 @@ for (const c of CHECKS) {
     log(`check ${c.label}: ${bad.length ? "BROKEN by " + bad.join(", ") : "holds"}`);
   } catch (e) { fails.push(`${c.label}: ${String(e.message || e).slice(0, 200)}`); }
 }
+const on = [];
+for (const db of RULES) for (const x of (await query_automations({automationType: "rule", database: db})).automations.filter(x => !x.enabled)) {
+  try { await update_automation({automationType: "rule", id: x.id, enabled: true}); on.push(x.name); } catch (e) { fails.push(`${x.name} on: ${String(e.message || e).slice(0, 200)}`); }
+}
+log(`rules turned on: ${on.join(", ") || "none was off"}`);
 log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 ```
 
