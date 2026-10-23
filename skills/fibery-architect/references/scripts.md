@@ -13,18 +13,18 @@ const DATABASES = [
   {name: J, color: "#B04E31", description: "One record per open role."}
 ];
 const PRIMITIVE = [
-  {database: C, name: f("Email"), fieldType: "fibery/text", meta: {"ui/type": "email"}, description: "Where the recruiter writes to the candidate"},
+  {database: C, name: f("Email"), fieldType: "fibery/text", meta: {"ui/type": "email"}},
   {database: C, name: f("Salary expectation"), fieldType: "fibery/decimal", meta: {"ui/number-format": "Money", "ui/number-currency-code": "USD"}, description: "What the candidate asked for, per year"},
-  {database: C, name: f("Stage changed on"), fieldType: "fibery/date", description: "Set by Stage changed; read by Days in stage"},
-  {database: C, name: f("Next interview"), fieldType: "fibery/date-time", description: "When the candidate's next interview starts"},
+  {database: C, name: f("Stage changed on"), fieldType: "fibery/date", description: "Set by Stage changed when the state changes"},
+  {database: C, name: f("Next interview"), fieldType: "fibery/date-time"},
   {database: J, name: f("Openings"), fieldType: "fibery/int", description: "How many people this role hires"},
-  {database: J, name: f("Hiring window"), fieldType: "fibery/date-range", description: "When the role should be filled"}
+  {database: J, name: f("Hiring window"), fieldType: "fibery/date-range"}
 ];
 const SINGLE = [{database: C, name: f("Source"), defaultOption: "Website", options: [{name: "Referral", color: "#4FAF54", icon: ":handshake:"}, {name: "Job board", color: "#2978FB", icon: ":clipboard:"}, {name: "Website", color: "#99A2AB", icon: ":globe_with_meridians:"}]}];
 const MULTI = [{database: C, name: f("Skills"), options: [{name: "Design", color: "#E72065"}, {name: "Engineering", color: "#2978FB"}, {name: "Sales", color: "#FBA32F"}]}];
-const FILES = [{database: C, name: f("Resume"), allowMultipleFiles: false, description: "The CV the candidate sent"}];
-const RELATIONS = [{database: C, name: f("Job"), relationDatabase: J, relationFieldName: f("Candidates"), cardinality: "many-to-one", description: "The role the candidate applied for"}];
-const PEOPLE = [{database: C, name: f("Recruiter"), relationFieldName: "user/Recruiting", cardinality: "many-to-many", description: "Who runs this candidate; My candidates shows them"}];
+const FILES = [{database: C, name: f("Resume"), allowMultipleFiles: false}];
+const RELATIONS = [{database: C, name: f("Job"), relationDatabase: J, relationFieldName: f("Candidates"), cardinality: "many-to-one"}];
+const PEOPLE = [{database: C, name: f("Recruiter"), relationFieldName: "user/Recruiting", cardinality: "many-to-many"}];
 const LINKS = [];
 const WORKFLOWS = [
   {database: C, defaultOption: "Applied", options: [{name: "Applied", type: "Not started", color: "#99A2AB"}, {name: "Screening", type: "Started", color: "#2978FB"}, {name: "Interview", type: "Started", color: "#673DB6"}, {name: "Offer", type: "Started", color: "#FBA32F"}, {name: "Hired", type: "Finished", color: "#4FAF54"}, {name: "Rejected", type: "Finished", color: "#D40915"}]},

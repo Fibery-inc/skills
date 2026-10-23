@@ -114,7 +114,7 @@ These are the recipe format's ceilings (`recipe-writer/references/recipe-format.
   | point at a place | location |
   | see a fact computed from other fields or linked records | formula |
 
-- Every field has a description that says what goes in it; people and agents fill it the same way. Select and workflow fields can't carry one in Fibery, so their guidance goes into the option names and the database's description.
+- A field's name says what goes in it; a description is added only where the name leaves a question: a scale or unit, what counts, or that a rule fills it. Select and workflow fields can't carry one in Fibery, so their guidance goes into the option names and the database's description.
 
 In the spec, one subsection per database, written the way a recipe's Details for building writes it:
 

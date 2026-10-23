@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.4 — 2026-10-23
+
+fibery-architect describes a field only when its name leaves a question: a scale or unit, what counts, or that a rule fills it ("Set by Stage changed when the state changes"). Email, Phone, Resume, Recruiter, Job or Due date get no description. Builds used to describe every text, number, date, relation and files field with what goes in it and why, down to "The day of the clinic; Clinic days runs on it" on the TNR program's Date. A formula still shows the prompt Fibery wrote it from as its description, since Fibery MCP has no other way to set one.
+
 ## 1.8.3 — 2026-10-23
 
 fibery-architect gives a select an emoji on every option when people tell its options apart at a glance: priorities (High `:fire:`, Low `:snowflake:`), health, channels, kinds and sizes. A select that reads fine as words gets none, and workflow states can't take one. Fibery MCP takes an option's icon as a shortcode with colons, and a probe showed that an unknown shortcode, a raw emoji or an empty string is stored as a random emoji rather than rejected (`:not_a_real_emoji_xyz:` became `:notebook:`, 🔥 became `:shamrock:`), so script 1 reads the icons back and logs every one stored differently; an alias, `:thumbsup:` stored as `:+1:`, is fine. Of 58 common shortcodes, 51 came back as sent and 7 as their aliases.
