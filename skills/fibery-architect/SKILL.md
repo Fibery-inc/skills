@@ -22,7 +22,7 @@ Paths are relative to this skill's folder. What to read, and when:
 | `references/recipe-delta.md` | before the questions, for a recipe build, instead of the design guide: the recipe's questions, what to take from the workspace, the one-page delta |
 | `references/existing-space.md` | when the source is an existing Space: how to read it, read-only |
 | `references/build-guide.md` | once the questions are answered: the build's steps in order and what goes into each, the app, the call shapes the templates don't show, troubleshooting |
-| `references/scripts.md` | with the build guide: the four scripts' templates, under the same numbers, and the app add-on |
+| `references/scripts.md` | with the build guide: the scripts' templates, under the same numbers |
 | The cookbook's index (§1 says where; each recipe's `summary` says what it is) | before designing anything from scratch, because a process with a recipe is built from it (§1) |
 | `examples/hiring-pipeline.md` | once, before writing your first design from scratch (a recipe build doesn't need it): a finished design at the depth expected |
 
@@ -64,7 +64,7 @@ Save it as `design.md` in the working folder when you can write files; otherwise
 
 ## 5. Build
 
-Follow `references/build-guide.md` in its order: four `execute_code` scripts, each started from its template, then the guide's two direct calls, so a build is under ten tool calls, not a hundred. The structure and then the formulas come first, in one script; the views and reports go with the sample records in one message; then the rules and buttons, after the records so no rule fires on them, together with the guide, whose text mentions the views. An app is built beside them, by a helper when the client has an Agent tool. The build guide's first section has the rules every script follows: above all, a script looks every id up by name, does only what's missing and logs what it found, so one that failed, was cut off or logged "time is up" runs again as it is, and a `fixLogs` line that renames a Space or database stops the build. Don't delete anything to start over unless the person asks; then delete only the new Spaces.
+Follow `references/build-guide.md` in its order: five `execute_code` scripts, each started from its template, then the guide's two direct calls, so a build is about ten tool calls, not a hundred. The structure comes first and the formulas second; the views and reports go with the sample records in one message; then the rules and buttons, after the records so no rule fires on them, together with the guide, whose text mentions the views. An app gets a short script of its own right after the formulas, then is built beside the rest, by a helper when the client has an Agent tool. The build guide's first section has the rules every script follows: above all, a script looks every id up by name, does only what's missing and logs what it found, so one that failed, was cut off or logged "time is up" runs again as it is, and a `fixLogs` line that renames a Space or database stops the build. Don't delete anything to start over unless the person asks; then delete only the new Spaces.
 
 There is no separate verification pass: the scripts check the formula types, the nested views, the stored rule texts and the sample data's promises, and the guide's last call opens the first view once, to see the Space the way the person will; fix what looks wrong before the report. Never change a record to test an automation.
 

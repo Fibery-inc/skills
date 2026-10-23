@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.13 — 2026-10-23
+
+fibery-architect's formulas are a script of their own again, script 2, as before 1.8.12, so a script that runs out of time is sent again with only its own part: in a timed TNR program build on 1.8.12, script 1 ran out of time on the structure and went again whole, formulas included, 15.2K characters. The app's part, an add-on to script 1 in 1.8.12, is a script of its own too, script 7 after the build guide's §7, run only with an app, right after script 2 (the TNR build had run it on its own anyway): it makes the empty app and logs its id and the ids the app's code needs, formula fields included, before script 3, which then finds a page app for the guide, and the app's helper starts there. Build guide §8 now gives a map view's `location`, so a map no longer needs Fibery's views guide (27K characters) for one line. Scripts 1, 2 and 7 ran on edge, first runs and reruns, with nothing failed, and a map built as §8 says was stored as sent.
+
 ## 1.8.12 — 2026-10-23
 
 fibery-architect's script templates are shorter, so a build types less and makes one call fewer. Script 1 now builds the structure and then the formulas, script 2's job until now: schema changes have been fast enough since Fibery MCP's release of 2026-10-22 for one script to do both. It starts the formulas once every field exists and stops in time as before. A build is four scripts, still numbered after the build guide's sections, so there is no script 2. The part of script 1 that makes the empty app and logs the ids its code needs is an add-on, pasted in only when the design has an app. Scripts 3 to 5 share smaller helpers, and the example data shows one of each kind: one job, three candidates, one report. The fixed code a build copies went from 27.4K characters to 23.1K without an app and 25.0K with one, and `scripts.md` from 38.5K to 36.1K. Every template ran on edge in a throwaway Space, first runs and reruns, with nothing failed.

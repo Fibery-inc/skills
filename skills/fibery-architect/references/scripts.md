@@ -1,8 +1,8 @@
 # Scripts
 
-The templates of the build guide's four scripts, numbered by its sections (script 1 also writes §2's formulas, so there is no script 2), and the app add-on, for a small hiring Space (Job, Candidate). Each data block shows one example of each kind, not how many to build. Replace the data block at the top with the spec's content, as the build guide's section of the same number says, and copy everything from `const fails` down unchanged. Every template reads what exists before it writes and logs what it found as well as what it made, so any of them runs again as it is, after a failure, a cut-off or a fix to its data.
+The templates of the build guide's scripts, under its section numbers (1 to 5, and 7 for an app), for a small hiring Space (Job, Candidate). Each data block shows one example of each kind, not how many to build. Replace the data block at the top with the spec's content, as the build guide's section of the same number says, and copy everything from `const fails` down unchanged. Every template reads what exists before it writes and logs what it found as well as what it made, so any of them runs again as it is, after a failure, a cut-off or a fix to its data.
 
-## 1. Structure and formulas
+## 1. Structure
 
 ```js
 const S = "Hiring"; const f = n => `${S}/${n}`;
@@ -32,16 +32,6 @@ const WORKFLOWS = [
 ];
 const COMMENTS = [C, J];
 const ICONS = [], AVATARS = [], NO_DESCRIPTION = [];
-const LEVELS = [
-  [
-    {database: C, name: f("Days in stage"), description: "Use exactly this Fibery formula: If(IsEmpty([Stage changed on]), 0, ToDays(Today() - [Stage changed on])). The result is a whole number."},
-    {database: J, name: f("Hired"), description: "How many of the job's Candidates have State Hired; 0 with none. The result is a whole number."}
-  ],
-  [
-    {database: J, name: f("Open seats"), description: "Openings minus Hired, and 0 when that is below 0. The result is a whole number."},
-    {database: C, name: f("Stuck"), description: "True when Days in stage is more than 14 and the State is neither Hired nor Rejected; false otherwise. The result is true or false."}
-  ]
-];
 
 const fails = [], made = [], t0 = Date.now();
 const run = async (label, p) => { try { const r = await p; made.push(label); return r; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
@@ -73,8 +63,8 @@ const renamed = [], people = missing(PEOPLE).map(p => {
   if (inv !== p.relationFieldName) renamed.push(`${p.relationFieldName} → ${inv}`);
   return {...p, relationDatabase: "fibery/user", relationFieldName: inv};
 });
-const fieldList = [PRIMITIVE, SINGLE, MULTI, FILES, RELATIONS, PEOPLE, LINKS].flat(), formulas = LEVELS.flat();
-const before = `Spaces ${SPACES.length - newSpaces.length}, databases ${dbs.length - newDbs.length}, fields ${fieldList.length - missing(fieldList).length}, workflows ${WORKFLOWS.filter(w => has[w.database].has("workflow/state")).length}, formulas ${formulas.length - missing(formulas).length}`;
+const fieldList = [PRIMITIVE, SINGLE, MULTI, FILES, RELATIONS, PEOPLE, LINKS].flat();
+const before = `Spaces ${SPACES.length - newSpaces.length}, databases ${dbs.length - newDbs.length}, fields ${fieldList.length - missing(fieldList).length}, workflows ${WORKFLOWS.filter(w => has[w.database].has("workflow/state")).length}`;
 const calls = [], call = (label, list, fn) => { if (list.length) calls.push([label, () => fn(list)]); };
 const desc = db => `${db.split("/")[0]}/Description`;
 NO_DESCRIPTION.filter(db => has[db].has(desc(db))).forEach(db => call("no description " + db, [db], () => delete_fields({fields: [{database: db, field: desc(db)}]})));
@@ -91,19 +81,7 @@ missing(LINKS).forEach(l => call("link " + l.name, [l], x => create_relation_fie
 WORKFLOWS.filter(w => !has[w.database].has("workflow/state")).forEach(w => call("workflow " + w.database, [w], ([x]) => create_workflow_field(x)));
 const results = [];
 for (const [label, go] of calls) if (Date.now() - t0 < 30000) results.push(await run(label, go()));
-// Formulas only once the fields they read exist, four at a time, each level after the one it reads.
-let left = calls.length - results.length, last = 15000;
-for (const level of LEVELS) {
-  const todo = missing(level);
-  for (let i = 0; i < todo.length; i += 4) {
-    if (left || Date.now() - t0 + last > 40000) { left += todo.length - i; break; }
-    const s0 = Date.now();
-    await Promise.all(todo.slice(i, i + 4).map(x => run(x.name, create_formula_field(x))));
-    last = Math.max(Date.now() - s0, 15000);
-  }
-}
-const after = formulas.length ? await fieldsOf(dbs) : {};
-formulas.forEach(x => { const line = after[x.database].get(x.name); log(line ? `${x.name}: ${line.replace(" # read-only; formula: ", " = ")}` : `${x.name}: missing`); });
+const left = calls.length - results.length;
 const off = [];
 await Promise.all([...SINGLE, ...MULTI].filter(s => s.options.some(o => o.icon)).map(s => query({query: {"q/from": `${s.name}_${s.database}`, "q/select": {n: "enum/name", i: "enum/icon"}, "q/limit": "q/no-limit"}}).then(r => r.result.forEach(x => {
   const o = s.options.find(o => o.name === x.n);
@@ -118,36 +96,50 @@ if (off.length) log("icons stored differently, resend any that isn't the same em
 log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 ```
 
-## The app add-on
-
-Only when the design has an app. Add the two lists to script 1's data, and the block just before script 1's first `log(` line. `APPS` holds `{name, kind: "view", spaceName}` for a page in the Space or `{name, kind: "layout", databaseName}` for a tab on every record page; `APP_TOUCHES` the databases and fields the app's code uses.
+## 2. Formulas
 
 ```js
-const APPS = [{name: "Offer desk", kind: "view", spaceName: S}];
-const APP_TOUCHES = [C, [C, "workflow/state"], [C, f("Stage changed on")], [C, f("Days in stage")]];
-```
+const S = "Hiring"; const f = n => `${S}/${n}`;
+const C = f("Candidate"), J = f("Job");
+const LEVELS = [
+  [
+    {database: C, name: f("Days in stage"), description: "Use exactly this Fibery formula: If(IsEmpty([Stage changed on]), 0, ToDays(Today() - [Stage changed on])). The result is a whole number."},
+    {database: J, name: f("Hired"), description: "How many of the job's Candidates have State Hired; 0 with none. The result is a whole number."}
+  ],
+  [
+    {database: J, name: f("Open seats"), description: "Openings minus Hired, and 0 when that is below 0. The result is a whole number."},
+    {database: C, name: f("Stuck"), description: "True when Days in stage is more than 14 and the State is neither Hired nor Rejected; false otherwise. The result is true or false."}
+  ]
+];
 
-```js
-const appViews = async () => (await query_views({space: S, withConfig: false})).views.filter(v => v.viewType === "custom-app");
-const viewsBefore = await appViews(), appsBefore = (await get_custom_apps_list({})).result;
-for (const a of APPS.filter(a => a.kind === "view" ? !viewsBefore.some(v => v.name === a.name) : !appsBefore.some(x => x.name === a.name && x.databaseName === a.databaseName))) {
-  if (Date.now() - t0 < 40000) await run("app " + a.name, create_custom_app(a)); else left++;
+const fails = [], made = [], t0 = Date.now();
+const run = async (label, p) => { try { const r = await p; made.push(label); return r; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
+const formulas = LEVELS.flat(), dbs = [...new Set(formulas.map(x => x.database))];
+const fieldsOf = async () => {
+  const out = {}; let cur = null;
+  for (const line of (await schema_detailed({databases: dbs})).schema.split("\n")) {
+    const d = line.match(/^(\S[^:]*):/); if (d) { cur = d[1]; out[cur] = new Map(); continue; }
+    const m = line.match(/^ {4}([^:]+): (.*)$/); if (cur && m) out[cur].set(m[1], m[2]);
+  }
+  return out;
+};
+const has = await fieldsOf(), before = formulas.filter(x => has[x.database].has(x.name)).length;
+// Four at a time, each level after the one it reads, while the next batch fits.
+let left = 0, last = 15000;
+for (const level of LEVELS) {
+  const todo = level.filter(x => !has[x.database].has(x.name));
+  for (let i = 0; i < todo.length; i += 4) {
+    if (left || Date.now() - t0 + last > 35000) { left += todo.length - i; break; }
+    const s0 = Date.now();
+    await Promise.all(todo.slice(i, i + 4).map(x => run(x.name, create_formula_field(x))));
+    last = Math.max(Date.now() - s0, 15000);
+  }
 }
-// A custom app id is a UUIDv7: its first 48 bits are when it was created, just before its view.
-const time = id => parseInt(id.replace(/-/g, "").slice(0, 12), 16);
-const appsNow = (await get_custom_apps_list({})).result, viewsNow = await appViews();
-for (const a of APPS) {
-  const view = viewsNow.find(v => v.name === a.name), at = view ? Date.parse(view.creationDate) + 5000 : Infinity;
-  const app = (a.kind === "layout" || view) && appsNow.filter(x => x.name === a.name && x.kind === a.kind && (a.kind === "view" || x.databaseName === a.databaseName) && time(x.id) <= at).sort((p, q) => time(q.id) - time(p.id))[0];
-  log(`app ${a.name}: ${app ? "id " + app.id : "not made yet"}${view ? ", " + view.url : ""}`);
-}
-const ids = {};
-for (const db of new Set(APP_TOUCHES.map(t => [].concat(t)[0]))) {
-  const t = (await query({query: {"q/from": "fibery/type", "q/select": {id: "fibery/id"}, "q/where": ["=", ["fibery/name"], db], "q/limit": 1}})).result[0];
-  if (t) ids[db] = t.id;
-  for (const r of (await query({query: {"q/from": "fibery/field", "q/select": {id: "fibery/id", n: "fibery/name"}, "q/where": ["=", ["fibery/holder-type", "fibery/name"], db], "q/limit": "q/no-limit"}})).result) ids[`${db}|${r.n}`] = r.id;
-}
-log("ids for the app: " + JSON.stringify(Object.fromEntries(APP_TOUCHES.map(t => [[].concat(t).join("|"), ids[[].concat(t).join("|")] || "not made yet"]))));
+const after = await fieldsOf();
+formulas.forEach(x => { const line = after[x.database].get(x.name); log(line ? `${x.name}: ${line.replace(" # read-only; formula: ", " = ")}` : `${x.name}: missing`); });
+log(`made: ${made.join(", ") || "nothing"}; formulas there before: ${before}`);
+if (left) log(`time is up with ${left} calls left: run this script again, as it is, to finish`);
+log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 ```
 
 ## 3. Views and reports
@@ -438,5 +430,39 @@ for (const c of CHECKS) {
 }
 log(`automations: ${made.filter(Boolean).length} made, ${list.length - todo.length} there before`);
 if (made.length < todo.length) log(`time is up with ${todo.length - made.length} automations left: run this script again, as it is, to finish`);
+log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
+```
+
+## 7. The app
+
+Only when the design has an app, right after script 2. `APPS` holds `{name, kind: "view", spaceName}` for a page in the Space or `{name, kind: "layout", databaseName}` for a tab on every record page; `APP_TOUCHES` the databases and fields the app's code uses.
+
+```js
+const S = "Hiring"; const f = n => `${S}/${n}`;
+const C = f("Candidate");
+const APPS = [{name: "Offer desk", kind: "view", spaceName: S}];
+const APP_TOUCHES = [C, [C, "workflow/state"], [C, f("Stage changed on")], [C, f("Days in stage")]];
+
+const fails = [], made = [];
+const run = async (label, p) => { try { const r = await p; made.push(label); return r; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
+const appViews = async () => (await query_views({space: S, withConfig: false})).views.filter(v => v.viewType === "custom-app");
+const viewsBefore = await appViews(), appsBefore = (await get_custom_apps_list({})).result;
+for (const a of APPS.filter(a => a.kind === "view" ? !viewsBefore.some(v => v.name === a.name) : !appsBefore.some(x => x.name === a.name && x.databaseName === a.databaseName))) await run("app " + a.name, create_custom_app(a));
+// A custom app id is a UUIDv7: its first 48 bits are when it was created, just before its view.
+const time = id => parseInt(id.replace(/-/g, "").slice(0, 12), 16);
+const appsNow = (await get_custom_apps_list({})).result, viewsNow = await appViews();
+for (const a of APPS) {
+  const view = viewsNow.find(v => v.name === a.name), at = view ? Date.parse(view.creationDate) + 5000 : Infinity;
+  const app = (a.kind === "layout" || view) && appsNow.filter(x => x.name === a.name && x.kind === a.kind && (a.kind === "view" || x.databaseName === a.databaseName) && time(x.id) <= at).sort((p, q) => time(q.id) - time(p.id))[0];
+  log(`app ${a.name}: ${app ? "id " + app.id : "not made yet"}${view ? ", " + view.url : ""}`);
+}
+const ids = {};
+for (const db of new Set(APP_TOUCHES.map(t => [].concat(t)[0]))) {
+  const t = (await query({query: {"q/from": "fibery/type", "q/select": {id: "fibery/id"}, "q/where": ["=", ["fibery/name"], db], "q/limit": 1}})).result[0];
+  if (t) ids[db] = t.id;
+  for (const r of (await query({query: {"q/from": "fibery/field", "q/select": {id: "fibery/id", n: "fibery/name"}, "q/where": ["=", ["fibery/holder-type", "fibery/name"], db], "q/limit": "q/no-limit"}})).result) ids[`${db}|${r.n}`] = r.id;
+}
+log("ids for the app: " + JSON.stringify(Object.fromEntries(APP_TOUCHES.map(t => [[].concat(t).join("|"), ids[[].concat(t).join("|")] || "not made yet"]))));
+log(`made: ${made.join(", ") || "nothing"}`);
 log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 ```
