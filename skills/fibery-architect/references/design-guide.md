@@ -202,7 +202,7 @@ The guide is `How to run <process>`, named after the process the way the team sa
 - **What stays true**: the promises the process can't do without, one line each, with what keeps one only when a person must act on it ("bet only with Bet on it: a card dragged to *Bet* gets no cycle").
 - **Make it yours**: one line of up to three requests for the parts left out on purpose ("Add a Take-home stage").
 
-The why behind each step and the rare cases stay out; the views, the rules and the sample records show them. In the built Space every view, report and app the guide names is a link to it, and nothing else is: rules, databases, fields and records stay plain names. The process document is for the part of the process that is written, not tracked (an interview guide, a definition of done), named the way the team names it, with its content in Markdown.
+The why behind each step and the rare cases stay out; the views, the rules and the sample records show them. In the built Space every view, report and app the guide names is a mention of it, which shows its current name and opens it, and nothing else is: rules, databases, fields and records stay plain names. The process document is for the part of the process that is written, not tracked (an interview guide, a definition of done), named the way the team names it, with its content in Markdown.
 
 ### Apps
 

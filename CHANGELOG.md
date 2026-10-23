@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.7 — 2026-10-23
+
+fibery-architect's guide, How to run <process>, mentions its views instead of linking to them: every view, form, report, document and app it names is a Fibery mention, which shows the view's current name, opens it on a click and keeps up with a rename. Script 3 asks Fibery MCP's `get_entity_mention` for every view and logs the mentions beside the urls; the recipe in the guide's last line stays a link. The guide also no longer opens with a blank line: a new document holds one empty paragraph, the guide was written after it, and now it replaces it. Sample records' Descriptions opened with the same blank line; script 4 now writes before that paragraph and deletes it, since a script has no `replace_document_blocks`.
+
 ## 1.8.6 — 2026-10-23
 
 fibery-architect asks its questions through the client's question tool when there is one, AskUserQuestion in Claude Code and Cowork, so the person clicks an answer instead of typing it. Each question gets a short header ("Trap bank"), the guess as the first option marked Recommended, one to three alternatives described by what the person gets, and the tool's own Other for a typed answer. From a recipe, the Making it yours table's Default is the guess and its "If not the default" the alternative. Closing the questions isn't a "go": nothing is built until they're answered. A client without such a tool still gets the numbered list, answered by number or "go". An interview no longer lists a database's fields to cut or add, since 1.8.5 made fields a default the person changes in the built Space.

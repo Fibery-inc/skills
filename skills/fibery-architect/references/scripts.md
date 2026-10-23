@@ -254,9 +254,12 @@ const left = todo.length - made.length + (charts.length ? 0 : REPORTS.length);
 if (left) log(`time is up with ${left} views and reports left: run this script again, as it is, to finish`);
 if (noisy.length) log("fixLogs: " + JSON.stringify(noisy));
 log("urls: " + JSON.stringify(Object.fromEntries(all.map(v => [v.name, v.url]))));
+const mentions = await Promise.all(all.map(v => run("mention " + v.name, get_entity_mention({database: "fibery/view", entityId: v.id, label: v.name})).then(r => [v.name, r && r.mention])));
+log("mentions: " + JSON.stringify(Object.fromEntries(mentions)));
 for (const d of all.filter(v => v.viewType === "document")) {
-  const c = (await query_views({id: d.id, withConfig: true})).views[0];
-  log(`document ${d.name}: secret ${c.config.documentSecret}, ${String(c.content || "").trim() ? "has text" : "empty"}`);
+  const secret = (await query_views({id: d.id, withConfig: true})).views[0].config.documentSecret, doc = String((await read_document({secret})).document || "");
+  const n = Number((doc.match(/rootBlockIds\[(\d+)\]/) || [])[1] || 0), first = (doc.match(/rootBlockIds\[1\]: (\S+)/) || [])[1];
+  log(`document ${d.name}: secret ${secret}, ${n === 1 && /,""|content: ""/.test(doc) ? "empty, block " + first : "has text"}`);
 }
 log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 ```
@@ -341,6 +344,14 @@ const lost = dbs.flatMap(db => fresh[db].filter(r => !ids[db][r.Name + X]).map(r
 if (lost.length) { fails.forEach(x => log("FAIL " + x)); throw new Error("not created: " + lost.join(", ")); }
 const ref = (db, key, name, who) => { const id = (ids[target(db, key)] || {})[name + X]; if (!id) fails.push(`${who}: no ${key} named ${name}`); return id; };
 const blank = doc => { const t = String((doc && doc.document) || ""), n = Number((t.match(/rootBlockIds\[(\d+)\]/) || [])[1] || 0); return n === 0 || (n === 1 && /,""|content: ""/.test(t)); };
+// A new document holds one empty paragraph: write before it, then delete it, or the text opens with a blank line.
+const fill = (who, secret, content) => run(who, read_document({secret})).then(async d => {
+  if (!d || !blank(d)) return null;
+  const empty = (String(d.document).match(/rootBlockIds\[1\]: (\S+)/) || [])[1];
+  const r = await run(who, insert_document_blocks({secret, inserts: [{parent: {blockId: null, position: "start"}, content}]}));
+  if (r && empty) await run(who + " empty line", delete_document_blocks({secret, deletions: [{blockId: empty}]}));
+  return add("texts")(r);
+});
 const writes = [];
 for (const db of dbs) {
   const keys = [...new Set(RECORDS[db].flatMap(r => Object.keys(r)))];
@@ -367,7 +378,7 @@ for (const db of dbs) {
       if (kd === "many") items(v.map(n => ref(db, k, n, who)), "links");
       if (kd === "people") items(v.map(n => n === "me" ? me : n), "people");
       if (kd === "multi") items(v.map(n => opt[db + k][n]), "options");
-      if (kd === "text" && got) writes.push(() => (isNew ? Promise.resolve(true) : run(who, read_document({secret: got})).then(d => d && blank(d))).then(e => e ? run(who, insert_document_blocks({secret: got, inserts: [{parent: {blockId: null, position: "end"}, content: v}]})).then(add("texts")) : null));
+      if (kd === "text" && got) writes.push(() => fill(who, got, v));
       if (kd === "comments" && !(has.cs || []).length) v.forEach(c => writes.push(() => run(who, add_comment({database: db, entityId: id, content: c})).then(add("comments"))));
       if (kd === "file" && isNew) fails.push(`${who}: files can't be attached; left empty`);
       if (kd === "unknown" && isNew) fails.push(`${who}: no such field`);
