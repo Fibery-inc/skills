@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.5 — 2026-10-23
+
+fibery-architect asks fewer questions, in plain words. Before a TNR program build it asked ten, in a three-column table, though the recipe has four: the recipe's adaptation bullets, a Space name nobody had to choose and the clinic list had become questions, each with a column of what the build would change, under notes about sample data and rules that might not build. Now it asks at most four, as a numbered list with its guess for each ("Do you lend out numbered traps? I'll assume yes."), answered by number or "go": only questions from the recipe's table, never its bullets, and only what changes what gets built and is hard to change later. Names, words, extra fields and option lists take defaults the report lists. The workspace adds a question where it holds a real choice: an existing database that could be part of the solution, asked about by name, or a Space name that's taken; a question about something the workspace doesn't have isn't asked. Notes on sample data, rules and the app wait for the report.
+
 ## 1.8.4 — 2026-10-23
 
 fibery-architect describes a field only when its name leaves a question: a scale or unit, what counts, or that a rule fills it ("Set by Stage changed when the state changes"). Email, Phone, Resume, Recruiter, Job or Due date get no description. Builds used to describe every text, number, date, relation and files field with what goes in it and why, down to "The day of the clinic; Clinic days runs on it" on the TNR program's Date. A formula still shows the prompt Fibery wrote it from as its description, since Fibery MCP has no other way to set one.

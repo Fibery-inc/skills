@@ -27,7 +27,7 @@ The aim is a model you can play back in five lines, in the team's own words, aft
 
 Stages, roles and existing databases change the structure; the rest you design from the standard below and adjust after the build, when they see it.
 
-**How to ask.** Two to four questions per message, never a questionnaire. In their words: if they say "tickets", the database is Ticket. Concrete over abstract: "what happens to a ticket after someone replies?" gets a stage, "describe your workflow" gets a shrug. Offer a default with every question, so a shrug still gives an answer. Ask about endings (Lost, Cancelled, Rejected), because they are what boards hide when they're missing. Read the workspace (§2) before the first question, so what already exists is a question only when it's unclear which database is the one. Don't ask what you can see: read what they shared first, ask only about the gaps. Never ask about fields one by one; once the nouns are clear, list the fields a database would have and ask what to cut or add, in one message: people can't list fields from memory, but they can strike three from a list of fifteen.
+**How to ask.** Two to four questions per message, written as SKILL.md §3 says, never a questionnaire. In their words: if they say "tickets", the database is Ticket. Concrete over abstract: "what happens to a ticket after someone replies?" gets a stage, "describe your workflow" gets a shrug. Offer a default with every question, so a shrug still gives an answer. Ask about endings (Lost, Cancelled, Rejected), because they are what boards hide when they're missing. Read the workspace (§2) before the first question, so what already exists is a question only when it's unclear which database is the one. Don't ask what you can see: read what they shared first, ask only about the gaps. Never ask about fields one by one; once the nouns are clear, list the fields a database would have and ask what to cut or add, in one message: people can't list fields from memory, but they can strike three from a list of fifteen.
 
 **The playback.** Before designing, play the model back, so a wrong assumption costs a sentence rather than a build:
 
@@ -49,9 +49,9 @@ A Space that duplicates what the team already tracks is worse than no Space: a s
 
 | Situation | Do this |
 |---|---|
-| The workspace has the system of record for a noun the process needs (customers, employees, products, projects, countries) | **Link** to it. Nobody re-enters customers. |
+| The workspace has the system of record for a noun the process needs (customers, employees, products, projects, countries) | **Link** to it, asked by name in the questions with yes as the guess (SKILL.md §3). Nobody re-enters customers. |
 | The noun is specific to this process (candidate, pitch, post, ticket, audit) | **Create** it in the new Space. |
-| The existing database is close but not the same thing (a synced Intercom Contact when the team means paying customers) | Ask which they mean, as a row in the questions whose default is a new database. Don't guess a link. |
+| The existing database is close but not the same thing (a synced Intercom Contact when the team means paying customers) | Ask about it by name in the questions, with no as the guess (a new database). Don't guess a link. |
 | The existing database is a test, an archive or one you can't understand from its fields | Don't link. Mention it in the report as an option. |
 | A lookup list exists elsewhere (Country, Currency, Period) | Link if it's maintained; a small select otherwise. |
 | The person wants the process added to an existing database (fields on their Task database) | Outside this skill: say so, and offer a new Space alongside, linked to it. |
