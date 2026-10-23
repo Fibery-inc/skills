@@ -1,7 +1,7 @@
 ---
 name: "fibery-architect"
 description: 'Design and build a ready-to-run Fibery Space for any process, directly in the connected workspace: databases and fields, relations and links to databases the workspace already has, workflows, formulas, views, reports, the automations the process depends on, a custom app where views fall short, documents and rich sample data, built with Fibery MCP. Starts from a one-line idea, an interview, a process document or SOP, a recipe (any from the Fibery Process Cookbook, which it looks up by itself, or one the person attaches, links or pastes) or an existing Space. Use whenever someone wants to set up, model, structure, replicate, design or build a process, workflow, pipeline, tracker, CRM, hiring flow, editorial calendar, service desk or operating system in Fibery, asks "how should I model X in Fibery", says "set up our ... process in Fibery" or asks for a Fibery template for one, even if they never say "architect" or "Space". Not for reviewing an existing workspace (fibery-health).'
-compatibility: 'Needs the Fibery MCP server with its execute_code tool, connected to a workspace where the person can create Spaces, and a strong reasoning model (Sonnet 5.5 or better): each build step is one script the model writes from a template. A place to write files helps (the design lives there); without one it lives in the conversation. Custom apps also need web access to the workspace, and an Agent tool lets the app build alongside the rest.'
+compatibility: 'Needs the Fibery MCP server with its execute_code tool, connected to a workspace where the person can create Spaces, and a strong reasoning model (Sonnet 5.5 or better): each build step is one script the model writes from a template. A place to write files helps (the design lives there); without one it lives in the conversation. Custom apps also need web access to the workspace, and an Agent tool that runs a helper in the background lets the app be written alongside the guide.'
 ---
 
 # Fibery architect
@@ -21,12 +21,12 @@ Paths are relative to this skill's folder. What to read, and when:
 | `references/design-guide.md` | before the questions, for a design from scratch: learning the process, reading the workspace and what to link, the 80% standard, what goes into each part and how it's written |
 | `references/recipe-delta.md` | before the questions, for a recipe build, instead of the design guide: the recipe's questions, what to take from the workspace, the one-page delta |
 | `references/existing-space.md` | when the source is an existing Space: how to read it, read-only |
-| `references/build-guide.md` | once the questions are answered: the build's steps in order and what goes into each, the app, the call shapes the templates don't show, troubleshooting |
+| `references/build-guide.md` | before the questions too, so the build starts the moment they're answered: the build's steps in order and what goes into each, the app, the call shapes the templates don't show, troubleshooting |
 | `references/scripts.md` | with the build guide: the scripts' templates, under the same numbers |
 | The cookbook's index (§1 says where; each recipe's `summary` says what it is) | before designing anything from scratch, because a process with a recipe is built from it (§1) |
 | `examples/hiring-pipeline.md` | once, before writing your first design from scratch (a recipe build doesn't need it): a finished design at the depth expected |
 
-Read what a phase needs in one message: the recipe and `recipe-delta.md` (for a design from scratch, the design guide and the example) before the questions, the build guide and `scripts.md` once they're answered.
+Read what the build needs before the questions, in one message: the recipe and `recipe-delta.md` (for a design from scratch, the design guide and the example), the build guide and `scripts.md`, so it starts the moment the person answers.
 
 ## 1. Understand the process
 
@@ -64,7 +64,7 @@ Save it as `design.md` in the working folder when you can write files; otherwise
 
 ## 5. Build
 
-Follow `references/build-guide.md` in its order: six `execute_code` scripts, each started from its template, and the guide's two direct calls, so a build is about ten tool calls, not a hundred. The structure comes first and the formulas second; then the views and reports, the sample records, the rules and buttons and the app, all at once, the app by a helper when the client has an Agent tool and the rules off, so none fires on the sample data; last the guide, whose text mentions the views, with the checks that read formulas and the rules turned on. The build guide's first section has the rules every script follows: above all, a script looks every id up by name, does only what's missing and logs what it found, so one that failed, was cut off or logged "time is up" runs again as it is, and a `fixLogs` line that renames a Space or database stops the build. Don't delete anything to start over unless the person asks; then delete only the new Spaces.
+Follow `references/build-guide.md` in its order: six `execute_code` scripts, each started from its template, and the guide's two direct calls, so a build is about ten tool calls, not a hundred. The structure comes first and the formulas second; then the views and reports, the sample records, the rules and buttons and the empty app, all at once, with the rules off so none fires on the sample data; last the guide, whose text mentions the views, with the checks that read formulas and the rules turned on. A helper writes the app's code only when the client can run one in the background, alongside the guide; otherwise you write it after the guide. The build guide's first section has the rules every script follows: above all, a script looks every id up by name, does only what's missing and logs what it found, so one that failed, was cut off or logged "time is up" runs again as it is, and a `fixLogs` line that renames a Space or database stops the build. Don't delete anything to start over unless the person asks; then delete only the new Spaces.
 
 There is no separate verification pass: the scripts check the formula types, the nested views, the stored rule texts and the sample data's promises, and the guide's last call opens the first view once, to see the Space the way the person will; fix what looks wrong before the report. Never change a record to test an automation.
 

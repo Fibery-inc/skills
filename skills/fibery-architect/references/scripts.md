@@ -84,7 +84,7 @@ call("people fields", people, l => create_relation_fields({fields: l}));
 missing(LINKS).forEach(l => call("link " + l.name, [l], x => create_relation_fields({fields: x})));
 WORKFLOWS.filter(w => !has[w.database].has("workflow/state")).forEach(w => call("workflow " + w.database, [w], ([x]) => create_workflow_field(x)));
 const results = [];
-for (const [label, go] of calls) if (Date.now() - t0 < 30000) results.push(await run(label, go()));
+for (let i = 0, slow = 5000; i < calls.length && Date.now() - t0 + slow < 45000; i++) { const s0 = Date.now(); results.push(await run(calls[i][0], calls[i][1]())); slow = Math.max(slow, Date.now() - s0); }
 const left = calls.length - results.length;
 const off = [];
 await Promise.all([...SINGLE, ...MULTI].filter(s => s.options.some(o => o.icon)).map(s => query({query: {"q/from": `${s.name}_${s.database}`, "q/select": {n: "enum/name", i: "enum/icon"}, "q/limit": "q/no-limit"}}).then(r => r.result.forEach(x => {
@@ -133,10 +133,10 @@ let left = 0, last = 15000;
 for (const level of LEVELS) {
   const todo = level.filter(x => !has[x.database].has(x.name));
   for (let i = 0; i < todo.length; i += 4) {
-    if (left || Date.now() - t0 + last > 35000) { left += todo.length - i; break; }
+    if (left || Date.now() - t0 + last > 45000) { left += todo.length - i; break; }
     const s0 = Date.now();
     await Promise.all(todo.slice(i, i + 4).map(x => run(x.name, create_formula_field(x))));
-    last = Math.max(Date.now() - s0, 15000);
+    last = Math.max(last, Date.now() - s0);
   }
 }
 const after = await fieldsOf();
@@ -203,8 +203,9 @@ const report = async ({title, database, tab, mode}, id) => {
 const views = VIEWS(), spaces = [...new Set([S, ...views.map(v => v.space).filter(Boolean)])];
 const listed = async () => (await Promise.all(spaces.map(sp => query_views({space: sp, withConfig: false})))).flatMap(r => r.views);
 const before = await listed(), todo = views.filter(v => !before.some(x => x.name === v.name)), made = [];
-for (let i = 0; i < todo.length && Date.now() - t0 < 25000; i += 6) made.push(...await Promise.all(todo.slice(i, i + 6).map(v => run("view " + v.name, create_view({space: S, ...v})).then(r => [v, r]))));
-const charts = Date.now() - t0 < 25000 ? await Promise.all(REPORTS.map(r => report(r, (before.find(x => x.viewType === "report" && x.name === r.title) || {}).id))) : [];
+let slow = 5000;
+for (let i = 0; i < todo.length && Date.now() - t0 + slow < 45000; i += 6) { const s0 = Date.now(); made.push(...await Promise.all(todo.slice(i, i + 6).map(v => run("view " + v.name, create_view({space: S, ...v})).then(r => [v, r])))); slow = Math.max(slow, Date.now() - s0); }
+const charts = Date.now() - t0 + slow < 45000 ? await Promise.all(REPORTS.map(r => report(r, (before.find(x => x.viewType === "report" && x.name === r.title) || {}).id))) : [];
 const all = await listed();
 for (const v of views.filter(v => v.config && (v.config.items || []).some(i => i.groupBy))) {
   const x = all.find(y => y.name === v.name); if (!x) continue;
@@ -340,8 +341,8 @@ for (const db of dbs) {
   }
   if (links.length) writes.push(() => run("links " + db, update_entities({database: db, entities: links})).then(add("links", links.length)));
 }
-let next = 0;
-while (next < writes.length && Date.now() - t0 < 30000) { const batch = writes.slice(next, next + 20); next += batch.length; await Promise.all(batch.map(w => w())); }
+let next = 0, slow = 5000;
+while (next < writes.length && Date.now() - t0 + slow < 45000) { const batch = writes.slice(next, next + 20), s0 = Date.now(); next += batch.length; await Promise.all(batch.map(w => w())); slow = Math.max(slow, Date.now() - s0); }
 for (const c of CHECKS) {
   const bad = (await rows(c.from, {n: `${sp(c.from)}/Name`, ...c.select})).filter(c.bad).map(r => r.n);
   log(`check ${c.label}: ${bad.length ? "BROKEN by " + bad.join(", ") : "holds"}`);
@@ -404,11 +405,11 @@ const read = async () => {
 };
 const before = await read(), todo = list.filter(a => !before[key(a)]), made = [];
 for (let i = 0, last = 15000; i < todo.length; i += 4) {
-  if (made.length && Date.now() - t0 + last > 35000) break;
+  if (made.length && Date.now() - t0 + last > 45000) break;
   const s0 = Date.now();
   // A rule starts off, so none fires on the sample records written beside this script; script 6 turns them on.
   made.push(...await Promise.all(todo.slice(i, i + 4).map(a => run(a.name, create_automation(a)).then(r => r && a.automationType === "rule" ? run(a.name + " off", update_automation({automationType: "rule", id: r.automation.id, enabled: false})).then(() => r) : r))));
-  last = Math.max(Date.now() - s0, 15000);
+  last = Math.max(last, Date.now() - s0);
 }
 const stored = made.length ? await read() : before;
 const names = Object.fromEntries(Object.values(st).flatMap(m => Object.entries(m).map(([n, id]) => [id, n])));
@@ -457,7 +458,7 @@ log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 
 ## 7. The app
 
-Only when the design has an app: the app's helper runs it, or you do, in the message with scripts 3 to 5. `APPS` holds `{name, kind: "view", spaceName}` for a page in the Space or `{name, kind: "layout", databaseName}` for a tab on every record page; `APP_TOUCHES` the databases and fields the app's code uses.
+Only when the design has an app, in the message with scripts 3 to 5 (build guide §7). `APPS` holds `{name, kind: "view", spaceName}` for a page in the Space or `{name, kind: "layout", databaseName}` for a tab on every record page; `APP_TOUCHES` the databases and fields the app's code uses.
 
 ```js
 const S = "Hiring"; const f = n => `${S}/${n}`;

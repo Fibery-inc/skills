@@ -12,16 +12,16 @@ In this order, each message once the one before has answered:
 
 1. **Script 1**, the structure and the guide's empty document: everything else hangs off them.
 2. **Script 2**, the formulas, which read its fields.
-3. **The rest, in one message:** the app's helper first when there's an app (§7), then scripts 3, 4 and 5, in that order: views and reports, the sample records, rules and buttons. None needs another, and script 5 makes its rules off, so none fires on the sample data.
+3. **The rest, in one message:** scripts 3, 4 and 5, in that order, and the app script when there's an app (§7): views and reports, the sample records, rules and buttons, the empty app. None needs another, and script 5 makes its rules off, so none fires on the sample data.
 4. **The guide's two calls and script 6** (§6): the guide mentions what the other scripts made, and script 6 checks the promises that read formulas, which Fibery has recomputed by now, then turns the rules on.
 
-A script that logs "time is up" goes again, alone, before the next message. Fixes for scripts 3 to 5, and a view that filters on a sample record, go in a message of their own before the guide's, so the guide mentions what exists. Then the report, once the helper is back; without an Agent tool, the app script goes in message 3 and the app is built after the guide (§7). Only the app goes to a helper: a script takes seconds, less than a helper would spend reading its brief.
+A script that logs "time is up" goes again, alone, before the next message. Fixes for scripts 3 to 5, and a view that filters on a sample record, go in a message of their own before the guide's, so the guide mentions what exists. The app's code comes after message 3: from a helper started in a message of its own as soon as message 3 has answered, when your Agent tool can run one in the background, or from you after the guide (§7). Then the report, once a helper is back. Only the app goes to a helper: a script takes seconds, less than a helper would spend reading its brief.
 
 **Every script:**
 
 - **Starts from its template** in `scripts.md`: replace the data block at the top with the spec's content, every name spelled as the spec spells it, and copy everything from `const fails` down unchanged. Write it straight into the `execute_code` call: `execute_code` reads no files, so a script assembled in a file first is typed twice. The data uses the tools' own input shapes; anything a template doesn't show goes into the same list in the tool's shape (§8), since the fixed part sends whatever the list holds.
 - **Is one step:** calls that depend on each other follow in `await` order, calls that don't run together in `Promise.all`.
-- **Stops in time, and says so.** One that runs about a minute is cut off with "connection lost" and no logs, though Fibery usually finishes it. So every template starts no new call once it is 25–30 seconds in, or, for what Fibery's AI writes (formulas, an automation's texts, 10–25 seconds for a batch of four), when the next batch wouldn't finish by 35, and logs "time is up … run this script again, as it is, to finish": send it again at once, alone in its message, and it goes on from where it stopped.
+- **Stops in time, and says so.** One that runs about a minute is cut off with no logs ("connection lost", or "The upstream server is timing out"; measured: 55 seconds came back, 70 didn't), though Fibery usually finishes it. So every template starts a call or a batch only while the time so far plus the slowest one yet ends by 45 seconds, counting at least 5 seconds for one, or 15 when Fibery's AI writes it (formulas, an automation's texts); that leaves about 15 seconds for the read-back and the logs. When it stops, it logs "time is up … run this script again, as it is, to finish": send it again at once, alone in its message, and it goes on from where it stopped.
 - **Looks ids up by name when it runs, in this build's Spaces only:** states and options with `enumIds`, records with `byName`, views and reports with `query_views({space})`, you with `get_me`; never an id pasted from an earlier result, and never a name matched across the workspace: `get_reports_list` and `search` return every Space's views, deleted Spaces' reports included, and a fix script that matched a report by title wrote to another Space's report of the same name.
 - **Does only what's missing, and logs what it found:** it reads what exists first, and its log names what was there before as well as what it made ("made: nothing; there before: Spaces 1, databases 5, fields 31, workflows 5, apps 1"). So a script that failed, stopped or was cut off runs again as it is and its log then says the step is complete, and a build interrupted anywhere (a client timeout, a new conversation) resumes by running the scripts again from 1, half a minute after the last one, since a script can finish after its result is lost. A schema call is atomic: one field that exists fails its whole batch.
 - **Logs little:** one line per failure, counts for the rest, the checks' findings, `failed 0` when the step is done. The tool's result also lists an artefact per write; read the logs.
@@ -30,7 +30,7 @@ A script that logs "time is up" goes again, alone, before the next message. Fixe
 
 ## 1. Structure
 
-One script, run again while it logs "time is up" (a Space of four or more databases usually needs it). Its data, in the spec's words:
+One script, run again while it logs "time is up" (a big Space may need it). Its data, in the spec's words:
 
 | The spec says | In the data |
 |---|---|
@@ -166,16 +166,15 @@ The spec describes the app and never contains its code: the code is written now,
 
 The app script, `scripts.md` §7, comes first: `APPS`, `{name, kind: "view", spaceName}` for a page in the Space (without `spaceName` it lands in the private space) or `{name, kind: "layout", databaseName}` for a tab on every record page, and `APP_TOUCHES`, the databases (`C`) and fields (`[C, f("Days in stage")]`, `[C, "workflow/state"]`) its code uses. It makes the empty app and logs its id, a page app's url and mention, and those ids, on every run.
 
-With an Agent tool, a helper of your own model builds the app, started first in the message with scripts 3 to 5 with this brief; it runs the app script itself. Without one, run the app script in that message and build the app yourself after the guide.
+You run the app script, in the message with scripts 3 to 5, so the guide can mention a page app. When your Agent tool can run a helper in the background (an option such as `run_in_background`), a helper of your own model then writes the app with this brief, started in a message of its own as soon as the app script has logged, while you go on to the guide. Otherwise you write it yourself after the guide: a helper call that waits for the helper holds up everything sent after it (measured in Cowork: a script sent beside a 30-second helper ran only when the helper was done), and only adds its hand-off.
 
 ```
-You are building the custom app "<name>" for the new Fibery Space "<Space>". Read <path to this file> §7,
-run its app script (<path to scripts.md> §7) with this data: <APPS and APP_TOUCHES>, then load Fibery's
-custom-apps-dev guide with get_fibery_skill. The app: <kind and purpose, and "how it works" from the
+You are writing the custom app "<name>" for the new Fibery Space "<Space>". Read <path to this file> §7
+and load Fibery's custom-apps-dev guide with get_fibery_skill. The app is made and empty; its script
+logged: <the "app" and "ids for the app" lines>. The app: <kind and purpose, and "how it works" from the
 spec>. Writes: <the only fields it may change>. Names: <the full name of every database and field it
 touches>. Upload description: "Built by fibery-architect from the design <name>". Change nothing else in
-the workspace. Reply with the app script's "app" line when the upload has built, or after three failed
-builds with the last error.
+the workspace. Reply when the upload has built, or after three failed builds with the last error.
 ```
 
 1. **Write the app**, usually only `src/App.tsx`, by three rules:
@@ -237,7 +236,7 @@ Relative dates: "is today" is `is` with `{amount: 0, unit: "day", isBeforeNow: f
 | What happened | What to do |
 |---|---|
 | "time is up … run this script again" | Not a failure: the script stopped before Fibery's cut-off. Send it again at once, as it is. |
-| "connection lost" with no logs, a timeout or a rate limit | The script ran about a minute, or Fibery was busy. It has usually finished, or stopped part-way: wait half a minute and send the same script again, alone in its message; it does only what's missing and logs the step as a first run would. Send the next scripts one at a time until one returns. |
+| "connection lost" or "The upstream server is timing out" with no logs, a timeout or a rate limit | The script ran about a minute, or Fibery was busy. It has usually finished, or stopped part-way: wait half a minute and send the same script again, alone in its message; it does only what's missing and logs the step as a first run would. Send the next scripts one at a time until one returns. |
 | Every script fails whole with "invalid response from the upstream server" or "JS Executor is down" | Fibery's script service is down, while direct calls may still work. Wait a minute or two and send one script at a time until one returns; nothing is lost, and nothing is deleted to start over. |
 | A `TypeError` or "is not defined" | A typo or an unexpected result: log the result's keys (`Object.keys(r)`), fix the script, run it again. |
 | "STOP, a Space with this name holds other databases" | The name is taken by a Space this build didn't make. Choose a free one ("Hiring 2"), update the design and run script 1 again; nothing was created, and `design.md`'s Assumptions name the Space you chose. |
