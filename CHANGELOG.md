@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.6 — 2026-10-23
+
+fibery-architect asks its questions through the client's question tool when there is one, AskUserQuestion in Claude Code and Cowork, so the person clicks an answer instead of typing it. Each question gets a short header ("Trap bank"), the guess as the first option marked Recommended, one to three alternatives described by what the person gets, and the tool's own Other for a typed answer. From a recipe, the Making it yours table's Default is the guess and its "If not the default" the alternative. Closing the questions isn't a "go": nothing is built until they're answered. A client without such a tool still gets the numbered list, answered by number or "go". An interview no longer lists a database's fields to cut or add, since 1.8.5 made fields a default the person changes in the built Space.
+
 ## 1.8.5 — 2026-10-23
 
 fibery-architect asks fewer questions, in plain words. Before a TNR program build it asked ten, in a three-column table, though the recipe has four: the recipe's adaptation bullets, a Space name nobody had to choose and the clinic list had become questions, each with a column of what the build would change, under notes about sample data and rules that might not build. Now it asks at most four, as a numbered list with its guess for each ("Do you lend out numbered traps? I'll assume yes."), answered by number or "go": only questions from the recipe's table, never its bullets, and only what changes what gets built and is hard to change later. Names, words, extra fields and option lists take defaults the report lists. The workspace adds a question where it holds a real choice: an existing database that could be part of the solution, asked about by name, or a Space name that's taken; a question about something the workspace doesn't have isn't asked. Notes on sample data, rules and the app wait for the report.
