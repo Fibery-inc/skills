@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.1 — 2026-10-23
+
+fibery-architect puts a table's columns in the order a person reads a row, whatever order the spec or recipe lists them in: what the record is part of, where it stands (the state and what measures it), who (the people fields together), what kind (the selects), when (dates in the order they happen), how much, then contact details, other links and text. A formula sits right after the field it reads, and pairs such as Salary min and Salary max sit side by side. Lists, nested items and board cards follow the same order. The TNR program's In care list used to end with the state, and its nested trappings split Coordinator and Trappers with Planned cats between them; by the rule they read Trapping, State, Age, Sex, Fixed on, Return on, and Colony, State, Coordinator, Trappers, Trap night, Planned cats.
+
 ## 1.8.0 — 2026-10-23
 
 fibery-architect builds as soon as the questions are answered: no design card and no "Build it?". It reads the workspace before it asks, so the one questions message also carries what the workspace leaves to the person (a Space name that's taken, an existing database that may or may not be the one to link), says when a Space for the same process exists already, and ends by saying the build starts with the answers. After "just build it" it asks nothing at all. What the card used to show moves to the report: the assumptions made in the person's place, the fields added outside the new Spaces, the By hand settings and what wasn't built. A rule that writes to records of an existing database is built only when the person asks for one. The Build it line of every cookbook recipe, the format and the two bundled copies now reads "Claude asks a few questions, then sets it up in about ten minutes."

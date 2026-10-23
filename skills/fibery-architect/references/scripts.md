@@ -182,7 +182,7 @@ const STATES = [C, J];
 const OPTIONS = [[C, "Source"]];
 const VIEWS = () => [
   {viewType: "board", name: "Pipeline", description: "Where is every candidate?", config: {x: [stateAxis(C)], y: [], cardSize: "comfortable", items: [
-    {database: C, fields: [fld("Name"), fld("Job"), fld("Recruiter"), fld("Days in stage")], colorCoding: [{color: "#D40915", filter: flag("Stuck")}, {color: "#FBA32F", filter: and(flag("Stuck", false), empty("reference", "Job"))}]}]}},
+    {database: C, fields: [fld("Name"), fld("Job"), fld("Days in stage"), fld("Recruiter")], colorCoding: [{color: "#D40915", filter: flag("Stuck")}, {color: "#FBA32F", filter: and(flag("Stuck", false), empty("reference", "Job"))}]}]}},
   {viewType: "list", name: "My candidates", description: "Who am I recruiting right now?", config: {items: [
     {database: C, fields: [fld("Name"), fld("Job"), {field: "workflow/state"}, fld("Days in stage")], filter: and(mine("Recruiter"), wf(C, "is-none-of", ["Hired", "Rejected"])), orderBy: [{field: f("Days in stage"), direction: "desc"}]}]}},
   {viewType: "grid", name: "Jobs", description: "How full is every role?", config: {rowHeight: "short", items: [
