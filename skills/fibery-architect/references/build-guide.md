@@ -1,6 +1,6 @@
 # Build guide
 
-After the yes, a build is five `execute_code` scripts, each started from its template in `scripts.md`, then the guide's two direct calls, with the app beside them. The spec you build from is `design.md`, or, for a recipe build, the recipe's Details for building with the delta in `design.md` applied on top: renames everywhere, links, additions, removals; whatever the delta doesn't mention is built as the recipe says.
+A build is five `execute_code` scripts, each started from its template in `scripts.md`, then the guide's two direct calls, with the app beside them. The spec you build from is `design.md`, or, for a recipe build, the recipe's Details for building with the delta in `design.md` applied on top: renames everywhere, links, additions, removals; whatever the delta doesn't mention is built as the recipe says.
 
 Before the scripts · 1 Structure · 2 Formulas · 3 Views and reports · 4 Sample records · 5 Rules and buttons · 6 The guide · 7 The app · 8 Shapes the templates don't show · 9 Troubleshooting. The scripts' templates are in `scripts.md`, under the same numbers.
 
@@ -10,7 +10,7 @@ Before the scripts · 1 Structure · 2 Formulas · 3 Views and reports · 4 Samp
 
 | Script | Builds | Runs |
 |---|---|---|
-| 1 | Spaces, databases, fields, relations, people fields, links, workflows, empty apps | after the yes |
+| 1 | Spaces, databases, fields, relations, people fields, links, workflows, empty apps | first, once the design is written |
 | 2 | formulas, level by level | after 1 |
 | 3 | views, documents and reports | after 2, in one message with 4 |
 | 4 | sample records with their links, states, people, texts and comments, and the checks on stored values | with 3 |
@@ -41,7 +41,7 @@ One script, run again while it logs "time is up" (a Space of four or more databa
 |---|---|
 | text; email, url, phone | `PRIMITIVE`, `fibery/text`, with `meta: {"ui/type": "email"}` (or url, phone) |
 | integer; decimal with its places | `fibery/int`; `fibery/decimal` with `meta: {"ui/number-precision": 1}` |
-| money | `fibery/decimal` with `ui/number-format` Money and `ui/number-currency-code`: the currency of the workspace's money fields, or the one the person names, or USD as an assumption on the card |
+| money | `fibery/decimal` with `ui/number-format` Money and `ui/number-currency-code`: the currency of the workspace's money fields, or the one the person names, or USD, an assumption the report names |
 | percent, as a field | `fibery/decimal` with `ui/number-format` Percent, holding a fraction (0.25 shows as 25%); a percent formula is a whole number from 0 to 100 (§2), so a threshold written for one never serves the other |
 | checkbox; location | `fibery/bool`; `fibery/location` |
 | date; date-time; date range | `fibery/date`; `fibery/date-time`; `fibery/date-range` (`fibery/date-time-range` when the hours matter) |
@@ -141,14 +141,14 @@ Databases may come in any order: to-one links are set once every record exists. 
 
 ## 5. Rules and buttons
 
-One script after script 4, since a rule created earlier would fire on the sample data as it is written; it creates four at a time and stops in time. A schedule starts the day after the build, at the spec's time, in UTC, and the card, the guide and the report say "UTC" next to the time. A rule that stamps the date a day count reads (Stage changed on) gets `created` as a second trigger, so every new record has it and the count stays a whole number (§2); a rule filtered on states no record is created in doesn't need it. The sample records carry their dates from script 4. `CHECKS` hold the promises that read formulas, which Fibery has recomputed by now (§4).
+One script after script 4, since a rule created earlier would fire on the sample data as it is written; it creates four at a time and stops in time. A schedule starts the day after the build, at the spec's time, in UTC, and the guide and the report say "UTC" next to the time. A rule that stamps the date a day count reads (Stage changed on) gets `created` as a second trigger, so every new record has it and the count stays a whole number (§2); a rule filtered on states no record is created in doesn't need it. The sample records carry their dates from script 4. `CHECKS` hold the promises that read formulas, which Fibery has recomputed by now (§4).
 
 - **Native actions only.** A rule or button never uses the `Script` action, whatever the spec says; `execute_code` builds the Space and never becomes part of it. Its condition is the filter, its texts are templates, and a rule with two conditions becomes two rules. An action no native shape can do (a comment on a linked record, a notification to the people of linked records, a check before acting, a value found by searching other records, email), or one rejected with no native shape in §8, is left out: the rule is built with the rest when the rest still does its job (Actions done still moves the postmortem to Closed, without its comment), and not at all when that action is its point (All parts in exists only to tell the builder). Either way the report lists what wasn't built and the guide names the step as done by hand. A rejected action fails its whole rule, so send the rule again without it.
 - **Buttons take no filter and can't check:** a button acts whatever the record's state, so its description and the guide say when to press it.
 - **Texts and formula values are prompts**, and Fibery writes the result (10–20 s each): "a short note naming who clicked the button and the publish date", never the finished text. A prompt names the literal words a text must contain: "The words 'Interview today:' followed by the interview's Name" came back as `Interview today: {{Name}}`, where "The interview's Name is today" came back as a bare date. A value carried from the record that triggered the rule names that record, and the target's field of the same name when there is one: "the Health of the Check in that triggered this rule, not the Key Result's own Health" (without it, Fibery took the target's: `[Step 1 Check in].[Key Result].Health`). A date-time stamp says "the current date and time, using Now(), not Today()": other wordings stored midnight (`DateTime(Year(Today()), …, 0, 0, 0)`) or `Today()`, and even this one is read back (measured).
 - **Read back what Fibery stored:** the script logs each automation's triggers, stored filter and actions; read the filter and every text and formula value against the spec. Resend once, in the next script, with `update_automation({automationType, id, changeActions: [{actionId, action, args}]})` (the ids from `query_automations`; `triggers` and `filter` replace the stored ones the same way) and a sharper prompt when one names a field the database doesn't have, multiplies a 0–100 value by 100 ("followed by a percent sign, never multiplied"), picks the wrong record ("the last item" for the one just added), or points at a field off the path; still wrong, drop the action, or the rule when the action is its point, and list it under Not built.
 - **An `updated` trigger names its fields** (`updatedField: ["workflow/state"]`); without them the rule fires on every edit of the record.
-- **Existing databases:** a filter through a link to one is fine (read its `schema_detailed` for exact names); an action that writes to its records reaches outside the Space, so it exists only if the card listed it and the person said yes.
+- **Existing databases:** a filter through a link to one is fine (read its `schema_detailed` for exact names); an action that writes to its records reaches outside the Space, so it exists only when the person asked for it, and the report names it.
 - `display_automations_schema` only when an action is rejected by name: its catalog is 15K tokens of integrations.
 
 The template is `scripts.md` §5.
@@ -243,9 +243,9 @@ Relative dates: "is today" is `is` with `{amount: 0, unit: "day", isBeforeNow: f
 | "connection lost" with no logs, a timeout or a rate limit | The script ran about a minute, or Fibery was busy. It has usually finished, or stopped part-way: wait half a minute and send the same script again, alone in its message; it does only what's missing and logs the step as a first run would. Send the next scripts one at a time until one returns. |
 | Every script fails whole with "invalid response from the upstream server" or "JS Executor is down" | Fibery's script service is down, while direct calls may still work. Wait a minute or two and send one script at a time until one returns; nothing is lost, and nothing is deleted to start over. |
 | A `TypeError` or "is not defined" | A typo or an unexpected result: log the result's keys (`Object.keys(r)`), fix the script, run it again. |
-| "STOP, a Space with this name holds other databases" | The name is taken by a Space this build didn't make. Choose a free one ("Hiring 2"), tell the person, update the design and run script 1 again; nothing was created. |
+| "STOP, a Space with this name holds other databases" | The name is taken by a Space this build didn't make. Choose a free one ("Hiring 2"), update the design and run script 1 again; nothing was created, and the report names the Space you chose. |
 | A `fixLogs` line | "Add default format…" on a number field and "Added field title…" on a view are Fibery's defaults. A renamed Space or database means the name you sent doesn't exist yet or is misspelled, and Fibery matched another one: stop. A field it created on an existing database is the build's mistake: show the person exactly what landed where, and remove it with `delete_fields` once they say yes. |
-| A link's inverse "already exists" on the existing database | Choose another name from its `schema_detailed`, tell the person and wait for their yes, since it's a field on their database; then send only that link, and update the design. |
+| A link's inverse "already exists" on the existing database | Choose another name, free in its `schema_detailed`, send only that link and update the design; the report names the field. |
 | "Last tab cannot be deleted" | A report's chart was rejected, so its default tab is its only one: fix the chart's condition (§8) and run script 3 again; it adds the chart, then removes the default tab. |
 | `Invalid input` on `query`'s `q/select` | A collection selected as a path, or a sub-query whose `q/from` is a list: a sub-query with the field's name as a string (§4). |
 | "Cannot access 'flag' before initialization" | A shared filter built at the top of the data: make it a function, like `VIEWS` (§3). |

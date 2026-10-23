@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.0 — 2026-10-23
+
+fibery-architect builds as soon as the questions are answered: no design card and no "Build it?". It reads the workspace before it asks, so the one questions message also carries what the workspace leaves to the person (a Space name that's taken, an existing database that may or may not be the one to link), says when a Space for the same process exists already, and ends by saying the build starts with the answers. After "just build it" it asks nothing at all. What the card used to show moves to the report: the assumptions made in the person's place, the fields added outside the new Spaces, the By hand settings and what wasn't built. A rule that writes to records of an existing database is built only when the person asks for one. The Build it line of every cookbook recipe, the format and the two bundled copies now reads "Claude asks a few questions, then sets it up in about ten minutes."
+
 ## 1.7.0 — 2026-10-21
 
 fibery-health starts a check of a big workspace, more than about 40 databases, with an overview: one script run reads every database's record count, its newest record and the schema, and gives one line per Space (active, quiet or dormant, size, descriptions, leftovers, switched-off and date-fixed formulas, synced databases), with the copies, same concepts and people-field clutter across Spaces. It then suggests 3–5 Spaces and checks in full the ones the person picks, automations included. On Fibery's own workspace (47 Spaces, 229 databases, 2.8 million records) the overview took 3 minutes and one run of a 7 KB script, where a full check of everything would have taken about 12 runs. The script and the report are in the new `references/overview.md`.

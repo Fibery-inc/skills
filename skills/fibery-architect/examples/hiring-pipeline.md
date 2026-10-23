@@ -1,10 +1,13 @@
 # Design: Hiring pipeline
 
-A finished design at the depth fibery-architect aims for, the 80% Space, cut to what shows the format: two databases in full and the rest in one line each, the complete views table, and the sample story; what reaches outside the Space, the assumptions and the estimate are on the card. The full design has 5 databases, 36 fields, 6 formulas, 7 views plus the guide, 2 reports, 4 automations and 36 sample records; it builds in about 10 minutes. It sits under most ceilings because the process needs no more, and what it leaves out is in the guide's Make it yours. The workspace it was written for has a `People/Person` database; if yours doesn't, the Referrer link is dropped. Dates are relative to the build day.
+A finished design at the depth fibery-architect aims for, the 80% Space, cut to what shows the format: the assumptions, two databases in full and the rest in one line each, the complete views table, and the sample story. The full design has 5 databases, 36 fields, 6 formulas, 7 views plus the guide, 2 reports, 4 automations and 36 sample records; it builds in about 10 minutes. It sits under most ceilings because the process needs no more, and what it leaves out is in the guide's Make it yours. The workspace it was written for has a `People/Person` database; if yours doesn't, the Referrer link is dropped. Dates are relative to the build day.
 
-## Summary
+## Assumptions
 
-The design card, as SKILL.md §4 shows it, with every database on a line of its own like Candidate's.
+- One recruiter per candidate.
+- Agencies are a Source, not a database of their own.
+- Salaries in USD.
+- Referrers are in People/Person, the workspace's directory, so Referrer links there.
 
 ## Databases
 

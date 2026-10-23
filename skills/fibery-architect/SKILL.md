@@ -6,7 +6,7 @@ compatibility: 'Needs the Fibery MCP server with its execute_code tool, connecte
 
 # Fibery architect
 
-Turn how a team works into a Fibery Space they'll run their work in: about 80% of what a mature Space would have, which is enough to run the process tomorrow and small enough to still feel like theirs, shaped to their words and their workspace. You read the process (from the person, a document, a recipe or an existing Space), read the workspace it will live in, write a design, show it, and only after a yes build it with Fibery MCP.
+Turn how a team works into a Fibery Space they'll run their work in: about 80% of what a mature Space would have, which is enough to run the process tomorrow and small enough to still feel like theirs, shaped to their words and their workspace. You read the process (from the person, a document, a recipe or an existing Space) and the workspace it will live in, ask what only the person can answer, then design the Space and build it with Fibery MCP straight away: their answers are the go-ahead, and the report after the build says what you decided in their place.
 
 ## What you need
 
@@ -18,17 +18,15 @@ Paths are relative to this skill's folder. What to read, and when:
 
 | File | Read it when |
 |---|---|
-| `references/design-guide.md` | before the yes, for a design from scratch: learning the process, reading the workspace and what to link, the 80% standard, what goes into each part and how it's written |
-| `references/recipe-delta.md` | before the yes, for a recipe build, instead of the design guide: the recipe's questions, what to take from the workspace, the one-page delta |
+| `references/design-guide.md` | before the questions, for a design from scratch: learning the process, reading the workspace and what to link, the 80% standard, what goes into each part and how it's written |
+| `references/recipe-delta.md` | before the questions, for a recipe build, instead of the design guide: the recipe's questions, what to take from the workspace, the one-page delta |
 | `references/existing-space.md` | when the source is an existing Space: how to read it, read-only |
-| `references/build-guide.md` | after the yes: the build's steps in order and what goes into each, the app, the call shapes the templates don't show, troubleshooting |
+| `references/build-guide.md` | once the questions are answered: the build's steps in order and what goes into each, the app, the call shapes the templates don't show, troubleshooting |
 | `references/scripts.md` | with the build guide: the five scripts' templates, under the same numbers |
 | The cookbook's index (§1 says where; each recipe's `summary` says what it is) | before designing anything from scratch, because a process with a recipe is built from it (§1) |
 | `examples/hiring-pipeline.md` | once, before writing your first design from scratch (a recipe build doesn't need it): a finished design at the depth expected |
 
-Read what a phase needs in one message: the recipe and `recipe-delta.md` (for a design from scratch, the design guide and the example) before the yes, the build guide and `scripts.md` after it.
-
-Builds are fastest in a fresh conversation. If the interview was long, finish `design.md` first; a new conversation shows the card again, waits for its yes, then builds from the file.
+Read what a phase needs in one message: the recipe and `recipe-delta.md` (for a design from scratch, the design guide and the example) before the questions, the build guide and `scripts.md` once they're answered.
 
 ## 1. Understand the process
 
@@ -36,67 +34,31 @@ Builds are fastest in a fresh conversation. If the interview was long, finish `d
 
 | The person gives you | Do this |
 |---|---|
-| An idea ("set up our hiring process") | Ask only the questions whose answers change the structure, at most three, in one message: usually the stages, the roles and what already exists in Fibery. If they said "just build it", ask nothing and list your assumptions on the design card. |
+| An idea ("set up our hiring process") | Ask only the questions whose answers change the structure, at most three: usually the stages and the roles. If they said "just build it", ask nothing. |
 | A request to be interviewed, or a vague idea | The design guide §1: a few questions at a time, in their words, playing the model back before you design. |
 | A process document, SOP or notes | Read it fully before asking anything; the design guide §1 table says what each part of it becomes. |
-| A recipe: one from the cookbook, named or implied ("set up Shape Up"), or one the person attaches as a file, links to, or pastes in full | Get its text: a cookbook recipe from its `raw` link (its copy in `../recipe-writer/examples/` when the cookbook can't be reached); the attached file, read from where the client put it; a link, fetched with your web fetch tool (a Fibery document link through Fibery MCP's `fetch_by_url`), and if it can't be fetched, ask for the file or the text rather than guessing; the pasted text itself. Fetch a recipe whole: a web fetch tool that summarizes pages can shorten it, so with a shell, download it (`curl -sSfL <link> -o recipe.md`). A recipe the person supplies wins over the cookbook's of the same name. A text without a "Details for building" section is a process document, not a recipe: the row above. Save a fetched or supplied recipe as `recipe.md` in the working folder, so the build reads one stable copy. Its "Making it yours" questions are the interview: ask all of them in one message, as a table with the defaults, and wait for the answers; a question the workspace already answers is stated as answered, not asked. Only an explicit "just build it" takes the defaults, listed as assumptions on the card; a short request ("set up Shape Up") isn't one. Then write the delta as `references/recipe-delta.md` says, not a full design. |
+| A recipe: one from the cookbook, named or implied ("set up Shape Up"), or one the person attaches as a file, links to, or pastes in full | Get its text: a cookbook recipe from its `raw` link (its copy in `../recipe-writer/examples/` when the cookbook can't be reached); the attached file, read from where the client put it; a link, fetched with your web fetch tool (a Fibery document link through Fibery MCP's `fetch_by_url`), and if it can't be fetched, ask for the file or the text rather than guessing; the pasted text itself. Fetch a recipe whole: a web fetch tool that summarizes pages can shorten it, so with a shell, download it (`curl -sSfL <link> -o recipe.md`). A recipe the person supplies wins over the cookbook's of the same name. A text without a "Details for building" section is a process document, not a recipe: the row above. Save a fetched or supplied recipe as `recipe.md` in the working folder, so the build reads one stable copy. Its "Making it yours" questions are the interview: ask all of them, as a table with the defaults, and wait for the answers; a question the workspace already answers is stated as answered, not asked. Only an explicit "just build it" takes the defaults; a short request ("set up Shape Up") isn't one. Then write the delta as `references/recipe-delta.md` says, not a full design. |
 | An existing Fibery Space (theirs or another workspace's) | Read it as `references/existing-space.md` describes, then design a new Space from it, copied or improved as asked; the existing Space is never changed. |
 
 The names they use become database, field and state names: a team runs a Space that speaks their language and abandons one that doesn't.
 
 ## 2. Read the workspace
 
-Do this before designing, because a Space that duplicates what the team already tracks is worse than no Space. The design guide §2 (for a recipe build, `references/recipe-delta.md` §1) says how to learn, reading only, what exists, what to **link** (the workspace's system of record for a noun: customers, employees, products), what to **create** (the nouns specific to this process), and which names are taken.
+Do this before asking anything: a Space that duplicates what the team already tracks is worse than no Space, and what the workspace leaves open goes into the same questions (§3). The design guide §2 (for a recipe build, `references/recipe-delta.md` §1) says how to learn, reading only, what exists, what to **link** (the workspace's system of record for a noun: customers, employees, products), what to **create** (the nouns specific to this process), and which names are taken.
 
-## 3. Write the design
+## 3. Ask once
 
-Design and write it as `references/design-guide.md` prescribes: a one-screen summary, then the spec in plain words. The standard is the **80% Space**, the one a team would have built for themselves after a month of running the process: enough to run it tomorrow, small enough to still feel like theirs. The design guide §3–4 give the rule for each part, from the number of databases to the custom app you consider every time; its numbers are ceilings for a typical process, never targets, so you decide what goes in, fewer is always fine, and what's left out is named in the guide's Make it yours. The person can ask for a starter Space or for everything; 80% is the default.
+The questions are the only stop. Send them in one message (an interview takes a few, the last being its playback), each with the default a shrug gets, plus a row for whatever the workspace leaves to the person: a new Space's name that's taken (default: a new one beside it, "<name> 2"), or an existing database that may or may not be the one to link to (default: a new database in the new Space). An existing Space for the same process is a line, not a question: the new one is built beside it. End that message, or an interview's playback, with one line: you'll build as soon as they answer, in about 10 minutes from a recipe and 15 from scratch, a few more with an app.
 
-Save it as `design.md` in the working folder when you can write files; otherwise it lives in the conversation, summary first.
+When the answers are in, or straight away after "just build it", write the design and build it in the same turn. Don't show the design or a summary, and don't ask whether to build, unless the person asked to see the design first. What you decide in their place (a default taken, a link made or left out, a name chosen) is written down in `design.md` and listed in the report, so they can ask for it to be changed.
 
-**With a recipe, the design is a delta.** The recipe's "Details for building" is the spec, so don't rewrite it: `design.md` holds only the card and what the answers, the workspace or Fibery change, as `references/recipe-delta.md` §2 says. It's a page, not a document, and it's what makes recipe builds fast. The guide is written at build time, one screen from the recipe's story that links back to the recipe (build guide §6).
+## 4. Write the design
 
-## 4. The design card, and a yes
+Design and write it as `references/design-guide.md` prescribes: the spec in plain words, under a short list of what you assumed in the person's place. The standard is the **80% Space**, the one a team would have built for themselves after a month of running the process: enough to run it tomorrow, small enough to still feel like theirs. The design guide §3–4 give the rule for each part, from the number of databases to the custom app you consider every time; its numbers are ceilings for a typical process, never targets, so you decide what goes in, fewer is always fine, and what's left out is named in the guide's Make it yours. The person can ask for a starter Space or for everything; 80% is the default.
 
-The card is the spec's summary, compact enough to read in a minute:
+Save it as `design.md` in the working folder when you can write files; otherwise it lives in the conversation.
 
-```
-**Hiring pipeline** — a new Space in <workspace>, for <what it's for, one line>.
-
-Databases
-- Candidate (12 fields): contact, Source, Salary expectation, Resume, Recruiter, Job,
-  Referrer → People/Person. Applied → Screening → Interview → Offer → Hired | Rejected |
-  Withdrawn. Formulas: Days in stage, Average score, Is stuck.
-- Job (6 fields), Interview (6 fields), Scorecard (6 fields), Offer (6 fields).
-
-Links to what you already have
-- Candidate → People/Person (existing): adds a "Referred candidates" field to Person.
-
-Views (7): Pipeline (board, the daily view), My candidates, My interviews, Offers out, Jobs,
-Closed, New candidate (form); plus the guide. Reports (2): hiring funnel; sources that convert.
-Automations (4): Applied on when created; Stage changed on on every move; Job → Filled when its
-openings are hired; Make offer (button). Web requests: none.
-App: none; considered a scorecard comparison grid, the Jobs grid and Average score cover it for now.
-Sample data: 36 records around today, every stage populated, all marked "(example)"; people are you.
-Outside the Space: adds "Recruiting", "Hiring manager of" and "Interviewing" to every person, and
-"Referred candidates" to People/Person. No automation writes to existing records.
-By hand after the build: the Space icon; sharing the New candidate form outside the workspace.
-Estimate: about 10 minutes after your yes. Assumptions: one recruiter per candidate; agencies are a Source.
-
-Build it? Nothing is created until you say yes.
-```
-
-For a recipe build the card is shorter: the recipe's parts as counts, and only what changes (`references/recipe-delta.md` §2).
-
-With two or three Spaces (the design guide §4 says when), the card's first line names each with its reason, and each database line says its Space.
-
-A rule on a schedule shows its time in UTC ("Mondays 09:00 UTC"), since the build has no time zone to go on.
-
-The **By hand** line names what Fibery MCP can't set, settings the person makes after the build and never failures: the Space icon, always; a Space's sharing, who may open it; a form shared with people outside the workspace; a number or date field's minimum, maximum and default; a formula's number format, when it comes back decimal (the report has the final list); a Description's template, the headings a new record starts with (the build names them in the database's description, and the hero record's Description uses them).
-
-A database's field count is the fields the design adds to it, without Name, Description, the state, comments and formulas (listed apart), with people fields and links, and with a relation counted once, on the database whose line names it; the report's N fields is the sum of these counts, so the two match. Views are counted without the guide and other documents, which the report counts as documents.
-
-Wait for a clear yes to this card. If they change something, change the design and show the card again (briefly, only what changed). A "just build it" said earlier skips the interview questions, not this yes: until they saw the card, they didn't know which existing database gets a field and what is added to every person in the workspace.
+**With a recipe, the design is a delta.** The recipe's "Details for building" is the spec, so don't rewrite it: `design.md` holds only what the answers, the workspace or Fibery change, as `references/recipe-delta.md` §2 says. It's a page, not a document, and it's what makes recipe builds fast. The guide is written at build time, one screen from the recipe's story that links back to the recipe (build guide §6).
 
 ## 5. Build
 
@@ -107,19 +69,28 @@ There is no separate verification pass: the scripts check the formula types, the
 ## 6. Report
 
 ```
-Built <Space name, or names> in <workspace>
+Built <Space name, or names, each with its reason when there are several> in <workspace>
 Created: N databases, N fields, N formulas, N views, N reports, N automations, N documents, N apps, N sample records
 Links: <Database.Field → Existing/Database> ...
 Build: N scripts, N minutes
 ```
 
-Then, briefly: **By hand**, the card's list (§4), one line each with where in Fibery to set it. Then anything else not built and why (every rule dropped because native actions couldn't do it, build guide §5), the fields added outside the Space, the view to open first, and two offers: delete the sample records or the whole Space if this was a trial, and share it. For an identical copy elsewhere, Fibery's **Share Space as template** does it.
+N fields counts the fields the build added: people fields and links in, a relation once, and Name, Description, the state, comments and formulas out. N views leaves out the guide and other documents, which are N documents.
+
+Then, briefly, one line each:
+
+- **Assumptions**: every choice made in the person's place, from `design.md`: a default taken, a link made or left out, a Space name chosen, a currency.
+- **Outside the Space**: the field each people field added to every person, the field each link added to its existing database, and any rule that writes to existing records.
+- **By hand**: what Fibery MCP can't set, settings the person makes after the build and never failures, each with where in Fibery to set it: the Space icon, always; a Space's sharing, who may open it; a form shared with people outside the workspace; a number or date field's minimum, maximum and default, including every default and range a recipe gives ("Date: today by default", "0 to 100"); a formula's number format, when it came back decimal; a Description's template, the headings a new record starts with (the build names them in the database's description, and the hero record's Description uses them).
+- **Not built**: every rule dropped because native actions couldn't do it (build guide §5), the app you considered when none was built, and anything else, with why.
+
+Then the view to open first, and two offers: delete the sample records or the whole Space if this was a trial, and share it. For an identical copy elsewhere, Fibery's **Share Space as template** does it.
 
 After a recipe build, end with **For the recipe**, at most five lines for whoever keeps it: what the delta added or changed that most teams would need too (never this team's names or links), what the recipe asked for that couldn't be built, and any promise the sample data couldn't keep. Offer to turn them into a revision with recipe-writer. After a design from scratch for a process without a recipe, offer to turn the new Space into one with recipe-writer, so the next team starts from a recipe.
 
 ## Boundaries
 
-- Never change, rename or delete anything that existed before the build. The build adds exactly three kinds of things outside the new Spaces, all agreed on the card, whether in the build or added later when the person asks for a change: the inverse field of each link on the existing database, the `user/<name>` field of each people field on the workspace's people, and any automation that will write to records of a linked database when the team's own records change. The build itself never reads existing records into sample data, writes to them, or links sample records to them.
+- Never change, rename or delete anything that existed before the build. The build adds exactly three kinds of things outside the new Spaces, all listed in the report: the inverse field of each link on the existing database, the `user/<name>` field of each people field on the workspace's people, and a rule that writes to records of a linked database when the team's own records change, which exists only when the person asked for one, before the build or after it. The build itself never reads existing records into sample data, writes to them, or links sample records to them.
 - Never put real people, customers, emails or record contents into sample data; sample data is invented, people are `me`.
 - No migration from other tools in this version: neither their structure (a Notion or Airtable base, a Jira project, a spreadsheet) nor their records. If that's what the person has, say so, design from their process as they describe it, and point them to Fibery's import for the records afterwards.
-- If the workspace already has a Space for this process, the card says so, and its yes builds alongside it (a new Space, links allowed); changing the existing one is fibery-health's kind of work, done differently.
+- If the workspace already has a Space for this process, say so with the questions (in the report after "just build it") and build alongside it (a new Space, links allowed); changing the existing one is fibery-health's kind of work, done differently.
