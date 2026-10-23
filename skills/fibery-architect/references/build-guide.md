@@ -1,25 +1,21 @@
 # Build guide
 
-A build is five `execute_code` scripts, each started from its template in `scripts.md`, then the guide's two direct calls, with the app beside them. The spec you build from is `design.md`, or, for a recipe build, the recipe's Details for building with the delta in `design.md` applied on top: renames everywhere, links, additions, removals; whatever the delta doesn't mention is built as the recipe says.
+A build is six `execute_code` scripts, each started from its template in `scripts.md`, and the guide's two direct calls, with the app beside them. The spec you build from is `design.md`, or, for a recipe build, the recipe's Details for building with the delta in `design.md` applied on top: renames everywhere, links, additions, removals; whatever the delta doesn't mention is built as the recipe says.
 
-Before the scripts · 1 Structure · 2 Formulas · 3 Views and reports · 4 Sample records · 5 Rules and buttons · 6 The guide · 7 The app · 8 Shapes the templates don't show · 9 Troubleshooting. The scripts' templates are in `scripts.md`, under the same numbers.
+Before the scripts · 1 Structure · 2 Formulas · 3 Views and reports · 4 Sample records · 5 Rules and buttons · 6 The guide and the last checks · 7 The app · 8 Shapes the templates don't show · 9 Troubleshooting. The scripts' templates are in `scripts.md`, under the same numbers.
 
 ## Before the scripts
 
 `execute_code`'s own description says how a script runs. What it doesn't say: `get_fibery_skill` isn't there (call it directly), and the tools a script calls need no loading in the client (SKILL.md, What you need): their inputs are in the templates and in §8.
 
-| Script | Builds | Runs |
-|---|---|---|
-| 1 | Spaces, databases, fields, relations, people fields, links, workflows | first, once the design is written |
-| 2 | formulas, level by level | after 1 |
-| 7 | only with an app: the empty app and the ids its code needs | after 2, before 3, so script 3 finds a page app |
-| 3 | views, documents and reports | after 2, in one message with 4 |
-| 4 | sample records with their links, states, people, texts and comments, and the checks on stored values | with 3 |
-| 5 | buttons and rules, and the checks that read formulas | after 4, so no rule fires on the sample data |
-| 6 | the guide's text, then a look at the first view: two direct calls, no script | with 5 |
-| App | the app's code, uploaded from Bash | after 7, beside the rest (§7) |
+In this order, each message once the one before has answered:
 
-Scripts 1 and 2 come first because everything hangs off the fields and formulas; with an app, script 7 follows at once, so the app's helper can start. Scripts 3 and 4 don't depend on each other, so they go in one message. Script 5 and the guide go in the next, with any fix for script 3; a fix for script 4's records goes in a message of its own before them, since a rule created first would fire on it. The guide needs only the urls script 3 logged, and if script 5 drops a rule, the message after it corrects what the guide says about the rule. The app is the one long piece, so it alone goes to a helper when the client has an Agent tool; a script takes seconds in Fibery, and a helper would spend longer reading its brief than the script takes.
+1. **Script 1**, the structure: everything else hangs off it.
+2. **Script 2**, the formulas, which read its fields.
+3. **The rest at once:** the app's helper first when there's an app (§7), then scripts 3, 4 and 5: views and reports, the sample records, rules and buttons. None needs another, and a rule may fire on the sample data as it's written, which is fine.
+4. **The guide's two calls and script 6** (§6): the guide mentions what the other scripts made, and script 6 checks the promises that read formulas, which Fibery has recomputed by now.
+
+A script that logs "time is up" goes again, alone, before the next message. Fixes for scripts 3 to 5, and a view that filters on a sample record, go in a message of their own before the guide's, so the guide mentions what exists. Then the report, once the helper is back; without an Agent tool, the app script goes in message 3 and the app is built after the guide (§7). Only the app goes to a helper: a script takes seconds, less than a helper would spend reading its brief.
 
 **Every script:**
 
@@ -60,7 +56,7 @@ The template is `scripts.md` §1.
 
 ## 2. Formulas
 
-One script, `LEVELS` in dependency order: the formulas that use no other formula, then the ones that use those, and so on, as many levels as there are. It sends four at a time and stops in time, and a rerun goes on from where it stopped. Scripts 3 and 4 wait until it logs no "time is up".
+One script, `LEVELS` in dependency order: the formulas that use no other formula, then the ones that use those, and so on, as many levels as there are. It sends four at a time and stops in time, and a rerun goes on from where it stopped. The rest waits until it logs no "time is up".
 
 `create_formula_field` takes no code: Fibery writes the formula from the description, in about 11 seconds. The description is the spec's meaning in one sentence under about 280 characters (longer ones are rejected), naming every field exactly and saying the result type ("The result is a whole number" / "a decimal with one decimal place" / "text" / "true or false" / "a date" / "a date range"); when the spec gives an expression, the formula has three or more conditions, or it divides, averages or counts a share, it adds "Use exactly this Fibery formula: <expression>", and then the description can be just that and the type sentence: left to itself, Fibery's writer wraps a share in `Round` (which makes it decimal) and adds clauses of its own. Fibery's syntax, as it writes it: fields in brackets (`[Stage changed on]`), or bare when one word; `If(c, a, b)`, `IsEmpty(x)`, `and`, `or`, `=`, `!=`; `State.Name = "Done"`; `Today()` and `ToDays(date - date)`; a collection's `Filter(…)`, `Count()`, `Avg(Field)`; `Greatest(a, b)`, `Round(x, places)`; a range's `Dates.Start()` and `Dates.End()`.
 
@@ -74,7 +70,7 @@ The type is fixed when the field is created, and `update_formula_field` keeps it
 
 The template is `scripts.md` §2.
 
-The log shows each formula's type and expression. Compare both with the spec before scripts 3 and 4: the type, and every condition, comparison and fallback, since Fibery's writer can drop a clause or add one and keep the type. A wrong type: delete and recreate in the next script, while nothing uses the field yet. A wrong expression: `update_formula_field({database, name, description})`, the field's full name in `name` and "Use exactly this Fibery formula: <expression>" as the description.
+The log shows each formula's type and expression. Compare both with the spec before the next message: the type, and every condition, comparison and fallback, since Fibery's writer can drop a clause or add one and keep the type. A wrong type: delete and recreate in the next script, while nothing uses the field yet. A wrong expression: `update_formula_field({database, name, description})`, the field's full name in `name` and "Use exactly this Fibery formula: <expression>" as the description.
 
 A report that keeps only some linked records (only key results whose objective is Active, only runs of strats that aren't Retired) needs a true-or-false formula on its source ("Objective active"), since a report filters on its source's own fields: the design lists it with the formulas (in a recipe's delta, as a Change row), and it is created here with the others.
 
@@ -87,7 +83,7 @@ Every view, document and report in one script: the state and option ids looked u
 - A calendar gets no card fields, whatever the spec's Shows says: each one squeezes the name down to its first letter, so the color carries the kind or state. A timeline bar takes one short field at most. Both use one field for start and end, a date range or a plain date or date-time, unless the spec names two.
 - Children nest through a to-many relation only, one item per level and each database once; a database nests inside itself through one item pointing at its own index (§8). A view that asks to nest through a to-one is dropped and reported.
 - A board or timeline groups by a state, select, relation or people, never a number, text or date: if the spec says otherwise, the spec is wrong, not the call.
-- A view that filters on a specific sample record waits for the records: a short script in the message with script 5 creates it.
+- A view that filters on a specific sample record waits for the records: a short script creates it after script 4, before the guide.
 - A document view is created empty, with its `space`; §6 writes its text.
 - A report is one tab holding one chart, never a second tab of any kind: a table, a metric or a second chart is another report. The script creates it, adds the chart and then removes the empty default tab, titled "Chart", which can't be given dimensions afterwards; while the chart is missing the default tab stays, since a report's last tab can't be removed. Rows are filtered by the tab's `fieldConditions` (their operators are in §8), never the source's `filterPrompt`, which has failed twice. Report fields are named without their Space (`[Publish date]`), the state is `State`, a relation its title, the id `Id`; a true-or-false field and a relation are text there (`{field: "Strat retired", operator: "is in", value: ["false"]}`), and only the source's own fields are there: a condition on a linked record's field needs the formula from §2. A historical report (time in state, change over time) is `mode: "historical"` in `REPORTS`, its chart's conditions starting with `{field: "Modification Date", operator: "range", value: "LAST 90 DAYS"}`; there a field that isn't part of the history is named "<Field> (current value)" (`{field: "Objective active (current value)", operator: "is in", value: ["true"]}`), as `display_report_schema({databases, sourceMode: "historical"})` lists. `display_report_schema({databases: [...], sourceMode})` only when a chart is rejected.
 
@@ -105,13 +101,13 @@ The records are the script's data, written from the spec's sample story and data
 - **Dates** in days from the build day, spread over the past quarter and the next month; a story's "Tuesday" or "last week" is an offset too, never a calendar date.
 - **Links** by the linked record's name; **people** as `"me"`.
 - **One hero per main database**, with its Description in Markdown showing how the team writes one.
-- **Every field a role fills every time**, filled, and every field a rule of script 5 keeps (a date stamped on a state change), filled from the story, since those rules come after the records.
+- **Every field a role fills every time**, filled, and every field a rule keeps (a date stamped on a state change), filled from the story; a rule that fires on a record as it is written may change it, and that's fine.
 - **The promises kept:** every record satisfies What must stay true as if the rules had run. A shipped pitch has every scope Done; a key result with a Last check in has the check in behind it; an official match calls only Match ready strats. A Space that contradicts its own promises on day one teaches the wrong habit. The exception is a record the story shows breaking a promise on purpose, the red card a flag exists for: its check leaves it out by name.
 - **Only dates the build can set.** Records are created at build time, and Creation Date can't be set ("Cannot update "fibery/creation-date" readonly fields"): a moment that needs an older record (an update posted ninety minutes ago, a postmortem past a due date counted from its creation) shows only through a date field the record has, and otherwise goes under For the recipe in `design.md`'s Build notes.
 
 Invent freely around the story, but never a real person, company or record of the workspace, and never a link to an existing database's records.
 
-`CHECKS` hold one line per promise on stored values, or per Must hold cell, each a query's `select` and a `bad` test that finds the records breaking it (pitches in *Bet* with no appetite; *Shipped* pitches with a scope not *Done*). Decimal values come back from `query` as strings ("25"), so a check compares `Number(r.x)`. A promise on a collection selects it as a sub-query whose `q/from` is the field's full name as a string, `skills: {"q/from": f("Skills"), "q/select": {n: "enum/name"}, "q/limit": "q/no-limit"}`, people and multi selects included; a path through a collection, or a `q/from` list, is rejected. A promise kept in comments selects them the same way, `cs: {"q/from": "comments/comments", "q/select": {id: "fibery/id"}, "q/limit": 1}`, with `bad: r => … && !r.cs.length`. A rich text is read with `read_document`, since its Snippet lags behind an insert. A check that reads a formula goes in script 5, since Fibery recomputes formulas a few seconds after the writes. Fix the data in the next script until every check holds; a promise no query can see (a practice, an app's behaviour) is reported as not checked.
+`CHECKS` hold one line per promise on stored values, or per Must hold cell, each a query's `select` and a `bad` test that finds the records breaking it (pitches in *Bet* with no appetite; *Shipped* pitches with a scope not *Done*). Decimal values come back from `query` as strings ("25"), so a check compares `Number(r.x)`. A promise on a collection selects it as a sub-query whose `q/from` is the field's full name as a string, `skills: {"q/from": f("Skills"), "q/select": {n: "enum/name"}, "q/limit": "q/no-limit"}`, people and multi selects included; a path through a collection, or a `q/from` list, is rejected. A promise kept in comments selects them the same way, `cs: {"q/from": "comments/comments", "q/select": {id: "fibery/id"}, "q/limit": 1}`, with `bad: r => … && !r.cs.length`. A rich text is read with `read_document`, since its Snippet lags behind an insert. A check that reads a formula goes in script 6, at the end, since Fibery recomputes formulas a few seconds after the writes. Fix the data in the next script until every check holds; a promise no query can see (a practice, an app's behaviour) is reported as not checked.
 
 The template is `scripts.md` §4.
 
@@ -139,7 +135,7 @@ Databases may come in any order: to-one links are set once every record exists. 
 
 ## 5. Rules and buttons
 
-One script after script 4, since a rule created earlier would fire on the sample data as it is written; it creates four at a time and stops in time. A schedule starts the day after the build, at the spec's time, in UTC, and the guide says "UTC" next to the time. A rule that stamps the date a day count reads (Stage changed on) gets `created` as a second trigger, so every new record has it and the count stays a whole number (§2); a rule filtered on states no record is created in doesn't need it. The sample records carry their dates from script 4. `CHECKS` hold the promises that read formulas, which Fibery has recomputed by now (§4).
+One script, in the message with scripts 3 and 4; a rule may fire on the sample data as it is written, and that's fine. It creates four at a time and stops in time. A schedule starts the day after the build, at the spec's time, in UTC, and the guide says "UTC" next to the time. A rule that stamps the date a day count reads (Stage changed on) gets `created` as a second trigger, so every new record has it and the count stays a whole number (§2); a rule filtered on states no record is created in doesn't need it.
 
 - **Native actions only.** A rule or button never uses the `Script` action, whatever the spec says; `execute_code` builds the Space and never becomes part of it. Its condition is the filter, its texts are templates, and a rule with two conditions becomes two rules. An action no native shape can do (a comment on a linked record, a notification to the people of linked records, a check before acting, a value found by searching other records, email), or one rejected with no native shape in §8, is left out: the rule is built with the rest when the rest still does its job (Actions done still moves the postmortem to Closed, without its comment), and not at all when that action is its point (All parts in exists only to tell the builder). Either way the report lists what wasn't built and the guide names the step as done by hand. A rejected action fails its whole rule, so send the rule again without it.
 - **Buttons take no filter and can't check:** a button acts whatever the record's state, so its description and the guide say when to press it.
@@ -153,31 +149,32 @@ The template is `scripts.md` §5.
 
 The builders: `wf`, `and`, `or`, `flag`, `num`, `empty` and `days` as in §3; `stateValue` sets a state; `tpl` a text and `formula` a value Fibery writes from a prompt; `tomorrowAt(8)` a schedule's first run. Other triggers, actions and values: §8.
 
-## 6. The guide
+## 6. The guide and the last checks
 
-Written once the views exist, in the message with script 5, because its text mentions them. It takes two direct calls, no script.
+Written last, since its text mentions what the other scripts made: two direct calls, in one message with script 6, which holds the checks that read formulas (§4), recomputed by now. Script 6's template is `scripts.md` §6; fix what it finds broken in the next script.
 
 **Its text.** The guide the design guide describes under Documents, one screen and under 500 words, for a recipe build too: the recipe teaches the method, the guide teaches this Space. From a recipe, write it with the delta applied (every rename, removal and Making it yours bullet taken, so nothing the guide names is missing) and the workspace's specifics where the recipe left a choice. Its parts come from the recipe's: the promise; How it runs, cut to its bold moments in order, each a line that says who acts and in which view; What people look at, as Where to look; the ★ promises of What must stay true; and up to three requests for the parts Making it yours says the recipe leaves out on purpose. A rule that wasn't built is named in its step as done by hand. The last line, in italics, links the recipe for the whole story: "The whole story, with the why behind each step: [Shape Up](https://github.com/Fibery-inc/process-cookbook/blob/main/recipes/software/shape-up.md)". A cookbook recipe links its page, `https://github.com/Fibery-inc/process-cookbook/blob/main/` followed by its `path` in the index (`recipes/<domain>/<id>.md`); a recipe from a link links that link; one attached or pasted gets no last line.
 
 **Its mentions.** Every view, form, report, document and app named in Where to look, which leaves the guide itself out, is a mention there. Elsewhere a view is a mention where it first appears in each section. A layout app has no view of its own: name it as a tab on every record of its database. Rules, buttons, databases, fields, states and records stay plain names, so the guide reads as a story whose doors are the views. A view that failed is named without a mention, and the guide says so.
 
-**The calls.** Put each mention in the text exactly as script 3's log gives it, where the view's name would go: "Every morning, open [[Pipeline#^…/…]]." Never write one by hand or put a url in its place; the recipe in the last line is the guide's one link. Then, in the message with script 5, `replace_document_blocks` (no Fibery skill to load first; its result echoes every block, so read only that it succeeded) with the document's secret and empty block from the same log and the whole text in one replacement, `{secret, blocks: [{blockId: <block>, content: <text>}]}`, sent only when that log says the document is empty, so a resumed build never writes it twice. The second call is `fetch_view_data` for the first view, its `publicId` the last part of its url, with `limit: 5`. Read those cards as the person will see them and fix what looks wrong before the report; a view with nested items comes back as one flat list per database, children unfiltered by their parents, so read its root items. Any other document in the spec is written the same way.
+**The calls.** Put each mention in the text exactly as script 3's log gives it, or the app script's for a page app, where the view's name would go: "Every morning, open [[Pipeline#^…/…]]." Never write one by hand or put a url in its place; the recipe in the last line is the guide's one link. Then `replace_document_blocks` (no Fibery skill to load first; its result echoes every block, so read only that it succeeded) with the document's secret and empty block from the same log and the whole text in one replacement, `{secret, blocks: [{blockId: <block>, content: <text>}]}`, sent only when that log says the document is empty, so a resumed build never writes it twice. The second call is `fetch_view_data` for the first view, its `publicId` the last part of its url, with `limit: 5`. Read those cards as the person will see them and fix what looks wrong before the report; a view with nested items comes back as one flat list per database, children unfiltered by their parents, so read its root items. Any other document in the spec is written the same way.
 
 ## 7. The app
 
 The spec describes the app and never contains its code: the code is written now, from the spec's "how it works" and the built Space's real names and ids, so it matches both and today's app platform. `get_fibery_skill({skill: "custom-apps-dev"})`, a direct call, never in a script, is the source of truth for the stack, the `@/lib/fibery` API, theming, the files you may change, the token (`create_custom_app_dev_token({appId})`, from a one-line script or directly) and the download and upload requests; the three rules below are this build's own and stand. The download and upload need the web, which `execute_code` has no access to: this runs in Bash.
 
-Script 7 comes first, right after script 2: `APPS`, `{name, kind: "view", spaceName}` for a page in the Space (without `spaceName` it lands in the private space) or `{name, kind: "layout", databaseName}` for a tab on every record page, and `APP_TOUCHES`, the databases (`C`) and fields (`[C, f("Days in stage")]`, `[C, "workflow/state"]`) its code uses. It makes the empty app and logs the app's id and those ids on every run. The template is `scripts.md` §7.
+The app script, `scripts.md` §7, comes first: `APPS`, `{name, kind: "view", spaceName}` for a page in the Space (without `spaceName` it lands in the private space) or `{name, kind: "layout", databaseName}` for a tab on every record page, and `APP_TOUCHES`, the databases (`C`) and fields (`[C, f("Days in stage")]`, `[C, "workflow/state"]`) its code uses. It makes the empty app and logs its id, a page app's url and mention, and those ids, on every run.
 
-With an Agent tool, a helper of your own model builds the app, started right after script 7 with this brief, while you run scripts 3 to 5 and the guide; without one, build it yourself after the guide.
+With an Agent tool, a helper of your own model builds the app, started first in the message with scripts 3 to 5 with this brief; it runs the app script itself. Without one, run the app script in that message and build the app yourself after the guide.
 
 ```
 You are building the custom app "<name>" for the new Fibery Space "<Space>". Read <path to this file> §7,
-then load Fibery's custom-apps-dev guide with get_fibery_skill. The app: <kind and purpose, and "how it
-works" from the spec>. Writes: <the only fields it may change>. Names: <the full name of every database
-and field it touches>. Ids: <the ids script 7 logged for them>. App id: <id>. Upload description:
-"Built by fibery-architect from the design <name>". Change nothing else in the workspace. Reply when the
-upload has built, or after three failed builds with the last error.
+run its app script (<path to scripts.md> §7) with this data: <APPS and APP_TOUCHES>, then load Fibery's
+custom-apps-dev guide with get_fibery_skill. The app: <kind and purpose, and "how it works" from the
+spec>. Writes: <the only fields it may change>. Names: <the full name of every database and field it
+touches>. Upload description: "Built by fibery-architect from the design <name>". Change nothing else in
+the workspace. Reply with the app script's "app" line when the upload has built, or after three failed
+builds with the last error.
 ```
 
 1. **Write the app**, usually only `src/App.tsx`, by three rules:

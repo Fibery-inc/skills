@@ -1,6 +1,6 @@
 # Scripts
 
-The templates of the build guide's scripts, under its section numbers (1 to 5, and 7 for an app), for a small hiring Space (Job, Candidate). Each data block shows one example of each kind, not how many to build. Replace the data block at the top with the spec's content, as the build guide's section of the same number says, and copy everything from `const fails` down unchanged. Every template reads what exists before it writes and logs what it found as well as what it made, so any of them runs again as it is, after a failure, a cut-off or a fix to its data.
+The templates of the build guide's scripts, under its section numbers (1 to 6, and 7 for an app), for a small hiring Space (Job, Candidate). Each data block shows one example of each kind, not how many to build. Replace the data block at the top with the spec's content, as the build guide's section of the same number says, and copy everything from `const fails` down unchanged. Every template reads what exists before it writes and logs what it found as well as what it made, so any of them runs again as it is, after a failure, a cut-off or a fix to its data.
 
 ## 1. Structure
 
@@ -367,10 +367,6 @@ const AUTOMATIONS = () => [
     triggers: [{trigger: "created"}, {trigger: "updated", args: {updatedField: ["workflow/state"]}}],
     actions: [{action: "Update", args: {fields: [{name: f("Stage changed on"), value: formula("today")}]}}]}
 ];
-const CHECKS = [
-  {label: "Stuck while finished", from: C, select: {state: ["workflow/state", "enum/name"], stuck: f("Stuck")}, bad: r => r.stuck && ["Hired", "Rejected"].includes(r.state)},
-  {label: "the story's stuck candidate shows red", from: C, select: {stuck: f("Stuck")}, bad: r => r.n === "Ben Okafor (example)" && !r.stuck}
-];
 
 const fails = [], t0 = Date.now();
 const run = async (label, p) => { try { return await p; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
@@ -424,18 +420,34 @@ for (const a of list) {
   const s = stored[key(a)];
   if (s) log(`${a.name}${todo.includes(a) ? "" : " (there before)"}: ${(s.triggers || []).map(when).join(" + ") || "button"}${s.filter ? "; if " + condition(s.filter) : ""}; ${readable((s.actions || []).map(x => [x.name, x.args]))}`.slice(0, 900));
 }
-for (const c of CHECKS) {
-  const bad = (await rows(c.from, {n: `${c.from.split("/")[0]}/Name`, ...c.select})).filter(c.bad).map(r => r.n);
-  log(`check ${c.label}: ${bad.length ? "BROKEN by " + bad.join(", ") : "holds"}`);
-}
 log(`automations: ${made.filter(Boolean).length} made, ${list.length - todo.length} there before`);
 if (made.length < todo.length) log(`time is up with ${todo.length - made.length} automations left: run this script again, as it is, to finish`);
 log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 ```
 
+## 6. The last checks
+
+```js
+const S = "Hiring"; const f = n => `${S}/${n}`;
+const C = f("Candidate");
+const CHECKS = [
+  {label: "Stuck while finished", from: C, select: {state: ["workflow/state", "enum/name"], stuck: f("Stuck")}, bad: r => r.stuck && ["Hired", "Rejected"].includes(r.state)},
+  {label: "the story's stuck candidate shows red", from: C, select: {stuck: f("Stuck")}, bad: r => r.n === "Ben Okafor (example)" && !r.stuck}
+];
+
+const fails = [];
+for (const c of CHECKS) {
+  try {
+    const bad = (await query({query: {"q/from": c.from, "q/select": {n: `${c.from.split("/")[0]}/Name`, ...c.select}, "q/limit": "q/no-limit"}})).result.filter(c.bad).map(r => r.n);
+    log(`check ${c.label}: ${bad.length ? "BROKEN by " + bad.join(", ") : "holds"}`);
+  } catch (e) { fails.push(`${c.label}: ${String(e.message || e).slice(0, 200)}`); }
+}
+log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
+```
+
 ## 7. The app
 
-Only when the design has an app, right after script 2. `APPS` holds `{name, kind: "view", spaceName}` for a page in the Space or `{name, kind: "layout", databaseName}` for a tab on every record page; `APP_TOUCHES` the databases and fields the app's code uses.
+Only when the design has an app: the app's helper runs it, or you do, in the message with scripts 3 to 5. `APPS` holds `{name, kind: "view", spaceName}` for a page in the Space or `{name, kind: "layout", databaseName}` for a tab on every record page; `APP_TOUCHES` the databases and fields the app's code uses.
 
 ```js
 const S = "Hiring"; const f = n => `${S}/${n}`;
@@ -454,7 +466,8 @@ const appsNow = (await get_custom_apps_list({})).result, viewsNow = await appVie
 for (const a of APPS) {
   const view = viewsNow.find(v => v.name === a.name), at = view ? Date.parse(view.creationDate) + 5000 : Infinity;
   const app = (a.kind === "layout" || view) && appsNow.filter(x => x.name === a.name && x.kind === a.kind && (a.kind === "view" || x.databaseName === a.databaseName) && time(x.id) <= at).sort((p, q) => time(q.id) - time(p.id))[0];
-  log(`app ${a.name}: ${app ? "id " + app.id : "not made yet"}${view ? ", " + view.url : ""}`);
+  const mention = view && await get_entity_mention({database: "fibery/view", entityId: view.id, label: a.name}).then(r => r.mention, e => "failed: " + e.message);
+  log(`app ${a.name}: ${app ? "id " + app.id : "not made yet"}${view ? `, ${view.url}, mention ${mention}` : ""}`);
 }
 const ids = {};
 for (const db of new Set(APP_TOUCHES.map(t => [].concat(t)[0]))) {

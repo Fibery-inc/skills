@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.14 — 2026-10-23
+
+fibery-architect builds in a new order: the structure, then the formulas, then everything else at once, then the guide. Views and reports, sample records, rules and buttons and the app now go out in one message, the app's helper first, running the app script itself, since none needs another; a rule may fire on the sample data as it is written, and that's fine. The guide comes last, so it can mention everything the others made, together with a new script 6, the checks that read formulas: they left script 5, which beside the records would check them before there was anything to read. The app script also logs a page app's mention for the guide. "Before the scripts" lists the four messages in order instead of a table numbered by section, and a fix goes in a message of its own before the guide's. On edge: scripts 1 and 2, then the app script and scripts 3 to 5 in one message, then script 6, with nothing failed and every check holding.
+
 ## 1.8.13 — 2026-10-23
 
 fibery-architect's formulas are a script of their own again, script 2, as before 1.8.12, so a script that runs out of time is sent again with only its own part: in a timed TNR program build on 1.8.12, script 1 ran out of time on the structure and went again whole, formulas included, 15.2K characters. The app's part, an add-on to script 1 in 1.8.12, is a script of its own too, script 7 after the build guide's §7, run only with an app, right after script 2 (the TNR build had run it on its own anyway): it makes the empty app and logs its id and the ids the app's code needs, formula fields included, before script 3, which then finds a page app for the guide, and the app's helper starts there. Build guide §8 now gives a map view's `location`, so a map no longer needs Fibery's views guide (27K characters) for one line. Scripts 1, 2 and 7 ran on edge, first runs and reruns, with nothing failed, and a map built as §8 says was stored as sent.
