@@ -1,8 +1,8 @@
 # Scripts
 
-The templates of the build guide's five scripts, under the same numbers, for a small hiring Space (Job, Candidate). Each data block shows one example of each kind, not how many to build. Replace the data block at the top with the spec's content, as the build guide's section of the same number says, and copy everything from `const fails = [];` down unchanged. Every template reads what exists before it writes and logs what it found as well as what it made, so any of them runs again as it is, after a failure, a cut-off or a fix to its data.
+The templates of the build guide's four scripts, numbered by its sections (script 1 also writes §2's formulas, so there is no script 2), and the app add-on, for a small hiring Space (Job, Candidate). Each data block shows one example of each kind, not how many to build. Replace the data block at the top with the spec's content, as the build guide's section of the same number says, and copy everything from `const fails` down unchanged. Every template reads what exists before it writes and logs what it found as well as what it made, so any of them runs again as it is, after a failure, a cut-off or a fix to its data.
 
-## 1. Structure
+## 1. Structure and formulas
 
 ```js
 const S = "Hiring"; const f = n => `${S}/${n}`;
@@ -32,8 +32,16 @@ const WORKFLOWS = [
 ];
 const COMMENTS = [C, J];
 const ICONS = [], AVATARS = [], NO_DESCRIPTION = [];
-const APPS = [];
-const APP_TOUCHES = [];
+const LEVELS = [
+  [
+    {database: C, name: f("Days in stage"), description: "Use exactly this Fibery formula: If(IsEmpty([Stage changed on]), 0, ToDays(Today() - [Stage changed on])). The result is a whole number."},
+    {database: J, name: f("Hired"), description: "How many of the job's Candidates have State Hired; 0 with none. The result is a whole number."}
+  ],
+  [
+    {database: J, name: f("Open seats"), description: "Openings minus Hired, and 0 when that is below 0. The result is a whole number."},
+    {database: C, name: f("Stuck"), description: "True when Days in stage is more than 14 and the State is neither Hired nor Rejected; false otherwise. The result is true or false."}
+  ]
+];
 
 const fails = [], made = [], t0 = Date.now();
 const run = async (label, p) => { try { const r = await p; made.push(label); return r; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
@@ -41,39 +49,35 @@ const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const fieldsOf = async dbs => {
   const out = {}; let cur = null;
   for (const line of (await schema_detailed({databases: dbs})).schema.split("\n")) {
-    const d = line.match(/^(\S[^:]*):/); if (d) { cur = d[1]; out[cur] = new Set(); continue; }
-    const m = line.match(/^ {4}([^:]+):/); if (cur && m) out[cur].add(m[1]);
+    const d = line.match(/^(\S[^:]*):/); if (d) { cur = d[1]; out[cur] = new Map(); continue; }
+    const m = line.match(/^ {4}([^:]+): (.*)$/); if (cur && m) out[cur].set(m[1], m[2]);
   }
   return out;
 };
 const tree = (await schema({})).schema;
 const foreign = SPACES.flatMap(sp => (tree.match(new RegExp(`^\\s*${esc(sp.name)}/[^,\\n]+(?=,)`, "gm")) || []).map(x => x.trim()).filter(n => !DATABASES.some(d => d.name === n)));
 if (foreign.length) { log("STOP, a Space with this name holds other databases: " + foreign.join(", ")); throw new Error("the Space isn't this build's"); }
-const pre = [];
 const newSpaces = SPACES.filter(sp => !new RegExp(`^\\s*- name: ${esc(sp.name)}$`, "m").test(tree));
-for (const sp of newSpaces) pre.push(await run("space " + sp.name, create_space(sp)));
 const newDbs = DATABASES.filter(d => !new RegExp(`^\\s*${esc(d.name)},`, "m").test(tree));
+const pre = [];
+for (const sp of newSpaces) pre.push(await run("space " + sp.name, create_space(sp)));
 if (newDbs.length) pre.push(await run("databases", create_databases({databases: newDbs})));
 if (pre.some(r => !r)) { fails.forEach(x => log("FAIL " + x)); throw new Error("a Space or database wasn't created"); }
-const moved = pre.flatMap(r => (r && r.fixLogs) || []);
+const moved = pre.flatMap(r => r.fixLogs || []);
 if (moved.length) { log("STOP, a name went elsewhere: " + JSON.stringify(moved)); throw new Error("fixLogs on a Space or database"); }
-const has = await fieldsOf([...DATABASES.map(d => d.name), "fibery/user"]);
+const dbs = DATABASES.map(d => d.name), has = await fieldsOf([...dbs, "fibery/user"]);
 const missing = list => list.filter(x => !has[x.database].has(x.name));
-const renamed = [];
-const people = missing(PEOPLE).map(p => {
+const renamed = [], people = missing(PEOPLE).map(p => {
   let inv = p.relationFieldName, n = 2;
   while (has["fibery/user"].has(inv)) inv = `${p.relationFieldName} ${n++}`;
   if (inv !== p.relationFieldName) renamed.push(`${p.relationFieldName} → ${inv}`);
   return {...p, relationDatabase: "fibery/user", relationFieldName: inv};
 });
-const appViews = async () => APPS.some(a => a.kind === "view") ? (await query_views({space: S, withConfig: false})).views.filter(v => v.viewType === "custom-app") : [];
-const appsBefore = APPS.length ? (await get_custom_apps_list({})).result : [], viewsBefore = await appViews();
-const newApps = APPS.filter(a => a.kind === "view" ? !viewsBefore.some(v => v.name === a.name) : !appsBefore.some(x => x.name === a.name && x.databaseName === a.databaseName));
-const fieldList = [PRIMITIVE, SINGLE, MULTI, FILES, RELATIONS, PEOPLE, LINKS].flat();
-const before = `Spaces ${SPACES.length - newSpaces.length}, databases ${DATABASES.length - newDbs.length}, fields ${fieldList.length - missing(fieldList).length}, workflows ${WORKFLOWS.filter(w => has[w.database].has("workflow/state")).length}, apps ${APPS.length - newApps.length}`;
-const calls = [];
-const call = (label, list, fn) => { if (list.length) calls.push([label, () => fn(list)]); };
-NO_DESCRIPTION.filter(db => has[db].has(`${db.split("/")[0]}/Description`)).forEach(db => call("no description " + db, [db], () => delete_fields({fields: [{database: db, field: `${db.split("/")[0]}/Description`}]})));
+const fieldList = [PRIMITIVE, SINGLE, MULTI, FILES, RELATIONS, PEOPLE, LINKS].flat(), formulas = LEVELS.flat();
+const before = `Spaces ${SPACES.length - newSpaces.length}, databases ${dbs.length - newDbs.length}, fields ${fieldList.length - missing(fieldList).length}, workflows ${WORKFLOWS.filter(w => has[w.database].has("workflow/state")).length}, formulas ${formulas.length - missing(formulas).length}`;
+const calls = [], call = (label, list, fn) => { if (list.length) calls.push([label, () => fn(list)]); };
+const desc = db => `${db.split("/")[0]}/Description`;
+NO_DESCRIPTION.filter(db => has[db].has(desc(db))).forEach(db => call("no description " + db, [db], () => delete_fields({fields: [{database: db, field: desc(db)}]})));
 call("comments", COMMENTS.filter(db => !has[db].has("comments/comments")), l => create_comments_fields({databases: l}));
 call("icons", ICONS.filter(db => !has[db].has("icon/icon")), l => create_icon_fields({databases: l}));
 call("avatars", AVATARS.filter(db => !has[db].has("avatar/avatars")), l => create_avatars_fields({databases: l}));
@@ -85,96 +89,65 @@ call("relations", missing(RELATIONS), l => create_relation_fields({fields: l}));
 call("people fields", people, l => create_relation_fields({fields: l}));
 missing(LINKS).forEach(l => call("link " + l.name, [l], x => create_relation_fields({fields: x})));
 WORKFLOWS.filter(w => !has[w.database].has("workflow/state")).forEach(w => call("workflow " + w.database, [w], ([x]) => create_workflow_field(x)));
-newApps.forEach(a => call("app " + a.name, [a], ([x]) => create_custom_app(x)));
 const results = [];
 for (const [label, go] of calls) if (Date.now() - t0 < 30000) results.push(await run(label, go()));
-const appIds = async touches => {
-  const out = {};
-  for (const db of [...new Set(touches.map(t => [].concat(t)[0]))]) {
-    const t = (await query({query: {"q/from": "fibery/type", "q/select": {id: "fibery/id"}, "q/where": ["=", ["fibery/name"], db], "q/limit": 1}})).result[0];
-    if (t) out[db] = t.id;
-    for (const r of (await query({query: {"q/from": "fibery/field", "q/select": {id: "fibery/id", n: "fibery/name"}, "q/where": ["=", ["fibery/holder-type", "fibery/name"], db], "q/limit": "q/no-limit"}})).result) out[`${db}|${r.n}`] = r.id;
-  }
-  return Object.fromEntries(touches.map(t => [[].concat(t).join("|"), out[[].concat(t).join("|")] || "not made yet"]));
-};
-if (APP_TOUCHES.length) log("ids for the app: " + JSON.stringify(await appIds(APP_TOUCHES)));
-if (APPS.length) {
-  // A custom app id is a UUIDv7: its first 48 bits are when it was created, just before its view.
-  const time = id => parseInt(id.replace(/-/g, "").slice(0, 12), 16);
-  const appsNow = (await get_custom_apps_list({})).result, viewsNow = await appViews();
-  for (const a of APPS) {
-    const view = viewsNow.find(v => v.name === a.name), at = view ? Date.parse(view.creationDate) + 5000 : Infinity;
-    const app = (a.kind === "layout" || view) && appsNow.filter(x => x.name === a.name && x.kind === a.kind && (a.kind === "view" || x.databaseName === a.databaseName) && time(x.id) <= at).sort((p, q) => time(q.id) - time(p.id))[0];
-    log(`app ${a.name}: ${app ? "id " + app.id : "not made yet"}${view ? ", " + view.url : ""}`);
+// Formulas only once the fields they read exist, four at a time, each level after the one it reads.
+let left = calls.length - results.length, last = 15000;
+for (const level of LEVELS) {
+  const todo = missing(level);
+  for (let i = 0; i < todo.length; i += 4) {
+    if (left || Date.now() - t0 + last > 40000) { left += todo.length - i; break; }
+    const s0 = Date.now();
+    await Promise.all(todo.slice(i, i + 4).map(x => run(x.name, create_formula_field(x))));
+    last = Math.max(Date.now() - s0, 15000);
   }
 }
-const iconsSent = [...SINGLE, ...MULTI].filter(s => s.options.some(o => o.icon)), icons = {};
-await Promise.all(iconsSent.map(s => query({query: {"q/from": `${s.name}_${s.database}`, "q/select": {n: ["enum/name"], i: ["enum/icon"]}, "q/limit": "q/no-limit"}}).then(r => r.result.forEach(x => { icons[`${s.name}|${x.n}`] = x.i; }), () => {})));
-const iconsOff = iconsSent.flatMap(s => s.options.filter(o => o.icon && icons[`${s.name}|${o.name}`] && icons[`${s.name}|${o.name}`] !== `:${o.icon.replace(/:/g, "")}:`).map(o => `${s.name.split("/").pop()}.${o.name} ${o.icon} → ${icons[`${s.name}|${o.name}`]}`));
+const after = formulas.length ? await fieldsOf(dbs) : {};
+formulas.forEach(x => { const line = after[x.database].get(x.name); log(line ? `${x.name}: ${line.replace(" # read-only; formula: ", " = ")}` : `${x.name}: missing`); });
+const off = [];
+await Promise.all([...SINGLE, ...MULTI].filter(s => s.options.some(o => o.icon)).map(s => query({query: {"q/from": `${s.name}_${s.database}`, "q/select": {n: "enum/name", i: "enum/icon"}, "q/limit": "q/no-limit"}}).then(r => r.result.forEach(x => {
+  const o = s.options.find(o => o.name === x.n);
+  if (o && o.icon && x.i && x.i !== `:${o.icon.replace(/:/g, "")}:`) off.push(`${s.name.split("/").pop()}.${x.n} ${o.icon} → ${x.i}`);
+}), () => {})));
 const fix = results.flatMap(r => (r && r.fixLogs) || []).filter(x => !/default format|Added field title/.test(x));
 log(`made: ${made.join(", ") || "nothing"}; there before: ${before}`);
-if (calls.length > results.length) log(`time is up with ${calls.length - results.length} calls left: run this script again, as it is, to finish`);
+if (left) log(`time is up with ${left} calls left: run this script again, as it is, to finish`);
 if (renamed.length) log("people fields renamed: " + renamed.join("; "));
 if (fix.length) log("fixLogs: " + JSON.stringify(fix));
-if (iconsOff.length) log("icons stored differently, resend any that isn't the same emoji: " + iconsOff.join("; "));
+if (off.length) log("icons stored differently, resend any that isn't the same emoji: " + off.join("; "));
 log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 ```
 
-## 2. Formulas
+## The app add-on
+
+Only when the design has an app. Add the two lists to script 1's data, and the block just before script 1's first `log(` line. `APPS` holds `{name, kind: "view", spaceName}` for a page in the Space or `{name, kind: "layout", databaseName}` for a tab on every record page; `APP_TOUCHES` the databases and fields the app's code uses.
 
 ```js
-const S = "Hiring"; const f = n => `${S}/${n}`;
-const C = f("Candidate"), J = f("Job");
-const LEVELS = [
-  [
-    {database: C, name: f("Days in stage"), description: "Use exactly this Fibery formula: If(IsEmpty([Stage changed on]), 0, ToDays(Today() - [Stage changed on])). The result is a whole number."},
-    {database: J, name: f("Hired"), description: "How many of the job's Candidates have State Hired; 0 with none. The result is a whole number."}
-  ],
-  [
-    {database: J, name: f("Open seats"), description: "Openings minus Hired, and 0 when that is below 0. The result is a whole number."},
-    {database: C, name: f("Stuck"), description: "True when Days in stage is more than 14 and the State is neither Hired nor Rejected; false otherwise. The result is true or false."}
-  ]
-];
-const APP_TOUCHES = [];
+const APPS = [{name: "Offer desk", kind: "view", spaceName: S}];
+const APP_TOUCHES = [C, [C, "workflow/state"], [C, f("Stage changed on")], [C, f("Days in stage")]];
+```
 
-const fails = [], t0 = Date.now();
-const run = async (label, p) => { try { return await p; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
-const dbs = [...new Set(LEVELS.flat().map(x => x.database))];
-const appIds = async touches => {
-  const out = {};
-  for (const db of [...new Set(touches.map(t => [].concat(t)[0]))]) {
-    const t = (await query({query: {"q/from": "fibery/type", "q/select": {id: "fibery/id"}, "q/where": ["=", ["fibery/name"], db], "q/limit": 1}})).result[0];
-    if (t) out[db] = t.id;
-    for (const r of (await query({query: {"q/from": "fibery/field", "q/select": {id: "fibery/id", n: "fibery/name"}, "q/where": ["=", ["fibery/holder-type", "fibery/name"], db], "q/limit": "q/no-limit"}})).result) out[`${db}|${r.n}`] = r.id;
-  }
-  return Object.fromEntries(touches.map(t => [[].concat(t).join("|"), out[[].concat(t).join("|")] || "not made yet"]));
-};
-const fieldsOf = async () => {
-  const out = {}; let cur = null;
-  for (const line of (await schema_detailed({databases: dbs})).schema.split("\n")) {
-    const d = line.match(/^(\S[^:]*):/); if (d) { cur = d[1]; out[cur] = []; continue; }
-    const m = line.match(/^ {4}([^:]+): (.*)$/); if (cur && m) out[cur].push([m[1], m[2]]);
-  }
-  return out;
-};
-const before = await fieldsOf();
-const todo = LEVELS.map(level => level.filter(x => !before[x.database].some(([n]) => n === x.name)));
-let sent = 0, last = 15000;
-send: for (const level of todo) for (let i = 0; i < level.length; i += 4) {
-  if (sent && Date.now() - t0 + last > 35000) break send;
-  const chunk = level.slice(i, i + 4), s0 = Date.now(); sent += chunk.length;
-  await Promise.all(chunk.map(x => run(x.name, create_formula_field(x))));
-  last = Math.max(Date.now() - s0, 15000);
+```js
+const appViews = async () => (await query_views({space: S, withConfig: false})).views.filter(v => v.viewType === "custom-app");
+const viewsBefore = await appViews(), appsBefore = (await get_custom_apps_list({})).result;
+for (const a of APPS.filter(a => a.kind === "view" ? !viewsBefore.some(v => v.name === a.name) : !appsBefore.some(x => x.name === a.name && x.databaseName === a.databaseName))) {
+  if (Date.now() - t0 < 40000) await run("app " + a.name, create_custom_app(a)); else left++;
 }
-const after = await fieldsOf();
-for (const x of LEVELS.flat()) {
-  const line = after[x.database].find(([n]) => n === x.name);
-  log(line ? `${x.name}: ${line[1].replace(" # read-only; formula: ", " = ")}` : `${x.name}: missing`);
+// A custom app id is a UUIDv7: its first 48 bits are when it was created, just before its view.
+const time = id => parseInt(id.replace(/-/g, "").slice(0, 12), 16);
+const appsNow = (await get_custom_apps_list({})).result, viewsNow = await appViews();
+for (const a of APPS) {
+  const view = viewsNow.find(v => v.name === a.name), at = view ? Date.parse(view.creationDate) + 5000 : Infinity;
+  const app = (a.kind === "layout" || view) && appsNow.filter(x => x.name === a.name && x.kind === a.kind && (a.kind === "view" || x.databaseName === a.databaseName) && time(x.id) <= at).sort((p, q) => time(q.id) - time(p.id))[0];
+  log(`app ${a.name}: ${app ? "id " + app.id : "not made yet"}${view ? ", " + view.url : ""}`);
 }
-if (APP_TOUCHES.length) log("ids for the app: " + JSON.stringify(await appIds(APP_TOUCHES)));
-log(`formulas: ${sent} sent, ${LEVELS.flat().length - todo.flat().length} there before`);
-if (todo.flat().length > sent) log(`time is up with ${todo.flat().length - sent} formulas left: run this script again, as it is, to finish`);
-log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
+const ids = {};
+for (const db of new Set(APP_TOUCHES.map(t => [].concat(t)[0]))) {
+  const t = (await query({query: {"q/from": "fibery/type", "q/select": {id: "fibery/id"}, "q/where": ["=", ["fibery/name"], db], "q/limit": 1}})).result[0];
+  if (t) ids[db] = t.id;
+  for (const r of (await query({query: {"q/from": "fibery/field", "q/select": {id: "fibery/id", n: "fibery/name"}, "q/where": ["=", ["fibery/holder-type", "fibery/name"], db], "q/limit": "q/no-limit"}})).result) ids[`${db}|${r.n}`] = r.id;
+}
+log("ids for the app: " + JSON.stringify(Object.fromEntries(APP_TOUCHES.map(t => [[].concat(t).join("|"), ids[[].concat(t).join("|")] || "not made yet"]))));
 ```
 
 ## 3. Views and reports
@@ -201,8 +174,7 @@ const VIEWS = () => [
   {viewType: "document", name: "How to run hiring", description: "The process, and how this Space runs it."}
 ];
 const REPORTS = [
-  {title: "Hiring funnel", database: C, tab: {type: "stacked-bar", x: [{expression: "[State]"}], y: [{expression: "COUNT([Id])", title: "Candidates"}], color: {expression: "[Source]"}, palette: "fibery2.0"}},
-  {title: "Sources that convert", database: C, tab: {type: "bar", x: [{expression: "[Source]"}], y: [{expression: "COUNT([Id])", title: "Hired"}], fieldConditions: [{field: "State", operator: "is in", value: ["Hired"]}, {field: "Job", operator: "exists", value: null}], palette: "fibery2.0"}}
+  {title: "Hiring funnel", database: C, tab: {type: "stacked-bar", x: [{expression: "[State]"}], y: [{expression: "COUNT([Id])", title: "Candidates"}], color: {expression: "[Source]"}, fieldConditions: [{field: "Job", operator: "exists", value: null}], palette: "fibery2.0"}}
 ];
 
 const fails = [], t0 = Date.now();
@@ -212,22 +184,22 @@ const enumIds = async from => Object.fromEntries((await rows(from, {id: "fibery/
 const st = {}, opts = {};
 for (const db of STATES) st[db] = await enumIds(`workflow/state_${db}`);
 for (const [db, field] of OPTIONS) (opts[db] = opts[db] || {})[field] = await enumIds(`${db.split("/")[0]}/${field}_${db}`);
+const node = (nodeType, field, operator, value) => ({nodeType, args: value === undefined ? {fieldPath: [field], operator} : {fieldPath: [field], operator, value}});
 const fld = n => ({field: f(n)});
-const wf = (db, op, names) => ({nodeType: "workflow", args: {fieldPath: ["workflow/state"], operator: op, value: names.map(n => st[db][n])}});
-const sel = (db, field, op, names) => ({nodeType: "single-select", args: {fieldPath: [f(field)], operator: op, value: names.map(n => opts[db][field][n])}});
+const wf = (db, op, names) => node("workflow", "workflow/state", op, names.map(n => st[db][n]));
+const sel = (db, field, op, names) => node("single-select", f(field), op, names.map(n => opts[db][field][n]));
 const and = (...filters) => ({nodeType: "logical", args: {operator: "and", filters}});
 const or = (...filters) => ({nodeType: "logical", args: {operator: "or", filters}});
-const flag = (field, value = true) => ({nodeType: "bool", args: {fieldPath: [f(field)], operator: "is", value}});
-const num = (field, op, value) => ({nodeType: "number", args: {fieldPath: [f(field)], operator: op, value}});
-const empty = (nodeType, field, operator = "is-empty") => ({nodeType, args: {fieldPath: [f(field)], operator}});
-const mine = field => ({nodeType: "collection", args: {fieldPath: [f(field)], operator: "contains-me"}});
-const days = (field, op, amount, isBeforeNow, unit = "day") => ({nodeType: "date", args: {fieldPath: [f(field)], operator: op, value: {amount, unit, isBeforeNow}}});
+const flag = (field, value = true) => node("bool", f(field), "is", value);
+const num = (field, op, value) => node("number", f(field), op, value);
+const empty = (nodeType, field, operator = "is-empty") => node(nodeType, f(field), operator);
+const mine = field => node("collection", f(field), "contains-me");
+const days = (field, op, amount, isBeforeNow, unit = "day") => node("date", f(field), op, {amount, unit, isBeforeNow});
 const stateAxis = db => ({forDatabase: db, field: "workflow/state", database: `workflow/state_${db}`, fields: []});
 const byState = (db, colors, also) => Object.entries(colors).map(([n, color]) => ({color, filter: also ? and(wf(db, "is-any-of", [n]), also) : wf(db, "is-any-of", [n])}));
 const report = async ({title, database, tab, mode}, id) => {
   if (!id) { const r = await run(title, create_report({title, sources: [{database}], sourceMode: mode || "current", spaceName: S})); if (!r) return false; id = r.id; }
-  const g = await run(title + " tabs", get_report({reportId: id}));
-  const tabs = (g && g.result && g.result.tabs) || [];
+  const tabs = (((await run(title + " tabs", get_report({reportId: id}))) || {}).result || {}).tabs || [];
   const chart = tabs.some(t => t.title === title) || Boolean(await run(title + " chart", add_chart_tab({reportId: id, title, ...tab})));
   const blank = tabs.find(t => t.title === "Chart");
   if (chart && blank) await run(title + " default tab", remove_tab({reportId: id, tabId: blank.id}));
@@ -235,22 +207,18 @@ const report = async ({title, database, tab, mode}, id) => {
 };
 const views = VIEWS(), spaces = [...new Set([S, ...views.map(v => v.space).filter(Boolean)])];
 const listed = async () => (await Promise.all(spaces.map(sp => query_views({space: sp, withConfig: false})))).flatMap(r => r.views);
-const before = await listed();
-const todo = views.filter(v => !before.some(x => x.name === v.name));
-const made = [];
+const before = await listed(), todo = views.filter(v => !before.some(x => x.name === v.name)), made = [];
 for (let i = 0; i < todo.length && Date.now() - t0 < 25000; i += 6) made.push(...await Promise.all(todo.slice(i, i + 6).map(v => run("view " + v.name, create_view({space: S, ...v})).then(r => [v, r]))));
 const charts = Date.now() - t0 < 25000 ? await Promise.all(REPORTS.map(r => report(r, (before.find(x => x.viewType === "report" && x.name === r.title) || {}).id))) : [];
 const all = await listed();
 for (const v of views.filter(v => v.config && (v.config.items || []).some(i => i.groupBy))) {
-  const x = all.find(y => y.name === v.name);
-  if (!x) continue;
-  const back = (await query_views({id: x.id, withConfig: true})).views[0];
-  const roots = back.config.items.filter((it, k) => !it.groupBy || it.groupBy.parentIndex === k).length;
+  const x = all.find(y => y.name === v.name); if (!x) continue;
+  const roots = (await query_views({id: x.id, withConfig: true})).views[0].config.items.filter((it, k) => !it.groupBy || it.groupBy.parentIndex === k).length;
   if (roots !== 1) fails.push(`view ${v.name}: ${roots} roots`);
 }
 const noisy = made.flatMap(([v, r]) => ((r && r.result && r.result.fixLogs) || []).filter(x => !/Added field title/.test(x)).map(x => `${v.name}: ${x}`));
-log(`views: ${made.filter(([, r]) => r).length} made, ${views.length - todo.length} there before; reports: ${charts.filter(Boolean).length} of ${REPORTS.length} with their chart`);
 const left = todo.length - made.length + (charts.length ? 0 : REPORTS.length);
+log(`views: ${made.filter(([, r]) => r).length} made, ${views.length - todo.length} there before; reports: ${charts.filter(Boolean).length} of ${REPORTS.length} with their chart`);
 if (left) log(`time is up with ${left} views and reports left: run this script again, as it is, to finish`);
 if (noisy.length) log("fixLogs: " + JSON.stringify(noisy));
 log("urls: " + JSON.stringify(Object.fromEntries(all.map(v => [v.name, v.url]))));
@@ -273,15 +241,13 @@ const X = " (example)";
 const day = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
 const RECORDS = {
   [J]: [
-    {Name: "Product designer", state: "Open", Openings: 2, "Hiring window": [-30, 30], comments: ["Two seats: one senior, one mid. Portfolio review comes before the technical round."]},
-    {Name: "Sales lead", state: "Filled", Openings: 1, "Hiring window": [-90, -10]}
+    {Name: "Product designer", state: "Open", Openings: 2, "Hiring window": [-30, 30], comments: ["Two seats: one senior, one mid. Portfolio review comes before the technical round."]}
   ],
   [C]: [
     {Name: "Ana Ruiz", state: "Interview", Job: "Product designer", Source: "Referral", Skills: ["Design"], Recruiter: ["me"], Email: "ana.ruiz@example.com", "Salary expectation": 95000, "Stage changed on": -3, "Next interview": [2, "14:00"],
       Description: "## Why her\nReferred by the design lead; shipped two design systems.\n\n## Concerns\nNo B2B product yet.\n\n## Next\nTechnical interview in two days."},
     {Name: "Ben Okafor", state: "Screening", Job: "Product designer", Source: "Job board", Skills: ["Design"], Recruiter: ["me"], Email: "ben.okafor@example.com", "Stage changed on": -20},
-    {Name: "Chen Wei", state: "Offer", Job: "Product designer", Source: "Website", Skills: ["Design", "Engineering"], Recruiter: ["me"], Email: "chen.wei@example.com", "Stage changed on": -2, comments: [`Offer sent on ${day(-2)}; an answer is due by ${day(5)}.`]},
-    {Name: "Fay Moreau", state: "Hired", Job: "Sales lead", Source: "Referral", Skills: ["Sales"], Recruiter: ["me"], Email: "fay.moreau@example.com", "Stage changed on": -12}
+    {Name: "Chen Wei", state: "Offer", Job: "Product designer", Source: "Website", Skills: ["Design", "Engineering"], Recruiter: ["me"], Email: "chen.wei@example.com", "Stage changed on": -2, comments: [`Offer sent on ${day(-2)}; an answer is due by ${day(5)}.`]}
   ]
 };
 const CHECKS = [
@@ -295,13 +261,13 @@ const add = (what, n = 1) => r => { if (r) filled[what] = (filled[what] || 0) + 
 const rows = async (from, select) => (await query({query: {"q/from": from, "q/select": select, "q/limit": "q/no-limit"}})).result;
 const sp = db => db.split("/")[0];
 const me = (await get_me({})).result[0]["fibery/id"];
-const dbs = Object.keys(RECORDS);
-const types = {}; let cur = null;
+const dbs = Object.keys(RECORDS), types = {};
+let cur = null;
 for (const line of (await schema_detailed({databases: dbs})).schema.split("\n")) {
   const d = line.match(/^(\S[^:]*):/); if (d) { cur = d[1]; types[cur] = {}; continue; }
-  const m = line.match(/^ {4}([^:]+): (.+?)(?: # (.*))?$/); if (!cur || !m) continue;
-  types[cur][m[1]] = {type: m[2], many: /collection/.test(m[3] || "")};
+  const m = line.match(/^ {4}([^:]+): (.+?)(?: # (.*))?$/); if (cur && m) types[cur][m[1]] = {type: m[2], many: /collection/.test(m[3] || "")};
 }
+const target = (db, key) => (types[db][`${sp(db)}/${key}`] || {}).type;
 const kind = (db, key) => {
   if (key === "state" || key === "comments") return key;
   const t = types[db][`${sp(db)}/${key}`];
@@ -313,18 +279,16 @@ const kind = (db, key) => {
   if (t.type.startsWith("fibery/")) return "value";
   return t.many ? "many" : "one";
 };
-const target = (db, key) => types[db][`${sp(db)}/${key}`].type;
 const value = (db, key, v) => {
-  const t = target(db, key);
+  const t = target(db, key), at = ([d, h]) => `${day(d)}T${h}:00.000Z`;
   if (t === "fibery/date" && typeof v === "number") return day(v);
-  if (t === "fibery/date-time" && Array.isArray(v)) return `${day(v[0])}T${v[1]}:00.000Z`;
+  if (t === "fibery/date-time" && Array.isArray(v)) return at(v);
   if (t === "fibery/date-range" && Array.isArray(v)) return {start: day(v[0]), end: day(v[1] + 1)};
-  if (t === "fibery/date-time-range" && Array.isArray(v)) return {start: `${day(v[0][0])}T${v[0][1]}:00.000Z`, end: `${day(v[1][0])}T${v[1][1]}:00.000Z`};
+  if (t === "fibery/date-time-range" && Array.isArray(v)) return {start: at(v[0]), end: at(v[1])};
   return v;
 };
-const opt = {};
+const opt = {}, ids = {};
 const options = async (db, key) => opt[db + key] = opt[db + key] || Object.fromEntries((await rows(`${sp(db)}/${key}_${db}`, {id: "fibery/id", n: "enum/name"})).map(r => [r.n, r.id]));
-const ids = {};
 const byName = async db => ids[db] = Object.fromEntries((await rows(db, {id: "fibery/id", n: `${sp(db)}/Name`})).map(r => [r.n, r.id]));
 for (const db of dbs) await byName(db);
 const fresh = Object.fromEntries(dbs.map(db => [db, RECORDS[db].filter(r => !ids[db][r.Name + X])]));
@@ -332,10 +296,10 @@ for (const db of dbs) for (const k of new Set(RECORDS[db].flatMap(r => Object.ke
 await Promise.all(dbs.filter(db => fresh[db].length).map(db => run("create " + db, create_entities({database: db, entities: fresh[db].map(r => {
   const e = {[`${sp(db)}/Name`]: r.Name + X};
   for (const [k, v] of Object.entries(r)) {
-    const kd = kind(db, k);
-    if (kd === "value" && k !== "Name") e[`${sp(db)}/${k}`] = value(db, k, v);
-    if (kd === "select") e[`${sp(db)}/${k}`] = opt[db + k][v];
-    if (kd === "person") e[`${sp(db)}/${k}`] = v === "me" ? me : v;
+    const kd = kind(db, k), F = `${sp(db)}/${k}`;
+    if (kd === "value" && k !== "Name") e[F] = value(db, k, v);
+    if (kd === "select") e[F] = opt[db + k][v];
+    if (kd === "person") e[F] = v === "me" ? me : v;
   }
   return e;
 })}))));
@@ -343,17 +307,15 @@ for (const db of dbs) await byName(db);
 const lost = dbs.flatMap(db => fresh[db].filter(r => !ids[db][r.Name + X]).map(r => r.Name));
 if (lost.length) { fails.forEach(x => log("FAIL " + x)); throw new Error("not created: " + lost.join(", ")); }
 const ref = (db, key, name, who) => { const id = (ids[target(db, key)] || {})[name + X]; if (!id) fails.push(`${who}: no ${key} named ${name}`); return id; };
-const blank = doc => { const t = String((doc && doc.document) || ""), n = Number((t.match(/rootBlockIds\[(\d+)\]/) || [])[1] || 0); return n === 0 || (n === 1 && /,""|content: ""/.test(t)); };
 // A new document holds one empty paragraph: replace it, or the text opens with a blank line.
 const fill = (who, secret, content) => run(who, read_document({secret})).then(d => {
-  if (!d || !blank(d)) return null;
-  const empty = (String(d.document).match(/rootBlockIds\[1\]: (\S+)/) || [])[1];
+  const t = String((d && d.document) || ""), n = Number((t.match(/rootBlockIds\[(\d+)\]/) || [])[1] || 0), empty = n === 1 && /,""|content: ""/.test(t) && (t.match(/rootBlockIds\[1\]: (\S+)/) || [])[1];
+  if (!d || (n && !empty)) return null;
   return run(who, empty ? replace_document_blocks({secret, blocks: [{blockId: empty, content}]}) : insert_document_blocks({secret, inserts: [{parent: {blockId: null, position: "end"}, content}]})).then(add("texts"));
 });
 const writes = [];
 for (const db of dbs) {
-  const keys = [...new Set(RECORDS[db].flatMap(r => Object.keys(r)))];
-  const select = {n: `${sp(db)}/Name`};
+  const keys = [...new Set(RECORDS[db].flatMap(r => Object.keys(r)))], select = {n: `${sp(db)}/Name`};
   keys.forEach((k, i) => {
     const kd = kind(db, k), F = `${sp(db)}/${k}`;
     if (kd === "state") select.state = ["workflow/state", "enum/name"];
@@ -362,8 +324,7 @@ for (const db of dbs) {
     if (kd === "text") select[`k${i}`] = [F, "Collaboration~Documents/secret"];
     if (kd === "comments") select.cs = {"q/from": "comments/comments", "q/select": {id: "fibery/id"}, "q/limit": 1};
   });
-  const now = Object.fromEntries((await rows(db, select)).map(r => [r.n, r]));
-  const links = [];
+  const now = Object.fromEntries((await rows(db, select)).map(r => [r.n, r])), links = [];
   for (const r of RECORDS[db]) {
     const id = ids[db][r.Name + X], has = now[r.Name + X] || {}, isNew = fresh[db].includes(r), link = {id};
     for (const [k, v] of Object.entries(r)) {
@@ -378,8 +339,7 @@ for (const db of dbs) {
       if (kd === "multi") items(v.map(n => opt[db + k][n]), "options");
       if (kd === "text" && got) writes.push(() => fill(who, got, v));
       if (kd === "comments" && !(has.cs || []).length) v.forEach(c => writes.push(() => run(who, add_comment({database: db, entityId: id, content: c})).then(add("comments"))));
-      if (kd === "file" && isNew) fails.push(`${who}: files can't be attached; left empty`);
-      if (kd === "unknown" && isNew) fails.push(`${who}: no such field`);
+      if ((kd === "file" || kd === "unknown") && isNew) fails.push(`${who}: ${kd === "file" ? "a sample file stays empty; leave the key out" : "no such field"}`);
     }
     if (Object.keys(link).length > 1) links.push(link);
   }
@@ -426,19 +386,20 @@ const rows = async (from, select) => (await query({query: {"q/from": from, "q/se
 const enumIds = async from => Object.fromEntries((await rows(from, {id: "fibery/id", n: "enum/name"})).map(r => [r.n, r.id]));
 const st = {};
 for (const db of STATES) st[db] = await enumIds(`workflow/state_${db}`);
-const wf = (db, op, names) => ({nodeType: "workflow", args: {fieldPath: ["workflow/state"], operator: op, value: names.map(n => st[db][n])}});
+const node = (nodeType, field, operator, value) => ({nodeType, args: value === undefined ? {fieldPath: [field], operator} : {fieldPath: [field], operator, value}});
+const wf = (db, op, names) => node("workflow", "workflow/state", op, names.map(n => st[db][n]));
 const and = (...filters) => ({nodeType: "logical", args: {operator: "and", filters}});
 const or = (...filters) => ({nodeType: "logical", args: {operator: "or", filters}});
-const flag = (field, value = true) => ({nodeType: "bool", args: {fieldPath: [f(field)], operator: "is", value}});
-const num = (field, op, value) => ({nodeType: "number", args: {fieldPath: [f(field)], operator: op, value}});
-const empty = (nodeType, field, operator = "is-empty") => ({nodeType, args: {fieldPath: [f(field)], operator}});
-const days = (field, op, amount, isBeforeNow, unit = "day") => ({nodeType: "date", args: {fieldPath: [f(field)], operator: op, value: {amount, unit, isBeforeNow}}});
+const flag = (field, value = true) => node("bool", f(field), "is", value);
+const num = (field, op, value) => node("number", f(field), op, value);
+const empty = (nodeType, field, operator = "is-empty") => node(nodeType, f(field), operator);
+const days = (field, op, amount, isBeforeNow, unit = "day") => node("date", f(field), op, {amount, unit, isBeforeNow});
 const stateValue = (db, name) => ({type: "value", value: {"fibery/id": st[db][name]}});
 const tpl = prompt => ({type: "template", prompt});
 const formula = prompt => ({type: "formula", prompt});
-const tomorrowAt = (h, m = 0) => `${new Date(Date.now() + 864e5).toISOString().slice(0, 10)}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00.000Z`;
-const list = AUTOMATIONS();
-const keys = [...new Set(list.map(a => `${a.database}|${a.automationType}`))];
+const two = n => String(n).padStart(2, "0");
+const tomorrowAt = (h, m = 0) => `${new Date(Date.now() + 864e5).toISOString().slice(0, 10)}T${two(h)}:${two(m)}:00.000Z`;
+const list = AUTOMATIONS(), keys = [...new Set(list.map(a => `${a.database}|${a.automationType}`))];
 const key = a => `${a.database}|${a.automationType}|${a.name}`;
 const read = async () => {
   const out = {};
@@ -450,9 +411,7 @@ const read = async () => {
   }
   return out;
 };
-const before = await read();
-const todo = list.filter(a => !before[key(a)]);
-const made = [];
+const before = await read(), todo = list.filter(a => !before[key(a)]), made = [];
 for (let i = 0, last = 15000; i < todo.length; i += 4) {
   if (made.length && Date.now() - t0 + last > 35000) break;
   const s0 = Date.now();
@@ -466,7 +425,8 @@ const condition = fl => readable(fl.filterExpression).replace(/"(\$where\d+)"/g,
 const when = t => {
   const c = (t.args && t.args.schedulerConfig) || {}, on = t.args && (t.args.updatedField || t.args.changedCollectionField);
   if (t.trigger !== "time-based") return t.trigger + (on ? ` (${[].concat(on).join(", ")})` : "");
-  return `${["yearly", "monthly", "weekly", "daily", "hourly"][c.freq] || "every"}${(c.byweekday || []).length ? " on " + c.byweekday.map(d => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][d]).join(", ") : ""} at ${String(c.byhour).padStart(2, "0")}:${String(c.byminute || 0).padStart(2, "0")} UTC from ${String(c.dtstart).slice(0, 10)}`;
+  const wd = (c.byweekday || []).map(d => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][d]).join(", ");
+  return `${["yearly", "monthly", "weekly", "daily", "hourly"][c.freq] || "every"}${wd ? " on " + wd : ""} at ${two(c.byhour)}:${two(c.byminute || 0)} UTC from ${String(c.dtstart).slice(0, 10)}`;
 };
 for (const a of list) {
   const s = stored[key(a)];
