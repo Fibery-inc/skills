@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.10 — 2026-10-23
+
+fibery-architect writes a sample record's location as an object with its coordinates, address and `addressParts`, which Fibery MCP rejects a create without; the parts can be `{}`. Sample places sit in one real city, since Fibery doesn't look an address up and the coordinates are the pin. A TNR program build was rejected on its colonies' Location.
+
 ## 1.8.9 — 2026-10-23
 
 fibery-architect gives every select an emoji on every option by default. A TNR program build put none on any of its seven selects, Sex and Age among them, since under the old rule short options "read fine as words" and none was always a defensible choice. The exceptions are options that are names (clinics, places, people, products, departments, countries), where any emoji would be arbitrary, and lists longer than about eight; workflow states still can't take one.
