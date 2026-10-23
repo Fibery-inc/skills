@@ -6,7 +6,7 @@ compatibility: 'Needs the Fibery MCP server with its execute_code tool, connecte
 
 # Fibery architect
 
-Turn how a team works into a Fibery Space they'll run their work in: about 80% of what a mature Space would have, which is enough to run the process tomorrow and small enough to still feel like theirs, shaped to their words and their workspace. You read the process (from the person, a document, a recipe or an existing Space) and the workspace it will live in, ask what only the person can answer, then design the Space and build it with Fibery MCP straight away: their answers are the go-ahead, and the report after the build says what you decided in their place.
+Turn how a team works into a Fibery Space they'll run their work in: about 80% of what a mature Space would have, which is enough to run the process tomorrow and small enough to still feel like theirs, shaped to their words and their workspace. You read the process (from the person, a document, a recipe or an existing Space) and the workspace it will live in, ask what only the person can answer, then design the Space and build it with Fibery MCP straight away: their answers are the go-ahead, and a short report after the build says where to start and what's left to them.
 
 ## What you need
 
@@ -48,11 +48,11 @@ Do this before asking anything: a Space that duplicates what the team already tr
 
 ## 3. Ask once
 
-The questions are the only stop. Ask at most four, the ones whose answers change what gets built and would be hard to change later: a database, a role, who uses Fibery, a second Space. What's easy to change after the build is never a question: names and words, an extra field and a select's options take defaults, and the report lists them. The workspace adds a question where it holds a real choice: an existing database that could be part of the solution, asked about by name ("Are your volunteers the people in Community/Member?"), the guess yes when it plainly serves the whole workspace or this team and no when it's only close; and a new Space's name that's taken (the guess: a new one beside it, "<name> 2"). Where the workspace has nothing that fits, the question about it isn't asked. An existing Space for the same process is a line, not a question: the new one is built beside it. Notes on the sample data, on rules that might not build or on the app wait for the report.
+The questions are the only stop. Ask at most four, the ones whose answers change what gets built and would be hard to change later: a database, a role, who uses Fibery, a second Space. What's easy to change after the build is never a question: names and words, an extra field and a select's options take defaults, written down in `design.md`. The workspace adds a question where it holds a real choice: an existing database that could be part of the solution, asked about by name ("Are your volunteers the people in Community/Member?"), the guess yes when it plainly serves the whole workspace or this team and no when it's only close; and a new Space's name that's taken (the guess: a new one beside it, "<name> 2"). Where the workspace has nothing that fits, the question about it isn't asked. An existing Space for the same process is a line, not a question: the new one is built beside it. Notes on the sample data, on rules that might not build or on the app don't go with the questions.
 
 Ask them all at once (an interview takes a few rounds, the last being its playback): each in their words, with your guess, and none about databases, views or rules. When your client has a tool for asking questions with choices (AskUserQuestion in Claude Code and Cowork), every round is one call to it. Each question gets a header of a word or two, 12 characters at most ("Trap bank"); your guess as the first option, with "(Recommended)" after its label; then one to three real alternatives. An option's description says in a few plain words what the person gets ("Trappers use their own traps"). The tool adds Other for a typed answer, so don't add one, and multiSelect is only for answers that add up (who uses Fibery). Closing the questions unanswered isn't a "go": don't build until they answer. Without such a tool, a round is one message, a numbered list the person can answer by number or with "go": each question, then your guess ("Do you lend out numbered traps? I'll assume yes."), with no table and no column of what each answer would change. Either way, one line says you'll build as soon as they answer, in about 10 minutes from a recipe and 15 from scratch, a few more with an app: just before the call, or at the end of the message.
 
-When the answers are in, or straight away after "just build it", write the design and build it in the same turn. Don't show the design or a summary, and don't ask whether to build, unless the person asked to see the design first. What you decide in their place (a default taken, a link made or left out, a name chosen) is written down in `design.md` and listed in the report, so they can ask for it to be changed.
+When the answers are in, or straight away after "just build it", write the design and build it in the same turn. Don't show the design or a summary, and don't ask whether to build, unless the person asked to see the design first. What you decide in their place (a default taken, a link made or left out, a name chosen) is written down in `design.md`, so it can be changed when they ask.
 
 ## 4. Write the design
 
@@ -70,29 +70,27 @@ There is no separate verification pass: the scripts check the formula types, the
 
 ## 6. Report
 
-```
-Built <Space name, or names, each with its reason when there are several> in <workspace>
-Created: N databases, N fields, N formulas, N views, N reports, N automations, N documents, N apps, N sample records
-Links: <Database.Field → Existing/Database> ...
-Build: N scripts, N minutes
-```
+A few lines for the person who will run the Space, each only when it has something to say:
 
-N fields counts the fields the build added: people fields and links in, a relation once, and Name, Description, the state, comments and formulas out. N views leaves out the guide and other documents, which are N documents.
+> **TNR program is ready in Edge.** Start with the guide, [How to run the TNR program](…), which is one screen, then [In care](…) for the day-to-day.
+>
+> **Your turn:** set who can open the Space; share [Colony report](…) and [Volunteer signup](…) publicly (each form's Share button); add Description templates to Colony and Trapping.
+>
+> **Worth a look:** the Colony portrait tab on any colony: I couldn't open it, so I haven't seen it run.
+>
+> The examples are marked "(example)".
 
-Then, briefly, one line each:
+- **Ready**, always: the Space ready in its workspace (several Spaces, each with its reason), then the guide and the first view, both linked; the only other links are the forms in Your turn.
+- **Your turn**: what the person sets by hand so the Space works for the team, each with where in Fibery: who may open the Space; a form to share with people outside the workspace, linked; a number or date field's minimum, maximum and default, including every default and range a recipe gives ("Date: today by default", "0 to 100"); a formula's number format, when it came back decimal; a Description's template, the headings a new record starts with (the build names them in the database's description, and the hero record's Description uses them). Never the Space icon, and never a failure.
+- **Not built**: a rule native actions couldn't do (build guide §5) or a part that failed, each with what's done by hand instead.
+- **Worth a look**: what the build couldn't check itself, usually the app, with why in a few words.
+- The last line says the sample records are marked "(example)".
 
-- **Assumptions**: every choice made in the person's place, from `design.md`: a default taken, a link made or left out, a Space name chosen, a currency, and the names, words and option lists nobody was asked about.
-- **Outside the Space**: the field each people field added to every person, the field each link added to its existing database, and any rule that writes to existing records.
-- **By hand**: what Fibery MCP can't set, settings the person makes after the build and never failures, each with where in Fibery to set it: the Space icon, always; a Space's sharing, who may open it; a form shared with people outside the workspace; a number or date field's minimum, maximum and default, including every default and range a recipe gives ("Date: today by default", "0 to 100"); a formula's number format, when it came back decimal; a Description's template, the headings a new record starts with (the build names them in the database's description, and the hero record's Description uses them).
-- **Not built**: every rule dropped because native actions couldn't do it (build guide §5), the app you considered when none was built, and anything else, with why.
-
-Then the view to open first, and two offers: delete the sample records or the whole Space if this was a trial, and share it. For an identical copy elsewhere, Fibery's **Share Space as template** does it.
-
-After a recipe build, end with **For the recipe**, at most five lines for whoever keeps it: what the delta added or changed that most teams would need too (never this team's names or links), what the recipe asked for that couldn't be built, and any promise the sample data couldn't keep. Offer to turn them into a revision with recipe-writer. After a design from scratch for a process without a recipe, offer to turn the new Space into one with recipe-writer, so the next team starts from a recipe.
+Nothing else goes in: no counts, no list of views or of what the Space tracks, no assumptions, nothing about what reaches outside the Space, how the build was checked, its time or scripts, or the recipe, and no offers. All of it is in `design.md` for when the person asks: the Assumptions at its top, and **Build notes** at its end, written now, a line each: what was created (N databases, N fields, N formulas, N views, N reports, N automations, N documents, N apps, N sample records; the fields the build added, people fields and links in, a relation once, Name, Description, the state, comments and formulas out; the views without the documents); the scripts and minutes; each link with the field it added to its existing database, the field each people field added to every person, and any rule that writes to existing records; what was checked and what wasn't; the app considered when none was built; and after a recipe build, **For the recipe**: what the delta added or changed that most teams would need too (never this team's names or links), what the recipe asked for that couldn't be built, and any promise the sample data couldn't keep.
 
 ## Boundaries
 
-- Never change, rename or delete anything that existed before the build. The build adds exactly three kinds of things outside the new Spaces, all listed in the report: the inverse field of each link on the existing database, the `user/<name>` field of each people field on the workspace's people, and a rule that writes to records of a linked database when the team's own records change, which exists only when the person asked for one, before the build or after it. The build itself never reads existing records into sample data, writes to them, or links sample records to them.
+- Never change, rename or delete anything that existed before the build. The build adds exactly three kinds of things outside the new Spaces, all written down in `design.md`'s Build notes: the inverse field of each link on the existing database, the `user/<name>` field of each people field on the workspace's people, and a rule that writes to records of a linked database when the team's own records change, which exists only when the person asked for one, before the build or after it. The build itself never reads existing records into sample data, writes to them, or links sample records to them.
 - Never put real people, customers, emails or record contents into sample data; sample data is invented, people are `me`.
 - No migration from other tools in this version: neither their structure (a Notion or Airtable base, a Jira project, a spreadsheet) nor their records. If that's what the person has, say so, design from their process as they describe it, and point them to Fibery's import for the records afterwards.
-- If the workspace already has a Space for this process, say so with the questions (in the report after "just build it") and build alongside it (a new Space, links allowed); changing the existing one is fibery-health's kind of work, done differently.
+- If the workspace already has a Space for this process, say so with the questions (after "just build it", in `design.md`'s Assumptions) and build alongside it (a new Space, links allowed); changing the existing one is fibery-health's kind of work, done differently.

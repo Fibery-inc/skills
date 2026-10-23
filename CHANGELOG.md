@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.8 — 2026-10-23
+
+fibery-architect's report after a build is a few lines for the person who runs the Space: that it's ready, with the guide and the first view linked; Your turn, what they set by hand (who may open the Space, forms to share, Description templates, a field's default or range); Not built, when something was dropped; Worth a look, what the build couldn't check itself, usually the app, and why; and that the examples are marked "(example)". The block of counts, the list of views, the assumptions, what reaches outside the Space, how the build was checked, the notes for the recipe and every offer are gone from it, and the Space icon is no longer asked for. What left the report is in `design.md` for when the person asks: the Assumptions at its top, and Build notes at its end with the counts, the scripts and minutes, what reaches outside the Space, what was checked and the notes for the recipe.
+
 ## 1.8.7 — 2026-10-23
 
 fibery-architect's guide, How to run <process>, mentions its views instead of linking to them: every view, form, report, document and app it names is a Fibery mention, which shows the view's current name, opens it on a click and keeps up with a rename. Script 3 asks Fibery MCP's `get_entity_mention` for every view and logs the mentions beside the urls; the recipe in the guide's last line stays a link. The guide also no longer opens with a blank line: a new document holds one empty paragraph, the guide was written after it, and now it replaces it. Sample records' Descriptions opened with the same blank line; script 4 now writes before that paragraph and deletes it, since a script has no `replace_document_blocks`.

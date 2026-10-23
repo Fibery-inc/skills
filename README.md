@@ -30,7 +30,7 @@ On Claude Code older than 2.1.275, run `claude plugin marketplace add Fibery-inc
 
 ## What it changes in your workspace
 
-fibery-architect creates new Spaces (one, or two or three when the design says why) and never edits existing databases or records. Three things reach outside the new Spaces, all listed in its report: the field each link adds to an existing database (when it isn't clear which database is the one, it asks first), the field each people field adds to every person, and an automation that writes to records of a linked database, built only when you ask for one.
+fibery-architect creates new Spaces (one, or two or three when the design says why) and never edits existing databases or records. Three things reach outside the new Spaces, all noted in the design file it writes (`design.md`): the field each link adds to an existing database (when it isn't clear which database is the one, it asks first), the field each people field adds to every person, and an automation that writes to records of a linked database, built only when you ask for one.
 
 fibery-health is read-only until you approve a specific fix, and asks again for every batch. It makes only safe, reversible changes: fixing workflow state types, deleting empty databases and unused or test fields, disabling a failing rule and "Health: ..." triage views. It never deletes records. Renames, merges, conversions and repairs come back as a written plan. With your yes, it saves its report as a document in your Private space.
 

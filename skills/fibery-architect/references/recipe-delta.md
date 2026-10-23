@@ -39,10 +39,10 @@ Everything not listed above is built exactly as the recipe's Details for buildin
 
 - A recipe whose Who sees what line makes two or three Spaces keeps them, each listed with its databases; merging or splitting Spaces is a change in the table, with its reason.
 - Apply renames everywhere the name occurs, including states, views, formulas and the guide; one line in the delta per name.
-- List in the Change table every translation that changes what the recipe says (below); a translation that changes nothing isn't listed. What Fibery MCP can't set goes on the report's By hand list (SKILL.md §6), never into a rule or a workaround.
+- List in the Change table every translation that changes what the recipe says (below); a translation that changes nothing isn't listed. What Fibery MCP can't set goes on the report's Your turn line (SKILL.md §6), never into a rule or a workaround.
 - Add beyond the recipe only what the answers, the workspace or the interview require: a recipe is the 80% by design, and what it leaves out is the team's to add once it runs (its Making it yours says what). Remove only what an answer, a "Making it yours" bullet or a translation below removes.
 - An answer, a rename, a removal or a "Making it yours" bullet applied changes everything that depends on it (views, formulas, rules, reports, the sample story, the guide), and never breaks a ★ promise of the recipe's What must stay true; the Change table lists what else changed and why.
-- An answer left to its default says "(default)". Those answers, and the Change rows that guess for the person (a currency, a link made or not), are the report's Assumptions.
+- An answer left to its default says "(default)". Those answers, and the Change rows that guess for the person (a currency, a link made or not), are what you decided in the person's place; the delta keeps them for when they ask.
 
 ### Translations that change the recipe
 
@@ -53,13 +53,13 @@ The build guide turns each of the recipe's words into Fibery's calls, and most t
 - **A report that keeps only some linked records** (only key results whose objective is Active, only runs of strats that aren't Retired) gets a true-or-false formula on its source, built with the other formulas, since a report filters on its source's own fields.
 - **A view that shows a linked record's field** (the customer's Phone on My calls) gets a formula on its database that reads it, since a view shows its database's own fields only.
 - **A grouping Fibery can't do**, a board's rows by a text, a number or a date, becomes a select.
-- **A whole-number formula** stays whole when it starts with its 0 case: a day count reads one date field and is 0 without it, with the rule that stamps the date also firing on creation; a share is 0 when there is nothing to count. Otherwise it comes back decimal, with its number format By hand.
+- **A whole-number formula** stays whole when it starts with its 0 case: a day count reads one date field and is 0 without it, with the rule that stamps the date also firing on creation; a share is 0 when there is nothing to count. Otherwise it comes back decimal, with its number format on Your turn.
 - **A view that only adds a filter to another view** isn't built, since people filter; the daily view and "My …" views stay. Each dropped view is a Change row.
 - **A custom view** is a custom app: a view app for a page of its own, a layout app for a tab on every record.
 - **A rule or button** is native actions only (build guide §5): an action that needs more (email, a comment on a linked record, a notification to the people of linked records, a check before acting) is left out and reported as not built, the rest of the rule is built when it still does its job, and the guide names the left-out step as done by hand; a rule whose point is that action isn't built at all.
-- **Who sees what** makes a Space per group it names, the first keeping the recipe's title; who may open each is By hand.
-- **`for: community`** makes members records in a database and organizers people fields, with intake through a form shared outside the workspace By hand.
+- **Who sees what** makes a Space per group it names, the first keeping the recipe's title; who may open each goes on Your turn.
+- **`for: community`** makes members records in a database and organizers people fields, with intake through a form shared outside the workspace, which goes on Your turn.
 
 ## 3. The build
 
-The build reads the recipe's Details for building and the delta together; the delta wins wherever they differ. The guide is written from the recipe's story as the build guide §6 says: one screen, ending with a link to the recipe. Older recipes may still carry Building notes; read them before the build. An older recipe's sample story may be a table rather than a paragraph: read it as the story. Keep the report's For the recipe lines (SKILL.md §6) as you go: a Change row most teams would need, a part of the recipe that couldn't be built, a promise the sample data couldn't keep.
+The build reads the recipe's Details for building and the delta together; the delta wins wherever they differ. The guide is written from the recipe's story as the build guide §6 says: one screen, ending with a link to the recipe. Older recipes may still carry Building notes; read them before the build. An older recipe's sample story may be a table rather than a paragraph: read it as the story. Keep the For the recipe notes (SKILL.md §6) as you go: a Change row most teams would need, a part of the recipe that couldn't be built, a promise the sample data couldn't keep.
