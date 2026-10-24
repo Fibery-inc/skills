@@ -1,8 +1,8 @@
 {
   "name": "fibery",
   "displayName": "Fibery",
-  "version": "1.8.19",
-  "description": "Design and build Fibery Spaces for any process, write the recipes they start from, and health-check your workspace's structure and data. Works with the Fibery connector.",
+  "version": "1.8.20",
+  "description": "Describe how your company, team, shop or club works and get it running in Fibery, from sales and OKRs to repair orders, production queues and volunteer programs. Also audits your workspace and writes processes up as playbooks.",
   "author": {
     "name": "Fibery",
     "url": "https://fibery.com"
@@ -15,5 +15,5 @@
   "repository": "https://github.com/Fibery-inc/skills",
   "license": "MIT",
   "icon": "./assets/logo.svg",
-  "keywords": ["fibery", "workspace", "process", "space", "recipe", "cookbook", "templates", "structure", "health", "audit"]
+  "keywords": ["fibery", "work management", "workflow", "templates", "automations", "crm", "sales pipeline", "okrs", "hiring", "product development", "incident management", "procurement", "content calendar", "compliance", "small business", "manufacturing", "nonprofit", "workspace audit"]
 }

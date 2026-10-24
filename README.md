@@ -1,17 +1,22 @@
 # Fibery skills
 
-Skills for building your processes in Fibery with an AI agent, and keeping your workspace in shape. This one repository installs as a plugin in Claude Code, Codex, GitHub Copilot, VS Code, Cursor, Gemini CLI and Kiro, and the skills follow the open [Agent Skills](https://agentskills.io) format, so any agent that reads skills can use them.
+Describe how your company, team, shop or club works and get it running in Fibery, from sales pipelines and OKRs to incident response, purchase approvals, repair orders, production queues and volunteer programs. fibery-architect builds a ready-to-run Space in your own workspace, with databases, workflows, views, reports, automations and sample data. fibery-health checks a workspace's health, and recipe-writer writes a process up as a recipe, a playbook any team can follow.
+
+It works in Claude, Cowork and Claude Code with your Fibery workspace, and in other agents that read skills (see [Install](#install)).
 
 ## Skills
 
-- **fibery-architect** — turns how a team works (an idea, an interview, a process document, a recipe or an existing Space) into a ready-to-run Fibery Space in your workspace: databases, fields, relations and links to what you already track, workflows, formulas, views, reports, the automations the process depends on, a custom app where views fall short, documents and sample data. It starts from a recipe from the [Fibery Process Cookbook](https://github.com/Fibery-inc/process-cookbook) whenever one fits the process, which gives a better Space than a design from scratch. It asks its questions in one message, then builds right away and reports what it decided for you. Say things like "set up our hiring process in Fibery", "build a content calendar", "how should I model client onboarding in Fibery".
+- **fibery-architect** — turns how a team works (an idea, an interview, a process document, a recipe or an existing Space) into a ready-to-run Fibery Space in your workspace: databases, fields, relations and links to what you already track, workflows, formulas, views, reports, the automations the process depends on, a custom app where views fall short, documents and sample data. It starts from a recipe from the [Fibery Process Cookbook](https://github.com/Fibery-inc/process-cookbook) whenever one fits the process, which gives a better Space than a design from scratch. It asks its questions in one message, then builds right away and reports what it decided for you. Say things like "set up our hiring process in Fibery", "build a content calendar", "track our repair shop's work orders in Fibery", "how should I model client onboarding in Fibery".
 - **recipe-writer** — writes and revises recipes for the [Fibery Process Cookbook](https://github.com/Fibery-inc/process-cookbook), an open library under CC BY 4.0: a method or domain process (Shape Up, OKRs, a sales pipeline, a service desk, a volunteer rota) in plain words any tool can follow, with its complete model, the questions to ask a team, adaptation rules and its sources. Say "make a recipe for OKRs", "turn this Space into a recipe" or "add incident management to the cookbook". It builds nothing; fibery-architect builds from what it writes.
 - **fibery-health** — checks a workspace, or the Spaces you name. By default it reviews the structure: copied, test and empty Spaces, databases and fields, missing descriptions (it drafts them), status kept in plain selects, wrongly typed workflow states, select options that split one value, formulas Fibery switched off or fixed to a date, text fields that should be relations, people lists that duplicate your users or still let people who left sign in, and failing, silent or never-run automations, including messages that contradict their rule. On a big workspace it starts with an overview, one line per Space, and checks in full the Spaces you pick. Ask for the data pass and it also reads how records fill their fields: unused and retired fields, missing links and owners who left, text that should be a select, dormant databases and demo data. Say "health-check our workspace", "which automations are broken", "is our workspace ready for AI agents", or, for the data pass, "check the data too", "find unused fields".
 
 ## Install
 
+The plugin installs in Claude and in the agents below, and the skills follow the open [Agent Skills](https://agentskills.io) format, so any agent that reads skills can use them.
+
 | Agent | Install |
 | --- | --- |
+| Claude and Cowork | **Customize → Plugins → Discover**, add Fibery, then connect Fibery on the plugin's **Connectors** tab |
 | Claude Code | `/plugin install fibery --marketplace Fibery-inc/skills` |
 | Codex CLI and the ChatGPT desktop app | `codex plugin marketplace add Fibery-inc/skills`, then `codex plugin add fibery@fibery` |
 | GitHub Copilot CLI | `copilot plugin marketplace add Fibery-inc/skills`, then `copilot plugin install fibery@fibery` |
@@ -46,7 +51,7 @@ Nothing else: no analytics, no other services.
 
 ## Recipes
 
-fibery-architect looks processes up in the [Fibery Process Cookbook](https://github.com/Fibery-inc/process-cookbook) by itself: say "set up OKRs" and it builds from the cookbook's recipe. Any other recipe in the same format works the same way: attach it, or paste it or its link. Shape Up and Content calendar are copied into `skills/recipe-writer/examples/` as the models recipe-writer writes from.
+fibery-architect looks processes up in the [Fibery Process Cookbook](https://github.com/Fibery-inc/process-cookbook) by itself: say "set up OKRs" and it builds from the cookbook's recipe. Its recipes range from a sales pipeline, OKRs, incident management and purchase requests to a phone repair shop, a custom guitar shop, a custom fiber mill, an esports team's practice and a volunteer cat-rescue program; a process without a recipe is designed from scratch. Any other recipe in the same format works the same way: attach it, or paste it or its link. Shape Up and Content calendar are copied into `skills/recipe-writer/examples/` as the models recipe-writer writes from.
 
 ## Support
 

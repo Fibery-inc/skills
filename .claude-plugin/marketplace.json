@@ -9,7 +9,7 @@
     {
       "name": "fibery",
       "source": "./",
-      "description": "Design and build Fibery Spaces for any process, write the recipes they start from, and health-check your workspace's structure and data."
+      "description": "Describe how your company, team, shop or club works and get it running in Fibery, from sales and OKRs to repair orders, production queues and volunteer programs. Also audits your workspace and writes processes up as playbooks."
     }
   ]
 }
