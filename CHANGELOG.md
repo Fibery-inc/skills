@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.18 — 2026-10-24
+
+The Claude manifest has the directory listing fields again: `icon` (`./assets/logo.svg`), `documentationUrl` (the README), `supportUrl` (the Fibery community), `privacyPolicyUrl` and `termsOfServiceUrl` (fibery.com). Anthropic's directory reads them for the plugin's listing and Claude Code ignores them; `claude plugin validate` accepts them from Claude Code 2.1.281. 1.4.1 had removed them when the Claude app stripped them as unknown, and the directory's validation of 1.8.17 noted the missing privacy policy URL.
+
 ## 1.8.17 — 2026-10-24
 
 The plugin brings Fibery MCP to Claude. A new `.mcp.json` names `https://mcp.fibery.io/mcp`, so in Claude and Cowork Fibery is on the plugin's Connectors tab, and Claude Code connects it with the plugin instead of needing `claude mcp add`; it is the Fibery connector's URL, so anyone who has both gets one set of tools. Until now only the other agents got the server (from `mcp.json` and `gemini-extension.json`), and Anthropic's directory validation reported "No MCP servers", which also keeps a plugin from being paired with its connector's listing. fibery-architect no longer spells out a `curl` command for downloading a recipe whole, which the same validation flagged as a download-and-run command; it says to download the file itself. And a cookbook recipe comes only from the cookbook, downloaded whole with a shell or else through the web fetch tool: the copies of Shape Up and Content calendar in recipe-writer's `examples/` stay recipe-writer's models but are no longer fibery-architect's fallback, so when the cookbook's index can't be fetched, the design starts from the process.

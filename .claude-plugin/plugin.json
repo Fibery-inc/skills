@@ -1,14 +1,19 @@
 {
   "name": "fibery",
   "displayName": "Fibery",
-  "version": "1.8.17",
+  "version": "1.8.18",
   "description": "Design and build Fibery Spaces for any process, write the recipes they start from, and health-check your workspace's structure and data. Works with the Fibery connector.",
   "author": {
     "name": "Fibery",
     "url": "https://fibery.com"
   },
   "homepage": "https://fibery.com",
+  "documentationUrl": "https://github.com/Fibery-inc/skills#readme",
+  "supportUrl": "https://community.fibery.io",
+  "privacyPolicyUrl": "https://fibery.com/privacy-policy",
+  "termsOfServiceUrl": "https://fibery.com/terms",
   "repository": "https://github.com/Fibery-inc/skills",
   "license": "MIT",
+  "icon": "./assets/logo.svg",
   "keywords": ["fibery", "workspace", "process", "space", "recipe", "cookbook", "templates", "structure", "health", "audit"]
 }
