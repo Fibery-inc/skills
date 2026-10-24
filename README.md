@@ -25,7 +25,7 @@ On Claude Code older than 2.1.275, run `claude plugin marketplace add Fibery-inc
 
 ## What you need
 
-- **Fibery MCP** (`https://mcp.fibery.io/mcp`), connected to the workspace you want to work in. The Codex, Copilot, VS Code, Cursor, Gemini CLI and Kiro installs add it for you and ask you to sign in to Fibery. In Claude, connect the Fibery connector; in Claude Code without it, run `claude mcp add --transport http fibery https://mcp.fibery.io/mcp`. fibery-architect needs a role that can create Spaces; recipe-writer uses it only to read a Space it turns into a recipe; fibery-health sees only what your role can see, so run it as a workspace admin for full coverage (applying its fixes needs Creator or Admin).
+- **Fibery MCP** (`https://mcp.fibery.io/mcp`), connected to the workspace you want to work in. The plugin installs add it for you and ask you to sign in to Fibery; in Claude and Cowork, connect it on the plugin's Connectors tab. It's the server behind the Fibery connector, so if you have that connected already, you get one set of tools. fibery-architect needs a role that can create Spaces; recipe-writer uses it only to read a Space it turns into a recipe; fibery-health sees only what your role can see, so run it as a workspace admin for full coverage (applying its fixes needs Creator or Admin).
 - Fibery MCP's `execute_code` tool. fibery-architect writes a handful of scripts from the design, each making a whole step's calls inside Fibery, and needs a strong reasoning model (Sonnet 5.5 or better); fibery-health gathers all its evidence with one script.
 
 ## What it changes in your workspace
@@ -36,7 +36,7 @@ fibery-health is read-only until you approve a specific fix, and asks again for 
 
 ## Recipes
 
-fibery-architect looks processes up in the [Fibery Process Cookbook](https://github.com/Fibery-inc/process-cookbook) by itself: say "set up OKRs" and it builds from the cookbook's recipe. Any other recipe in the same format works the same way: attach it, or paste it or its link. Shape Up and Content calendar are copied into `skills/recipe-writer/examples/`: the models recipe-writer writes from, and what fibery-architect uses when it can't reach the cookbook.
+fibery-architect looks processes up in the [Fibery Process Cookbook](https://github.com/Fibery-inc/process-cookbook) by itself: say "set up OKRs" and it builds from the cookbook's recipe. Any other recipe in the same format works the same way: attach it, or paste it or its link. Shape Up and Content calendar are copied into `skills/recipe-writer/examples/` as the models recipe-writer writes from.
 
 ## Support
 
