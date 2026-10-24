@@ -34,13 +34,23 @@ fibery-architect creates new Spaces (one, or two or three when the design says w
 
 fibery-health is read-only until you approve a specific fix, and asks again for every batch. It makes only safe, reversible changes: fixing workflow state types, deleting empty databases and unused or test fields, disabling a failing rule and "Health: ..." triage views. It never deletes records. Renames, merges, conversions and repairs come back as a written plan. With your yes, it saves its report as a document in your Private space.
 
+## What it sends and fetches
+
+- **Fibery MCP** (`https://mcp.fibery.io/mcp`): every read and change in your workspace, under your own Fibery login and role.
+- **GitHub**: fibery-architect downloads the cookbook's index and the recipe it builds from, from `raw.githubusercontent.com/Fibery-inc/process-cookbook`. Nothing from your workspace is sent.
+- **Your workspace's app endpoints**: for a custom app, fibery-architect gets a developer token from Fibery MCP (it lasts about an hour and works only for the app's source files), downloads the app's code from your workspace into the working folder, and uploads the code it writes back to your workspace, which builds it. Fibery's custom-apps-dev guide, which it follows, may also check the code with a local `pnpm` build, which installs packages from the npm registry.
+- **Public web pages**: recipe-writer reads one to three published sources with your agent's web search and fetch tools; fibery-architect fetches a recipe or process document you link to.
+- **Your working folder**: fibery-architect writes `design.md`, `recipe.md` and a custom app's code there, recipe-writer the recipe's `<process>.md`.
+
+Nothing else: no analytics, no other services.
+
 ## Recipes
 
 fibery-architect looks processes up in the [Fibery Process Cookbook](https://github.com/Fibery-inc/process-cookbook) by itself: say "set up OKRs" and it builds from the cookbook's recipe. Any other recipe in the same format works the same way: attach it, or paste it or its link. Shape Up and Content calendar are copied into `skills/recipe-writer/examples/` as the models recipe-writer writes from.
 
 ## Support
 
-Ask on the [Fibery community](https://community.fibery.io). Fibery's [privacy policy](https://fibery.com/privacy-policy) and [terms](https://fibery.com/terms) cover the workspace data these skills read and write through Fibery MCP.
+Ask on the [Fibery community](https://community.fibery.io); report a security issue privately, as [SECURITY.md](SECURITY.md) says. Fibery's [privacy policy](https://fibery.com/privacy-policy) and [terms](https://fibery.com/terms) cover the workspace data these skills read and write through Fibery MCP.
 
 ## License
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.19 — 2026-10-24
+
+The README says what the plugin sends and fetches outside Fibery MCP: the cookbook's index and recipes from GitHub, with nothing from the workspace; for a custom app, its code downloaded from and uploaded to the person's own workspace with a developer token from Fibery MCP, and possibly a local `pnpm` build; public pages for recipe-writer's sources and a link the person gives; and the files written in the working folder. A new SECURITY.md says how to report a security issue (support@fibery.io), and the README's Support points to it. Both are for Anthropic's directory review, whose policy asks for a way to receive vulnerability reports and a README that describes everything a plugin sends or fetches.
+
 ## 1.8.18 — 2026-10-24
 
 The Claude manifest has the directory listing fields again: `icon` (`./assets/logo.svg`), `documentationUrl` (the README), `supportUrl` (the Fibery community), `privacyPolicyUrl` and `termsOfServiceUrl` (fibery.com). Anthropic's directory reads them for the plugin's listing and Claude Code ignores them; `claude plugin validate` accepts them from Claude Code 2.1.281. 1.4.1 had removed them when the Claude app stripped them as unknown, and the directory's validation of 1.8.17 noted the missing privacy policy URL.
