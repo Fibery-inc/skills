@@ -235,6 +235,7 @@ const S = "Hiring"; const f = n => `${S}/${n}`;
 const C = f("Candidate"), J = f("Job");
 const X = " (example)";
 const day = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+const cover = (text, color) => `https://placehold.co/640x360/${color.slice(1)}/FFFFFF/png?text=${encodeURIComponent(text)}`;
 const RECORDS = {
   [J]: [
     {Name: "Product designer", state: "Open", Openings: 2, "Hiring window": [-30, 30], comments: ["Two seats: one senior, one mid. Portfolio review comes before the technical round."]}
@@ -318,6 +319,7 @@ for (const db of dbs) {
     if (kd === "one" || kd === "person") select[`k${i}`] = [F, "fibery/id"];
     if (kd === "many" || kd === "people" || kd === "multi") select[`k${i}`] = {"q/from": F, "q/select": {id: "fibery/id"}, "q/limit": "q/no-limit"};
     if (kd === "text") select[`k${i}`] = [F, "Collaboration~Documents/secret"];
+    if (kd === "file") select[`k${i}`] = types[db][F].many ? {"q/from": F, "q/select": {id: "fibery/id"}, "q/limit": 1} : [F, "fibery/id"];
     if (kd === "comments") select.cs = {"q/from": "comments/comments", "q/select": {id: "fibery/id"}, "q/limit": 1};
   });
   const now = Object.fromEntries((await rows(db, select)).map(r => [r.n, r])), links = [];
@@ -335,7 +337,8 @@ for (const db of dbs) {
       if (kd === "multi") items(v.map(n => opt[db + k][n]), "options");
       if (kd === "text" && got) writes.push(() => fill(who, got, v));
       if (kd === "comments" && !(has.cs || []).length) v.forEach(c => writes.push(() => run(who, add_comment({database: db, entityId: id, content: c})).then(add("comments"))));
-      if ((kd === "file" || kd === "unknown") && isNew) fails.push(`${who}: ${kd === "file" ? "a sample file stays empty; leave the key out" : "no such field"}`);
+      if (kd === "file" && !(Array.isArray(got) ? got.length : got)) [].concat(v).forEach(url => writes.push(() => run(who, add_file_from_url({database: db, field: F, entityId: id, url, fileName: r.Name + ".png"})).then(add("pictures"))));
+      if (kd === "unknown" && isNew) fails.push(`${who}: no such field`);
     }
     if (Object.keys(link).length > 1) links.push(link);
   }

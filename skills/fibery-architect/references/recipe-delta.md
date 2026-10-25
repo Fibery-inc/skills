@@ -52,6 +52,7 @@ The build guide turns each of the recipe's words into Fibery's calls, and most t
 - **Money** is in the currency of the workspace's existing money fields, or the one the person names, or USD as an assumption.
 - **A report that keeps only some linked records** (only key results whose objective is Active, only runs of strats that aren't Retired) gets a true-or-false formula on its source, built with the other formulas, since a report filters on its source's own fields.
 - **A view that shows a linked record's field** (the customer's Phone on My calls) gets a formula on its database that reads it, since a view shows its database's own fields only.
+- **A board whose cards show a picture** ("Frames as the cover") is a gallery whose lanes are the board's columns, since a Fibery board has no cover.
 - **A grouping Fibery can't do**, a board's rows by a text, a number or a date, becomes a select.
 - **A whole-number formula** stays whole when it starts with its 0 case: a day count reads one date field and is 0 without it, with the rule that stamps the date also firing on creation; a share is 0 when there is nothing to count. Otherwise it comes back decimal, with its number format on Your turn.
 - **A view that only adds a filter to another view** isn't built, since people filter; the daily view and "My …" views stay. Each dropped view is a Change row.

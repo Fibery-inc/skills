@@ -43,6 +43,7 @@ fibery-health is read-only until you approve a specific fix, and asks again for 
 
 - **Fibery MCP** (`https://mcp.fibery.io/mcp`): every read and change in your workspace, under your own Fibery login and role.
 - **GitHub**: fibery-architect downloads the cookbook's index and the recipe it builds from, from `raw.githubusercontent.com/Fibery-inc/process-cookbook`. Nothing from your workspace is sent.
+- **placehold.co, through Fibery**: when a Space has a gallery, Fibery downloads a placeholder picture for each of its sample records, so the gallery doesn't open with blank covers. The address carries the invented record's name and a color, nothing else from your workspace.
 - **Your workspace's app endpoints**: for a custom app, fibery-architect gets a developer token from Fibery MCP (it lasts about an hour and works only for the app's source files), downloads the app's code from your workspace into the working folder, and uploads the code it writes back to your workspace, which builds it. Fibery's custom-apps-dev guide, which it follows, may also check the code with a local `pnpm` build, which installs packages from the npm registry.
 - **Public web pages**: recipe-writer reads one to three published sources with your agent's web search and fetch tools; fibery-architect fetches a recipe or process document you link to.
 - **Your working folder**: fibery-architect writes `design.md`, `recipe.md` and a custom app's code there, recipe-writer the recipe's `<process>.md`.
