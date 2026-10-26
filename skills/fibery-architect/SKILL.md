@@ -66,7 +66,7 @@ Save it as `design.md` in the working folder when you can write files; otherwise
 
 Follow `references/build-guide.md` in its order: six `execute_code` scripts, each started from its template, and the guide's two direct calls, so a build is about ten tool calls, not a hundred. The structure comes first and the formulas second; then the views and reports, the sample records, the rules and buttons and the empty app, all at once, with the rules off so none fires on the sample data; last the guide, whose text mentions the views, with the checks that read formulas and the rules turned on. A helper writes the app's code only when the client can run one in the background, alongside the guide; otherwise you write it after the guide. The build guide's first section has the rules every script follows: above all, a script looks every id up by name, does only what's missing and logs what it found, so one that failed, was cut off or logged "time is up" runs again as it is, and a `fixLogs` line that renames a Space or database stops the build. Don't delete anything to start over unless the person asks; then delete only the new Spaces.
 
-There is no separate verification pass: the scripts check the formula types, the nested views, the stored rule texts and the sample data's promises, and the guide's last call opens the first view once, to see the Space the way the person will; fix what looks wrong before the report. Never change a record to test an automation.
+There is no separate verification pass: the scripts check the formula types, the nested views, the stored rule texts and the sample data's promises, and the guide's last call opens the first view after the guide, once, to see the Space the way the person will; fix what looks wrong before the report. Never change a record to test an automation.
 
 ## 6. Report
 
@@ -80,7 +80,7 @@ A few lines for the person who will run the Space, each only when it has somethi
 >
 > The examples are marked "(example)".
 
-- **Ready**, always: the Space ready in its workspace (several Spaces, each with its reason), then the guide and the first view, both linked; the only other links are the forms in Your turn.
+- **Ready**, always: the Space ready in its workspace (several Spaces, each with its reason), then the guide and the first view after it, both linked; the only other links are the forms in Your turn.
 - **Your turn**: what the person sets by hand so the Space works for the team, each with where in Fibery: who may open the Space; a form to share with people outside the workspace, linked; a number or date field's minimum, maximum and default, including every default and range a recipe gives ("Date: today by default", "0 to 100"); a formula's number format, when it came back decimal; a Description's template, the headings a new record starts with (the build names them in the database's description, and the hero record's Description uses them). Never the Space icon, and never a failure.
 - **Not built**: a rule native actions couldn't do (build guide §5) or a part that failed, each with what's done by hand instead.
 - **Worth a look**: what the build couldn't check itself, usually the app, with why in a few words.

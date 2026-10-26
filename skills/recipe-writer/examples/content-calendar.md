@@ -3,6 +3,8 @@ title: Content calendar
 summary: "A content calendar for a marketing team: every blog post, newsletter and social post on one board from idea to published link, with campaigns to watch."
 domain: marketing
 for: team
+roles: "The editor and the authors open the tool; anyone outside the team suggests posts through a form."
+needs: "Channels the team publishes to regularly, one person who plans the calendar, and a few people who write."
 keywords: [content calendar, editorial calendar, blog posts, newsletter, social media, campaigns, publishing schedule, marketing content]
 version: 3
 license: CC-BY-4.0
@@ -25,12 +27,12 @@ In any work tool, this becomes two kinds of linked records: posts whose workflow
 Follow one post, *Onboarding in half the time*, from idea to link.
 
 1. **An idea is captured.** Someone adds a post in *Idea*, through the **New post** form or straight on the board: "Onboarding in half the time". They tag its **Channels**, where it goes out: *Blog*, *Newsletter*, *LinkedIn*, *X*, or the team's own list; one post often goes to several, and this one is *Blog* and *LinkedIn*. If it belongs to one, they link it to a campaign, here the Spring launch. No date yet; ideas are cheap.
-2. **It gets planned.** The editor, who owns the calendar, gives it a **Publish date**, the day it goes out, its authors, the one or several people who write it, and a rough **Word count**. It appears on the **Calendar**, every post by publish date, and, once the date is within seven days, in **This week**.
+2. **It gets planned.** The editor, who owns the calendar, gives it a **Publish date**, the day it goes out. It also gets its authors, the one or several people who write it, and a rough **Word count**. It appears on the **Calendar**, every post by publish date, and, once the date is within seven days, in **This week**.
 3. **It gets written.** An author moves it to *Drafting*, writes in its description and attaches its **Images**, the cover and any visuals it goes out with. When the draft is ready, they move it to *In review*. The **Stage changed** rule notes the day a post is added and the day of every move, so every post shows **Days in stage**, how long it has sat where it is.
-4. **It gets approved.** The editor, or whoever approves, finds it in the *In review* column of **Pipeline**, the board of every post in its state, reads it and presses **Ready to schedule**, a button on the post: it moves to *Scheduled*, and a comment records who approved it and for which date. A post scheduled without a date turns red on Pipeline until someone gives it one.
-5. **The morning it goes out**, the **Publish reminder** rule tells its authors it goes out today, with the post's channels; nobody has to ask.
+4. **It gets approved.** The editor, or whoever approves, finds it in the *In review* column of **Pipeline**, the board of every post in its state. They read it and press **Ready to schedule**, a button on the post: it moves to *Scheduled*, and a comment records who approved it and for which date. A post scheduled without a date turns red on Pipeline until someone gives it one.
+5. **Its authors are reminded.** The morning it goes out, the **Publish reminder** rule tells its authors it goes out today, with the post's channels; nobody has to ask.
 6. **It gets published.** The author publishes on each channel, pastes the **Link**, where the published post now lives, and moves the post to *Published*. A post published without a publish date gets today from the **Publish date on publish** rule, so the calendar and the reports stay true.
-7. **Or it gets dropped.** When the team decides not to run a post, the editor moves it to *Dropped*: the board stays honest, and so do the campaign's numbers.
+7. **Or it gets dropped.** When the team decides not to run a post, the editor moves it to *Dropped*. The board stays honest, and so do the campaign's numbers.
 8. **The editor watches the campaigns.** A post whose publish date has passed and that is neither *Published* nor *Dropped* is **Late**, and its card turns red on the board. The **Campaigns** timeline shows each campaign's **Progress**, the share of its posts already published, dropped ones aside, from 0 to 100, and the **Campaign posts** grid shows its **Published posts** and **Late posts**, counts of its posts. The editor moves a campaign from *Planned* to *Running* when its first post goes out and to *Done* when its dates end. A running campaign in its last seven days with under half its posts published is **At risk** and turns red on the timeline, so the editor decides in time what to move or cut.
 
 ## What people look at
@@ -58,9 +60,9 @@ Whatever anyone edits, adapts or corrects, these hold; each says what keeps it s
 - ★ Every piece of content is one post on one board, whatever its channel; a channel with its own tool still gets a post here, with the link. A practice; nothing stops a second board, and a second board brings back the question of what goes out this week.
 - ★ A post that is *Scheduled* or *Published* has a publish date. Shown on **Pipeline**, where a *Scheduled* post with no date is red, like a late one; kept by **Publish date on publish** for a post moved to *Published* straight from the board.
 - Approval leaves a trace: who approved a post, and for which date, is in its comments. Kept by **Ready to schedule**, which writes the comment; a card dragged to *Scheduled* on the Pipeline board skips it, so approving means pressing the button.
-- ★ *Dropped* is a real ending: a post the team won't run is moved to *Dropped*, not deleted and not left in *Idea*, so the board and the campaign counts stay honest. Shown by **Late**: a post past its date that is neither *Published* nor *Dropped* turns red on Pipeline and counts against its campaign until someone publishes or drops it.
+- ★ *Dropped* is a real ending: a post the team won't run is moved to *Dropped*, not deleted and not left in *Idea*, so the board and the campaign counts stay honest. Shown on **Pipeline**, where a post that is **Late**, past its date and neither *Published* nor *Dropped*, is red; it counts against its campaign until someone publishes or drops it.
 - A campaign's numbers follow its posts: Published posts, Late posts and Progress count the posts linked to the campaign now, so a post moved to another campaign, or dropped, changes the counts at once. Kept by the **Published posts**, **Late posts** and **Progress** formulas.
-- A slipping campaign shows before it ends: a running campaign in its last seven days with under half its posts published is red on Campaigns. Shown by **At risk**; what to move or cut is the editor's call.
+- A slipping campaign shows before it ends. Shown on **Campaigns**, where **At risk** turns a running campaign red in its last seven days with under half its posts published; what to move or cut is the editor's call.
 - A published post is history: it stays *Published*, its publish date says when it went out, its link says where. A fix is an edit to the description or the link; a rewrite is a new post; a post that slipped a day gets its date corrected by whoever pastes the link. A practice; the Output by channel report counts what the dates say.
 
 ## Making it yours
@@ -118,7 +120,7 @@ Formulas:
 
 ### Campaign
 
-One record per launch or theme: a group of posts with a shared goal and dates. The description holds the goal and the plan. Comments on.
+One record per launch or theme. It is a group of posts with a shared goal and dates. The description holds the goal and the plan. Comments on.
 
 | Field | Type | Why |
 |---|---|---|

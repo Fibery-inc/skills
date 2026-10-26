@@ -3,6 +3,8 @@ title: Shape Up
 summary: "Basecamp's Shape Up for a product team: pitches with an appetite, a betting table, six-week cycles, scopes on a hill chart, a circuit breaker."
 domain: software
 for: team
+roles: "Shapers, the leaders who bet and the teams who build open the tool; anyone else can send an idea through a form."
+needs: "Senior people who can shape work, teams of a designer and one or two programmers, and leaders who bet six weeks at a time."
 keywords: [shape up, basecamp, betting, appetite, hill chart, six week cycles, bets, cool down]
 version: 2
 license: CC-BY-4.0
@@ -25,11 +27,11 @@ In any work tool, this becomes a few kinds of linked records: pitches whose work
 Follow one pitch, *Faster search*, through a cycle.
 
 1. **An idea appears.** Someone notices that search is slow and writes it down as a pitch in *Raw idea*: "Faster search". Anyone can, from inside the team or through the **New idea** form. Nothing is promised yet. There is no backlog to groom.
-2. **A shaper shapes it.** The **Shaper**, the senior person who turns ideas into pitches, moves it to *Shaping* and writes the pitch in its description under four headings: Problem, Solution, Rabbit holes, No-gos, then attaches its **Sketches**, the breadboards and fat-marker drawings of the solution. They set the appetite, a Big batch here, and the **Area**, the part of the product it touches. When it's ready to be judged, they move it to *Pitched*.
-3. **Leadership bets.** During cool down, whoever runs the betting table, usually the CEO or the head of product, opens the next betting table, one record per betting meeting, which names the cycle it bets for: it moves from *Upcoming* to *Open*, and they put on it the pitches worth considering; not every pitch in *Pitched* gets a seat, which is why a person picks them. For each pitch worth building they press **Bet on it**: the pitch becomes *Bet*, linked to the cycle the table bets for; a pitch with no appetite shows red on the table's board, so nobody bets on one by accident. Everything else is moved to *Not bet*, and that is final; when the bets are made, the table is moved to *Closed*. An idea that comes back gets re-shaped as a new pitch, so the history of what was declined stays honest in **All pitches**, the grid of every pitch with its scopes. Faster search gets a bet.
+2. **A shaper shapes it.** The **Shaper**, the senior person who turns ideas into pitches, moves it to *Shaping*. They write the pitch in its description under four headings: Problem, Solution, Rabbit holes, No-gos, then attach its **Sketches**, the breadboards and fat-marker drawings of the solution. They set the appetite, a Big batch here, and the **Area**, the part of the product it touches. When it's ready to be judged, they move it to *Pitched*.
+3. **Leadership bets.** During cool down, whoever runs the betting table, usually the CEO or the head of product, opens the next betting table. It is one record per betting meeting, which names the cycle it bets for: it moves from *Upcoming* to *Open*, and they put on it the pitches worth considering; not every pitch in *Pitched* gets a seat, which is why a person picks them. For each pitch worth building they press **Bet on it**: the pitch becomes *Bet*, linked to the cycle the table bets for; a pitch with no appetite shows red on the table's board, so nobody bets on one by accident. Everything else is moved to *Not bet*, and that is final; when the bets are made, the table is moved to *Closed*. An idea that comes back gets re-shaped as a new pitch, so the history of what was declined stays honest in **All pitches**, the grid of every pitch with its scopes. Faster search gets a bet.
 4. **The cycle starts.** Whoever runs the betting table moves the cycle to *Building*, and the **Cycle starts** rule moves every pitch bet on it along. The team is set on the pitch, usually a designer and one or two programmers; from here on they own the whole cycle. A *Small batch* pitch doesn't get a cycle to itself: a small-batch team takes several in one cycle, one or two weeks each.
 5. **The team maps the work.** In the first days the team splits the pitch into **Scopes**, demoable slices they discover while building. For Faster search: Index rebuild, Query parser, Result ranking, Search box polish. They mark the ones that are **Nice to have**, the ones that can be cut without breaking the bet; Search box polish is one. Scopes get **Tasks**, concrete to-dos written by the team, never by shapers.
-6. **Every week, the dots move.** Each scope's **Owner** moves its **Hill position**, a number from 0 to 100, on the **Hill chart**, a chart shaped like a hill: the left slope is figuring things out, the top is where the approach is clear, the right slope is making it happen. A scope is *Not started* at 0, *Uphill* below 50, over the top at 50, *Downhill* while it's just work. The chart moves the scope's state with it. On Mondays the **Hill reminder** asks every owner of an unfinished scope to move their dot. A dot that stays uphill for two weeks is the signal of an unsolved unknown, and the shaper should look.
+6. **Every week, the dots move.** Each scope's **Owner** moves its **Hill position**, a number from 0 to 100, on the **Hill chart**, a chart shaped like a hill. The left slope is figuring things out, the top is where the approach is clear, the right slope is making it happen. A scope is *Not started* at 0, *Uphill* below 50, over the top at 50, *Downhill* while it's just work. The chart moves the scope's state with it. On Mondays the **Hill reminder** asks every owner of an unfinished scope to move their dot. A dot that stays uphill for two weeks is the signal of an unsolved unknown, and the shaper should look.
 7. **Scope hammering.** With under two weeks left and the pitch behind, the team cuts nice-to-have scopes and tasks first. Search box polish goes. Appetite doesn't move; scope does.
 8. **It ships, or it stops.** When the last scope is *Done*, the **Auto ship** rule moves the pitch to *Shipped*. When whoever runs the betting table moves the cycle to *Cool down*, the **Circuit breaker** rule moves every pitch in it that isn't shipped to *Stopped*: unfinished work is re-shaped, not extended. A bet that didn't ship stops; it can be re-pitched, never prolonged.
 9. **Cool down.** Two weeks: bugs, small things, breathing. The next betting table happens here, and the loop starts again.
@@ -60,7 +62,7 @@ No automations in your tool? Then a person does each of these at the same moment
 Whatever anyone edits, adapts or corrects, these hold; each says what keeps it so.
 
 - ★ A pitch is bet only with an appetite, and a bet names its cycle. Shown on **Bets**, where a pitch with no appetite is red; kept by **Bet on it**, which sets the cycle from the table. A card dragged into *Bet* on the board gets no cycle, so betting means pressing the button; that part is a practice.
-- ★ Once bet, the appetite is fixed and the scope flexes. Shown by **Hammer time** on the All pitches grid: it flags a building pitch that is behind with under two weeks left, so the cutting starts in time; the cutting itself is the team's.
+- ★ Once bet, the appetite is fixed and the scope flexes. Shown on the **All pitches** grid, where **Hammer time** flags a building pitch that is behind with under two weeks left, so the cutting starts in time; the cutting itself is the team's.
 - ★ The hill is the truth about a scope: Hill position and State agree. Kept by the **Hill chart**, which sets the state from the position; a card moved on the Current cycle board is overruled by the next drag.
 - A pitch is *Shipped* only when every scope is *Done*. Kept by **Auto ship**. A scope reopened after shipping doesn't un-ship the pitch; the team decides whether it's a cool-down fix or a new pitch.
 - ★ Nothing outlives its cycle: when the cycle ends, what didn't ship is *Stopped*. Kept by the **Circuit breaker**. A stopped pitch is re-shaped as a new pitch, never reopened; that part is a practice.
@@ -127,7 +129,7 @@ Formulas:
 
 ### Betting table
 
-One record per betting meeting; its description holds the decisions and the reasoning. Comments on. Fields: Date (date; when the meeting is, set by whoever runs the table when they open it); Next cycle (relation, one-to-one → Cycle; inverse **Betting table**; the cycle the meeting bets for, which Bet on it copies onto every bet pitch). States: Upcoming → Open → Closed (finished). Default: Upcoming.
+One record per betting meeting. Its description holds the decisions and the reasoning. Comments on. Fields: Date (date; when the meeting is, set by whoever runs the table when they open it); Next cycle (relation, one-to-one → Cycle; inverse **Betting table**; the cycle the meeting bets for, which Bet on it copies onto every bet pitch). States: Upcoming → Open → Closed (finished). Default: Upcoming.
 
 ### Cycle
 
@@ -158,7 +160,7 @@ A to-do inside a scope. No description. Fields: Scope (relation, many-to-one →
 
 ### Product
 
-Only when asked for: Name and a description. Its pitches come through the inverse **Pitches**.
+One product the team runs. Only when asked for: Name and a description. Its pitches come through the inverse **Pitches**.
 
 ### Views
 

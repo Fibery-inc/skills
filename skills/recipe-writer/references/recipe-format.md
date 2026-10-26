@@ -14,7 +14,7 @@ One Markdown file, `<process>.md`, as long as the process needs: a metadata head
 
 ## 0. Header
 
-YAML frontmatter, the first thing in the file and the only YAML in it; search engines and builders read it, people mostly don't. Plain values, names with their capitals, short lists in brackets, `summary` in double quotes:
+YAML frontmatter, the first thing in the file and the only YAML in it; search engines and builders read it, people mostly don't. Plain values, names with their capitals, short lists in brackets, `summary`, `roles` and `needs` in double quotes:
 
 ```yaml
 ---
@@ -22,13 +22,15 @@ title: Shape Up
 summary: "Basecamp's Shape Up for a product team: pitches with an appetite, a betting table, six-week cycles, scopes on a hill chart, a circuit breaker."
 domain: software
 for: team
+roles: "Shapers, the leaders who bet and the teams who build open the tool; anyone else can send an idea through a form."
+needs: "Senior people who can shape work, teams of a designer and one or two programmers, and leaders who bet six weeks at a time."
 keywords: [shape up, basecamp, betting, appetite, hill chart, six week cycles]
 version: 1
 license: CC-BY-4.0
 ---
 ```
 
-`summary` is one sentence under 160 characters, unique to this recipe: what the process is and for whom; it is what a search snippet and a skimming agent see first. `domain` is one of the cookbook's domains below. `for` is `solo`, `team`, `company` or `community`. `keywords` are the words someone would search for, including the method's own and the plain ones ("betting", "six week cycles"). `version` starts at 1 and goes up by one whenever the model changes (a database, a field, a state, a rule), never for wording. `license` is always `CC-BY-4.0`. The file name is the recipe's id; its sources are listed in Sources.
+`summary` is one sentence under 160 characters, unique to this recipe: what the process is and for whom; it is what a search snippet and a skimming agent see first. `domain` is one of the cookbook's domains below. `for` is `solo`, `team`, `company` or `community`. `roles` is one sentence under 160 characters on who opens the tool and who stays out of it. `needs` is one sentence under 160 characters on what a group must already have for the process to make sense. Both are true to the story and name no tool. `keywords` are the words someone would search for, including the method's own and the plain ones ("betting", "six week cycles"). `version` starts at 1 and goes up by one whenever the model changes (a database, a field, a state, a rule), never for wording. `license` is always `CC-BY-4.0`. The file name is the recipe's id; its sources are listed in Sources.
 
 **Domains.** software, product, design, marketing, sales, support, operations, management, finance, hr, legal, compliance, security, education, research, healthcare, nonprofit, community, faith, events, sports, esports, music, arts, media, hospitality, retail, manufacturing, construction, farming, household, personal. A process that fits two takes the one its people would name; a domain the list lacks is added here first, never invented in a header.
 
@@ -56,6 +58,8 @@ The italic line is fixed; a reader who lands on the file from anywhere learns in
 
 `## How it runs`. Follow one named example through its whole life ("Follow one pitch, *Faster search*, through a cycle") in numbered moments, up to ten: who picks it up, what they decide, what changes, how it ends, including the endings that aren't success. Every moment names the things by their words, defining each new one where it first appears, so the walk carries the states, roles and decisions in order. The example makes the abstract concrete for the reader; for the builder it becomes the hero record of the sample story.
 
+Each moment opens with a bold title that is a sentence of its own, ending in a period ("**An idea appears.**", "**Cool down.**"). The first sentence after it sums the moment up on its own, in under 25 words; the cookbook's site shows the title and that sentence, and the rest on request.
+
 Two conventions keep this half honest for the builder without marking up the prose:
 
 - **The rules is the complete list of automations.** Anything the story describes that isn't there is done by a person, so "the shaper moves it to *Pitched*" needs no marker. An automatic step says so by naming its rule: "the **Cycle starts** rule moves every pitch bet on it along".
@@ -82,7 +86,7 @@ Two conventions keep this half honest for the builder without marking up the pro
 
 ## 6. What must stay true
 
-`## What must stay true`, opening with the line "Whatever anyone edits, adapts or corrects, these hold; each says what keeps it so." Then up to seven bullets, the promises the process can't do without, each one in plain words, then how it is kept, in one of three ways and in these words: *kept by* a rule, a button, a formula or the app, so nobody has to remember; *shown by* a formula or a view that makes the exceptions visible (a red card, a count, a blank beside the name), so someone sees; or *a practice*, people keep it and nothing enforces it, with the reminder when there is one. Nothing refuses: a button can't check, so a promise a button would have guarded is shown or a practice. The promises are the ones the process can't do without and the ones the forward story never answers: what happens when a record is corrected, reopened, moved or entered late; what completion requires and what stays true after it; which of two things that could disagree wins. ★ marks the promises no adaptation may break, and appears nowhere else in the recipe: few stars, so each one counts. What keeps a promise is named the way The rules and Details name it, and exists there: a rule or button is in The rules, a view is in the Views table, a formula is in Details; a formula that checks a promise may appear here for the first time, with what it is in the same sentence. A promise nothing keeps is written as a practice, never left vague, and is often the moment to add the check. Nothing else starts here: no database, role, state, view or rule.
+`## What must stay true`, opening with the line "Whatever anyone edits, adapts or corrects, these hold; each says what keeps it so." Then up to seven bullets, the promises the process can't do without, each one in plain words, then how it is kept, in one of three ways, in a sentence that starts with these words: *Kept by* a rule, a button, a formula or the app, so nobody has to remember; *Shown on* a view, where it or a formula makes the exceptions visible (a red card, a count, a blank beside the name), so someone sees; or *A practice*: people keep it and nothing enforces it, with the reminder when there is one. Nothing refuses: a button can't check, so a promise a button would have guarded is shown or a practice. The promises are the ones the process can't do without and the ones the forward story never answers: what happens when a record is corrected, reopened, moved or entered late; what completion requires and what stays true after it; which of two things that could disagree wins. ★ marks the promises no adaptation may break, and appears nowhere else in the recipe: few stars, so each one counts. What keeps a promise is named the way The rules and Details name it, and exists there: a rule or button is in The rules, a view is in the Views table, a formula is in Details; a formula that checks a promise may appear here for the first time, with what it is in the same sentence. A promise nothing keeps is written as a practice, never left vague, and is often the moment to add the check. Nothing else starts here: no database, role, state, view or rule.
 
 ```markdown
 - ★ A pitch is bet only with an appetite, and a bet names its cycle. Shown on **Bets**, where a pitch with no appetite is red; kept by **Bet on it**, which sets the cycle from the table.
@@ -118,7 +122,7 @@ erDiagram
 
 **Who sees what**, only when it matters: a database some people must not open (salaries, the authors behind a blind review), or one several processes will share (customers, products). One line per group of databases set apart, with the reason ("Candidate and Offer: the hiring team only, because offers carry salaries"). A builder turns each group into its tool's access, a Space of its own in Fibery. Without the line, everything is in one place, open to everyone who runs the process. Colors and icons are the build's choice, not the recipe's.
 
-**One `###` subsection per database**, main thing first: what one record is and what its description holds; settings (comments on, no description); a field table; the states; the formulas.
+**One `###` subsection per database**, main thing first: one sentence under twelve words on what one record is, which the cookbook's site prints as the recipe's vocabulary; then what its description holds; settings (comments on, no description); a field table; the states; the formulas.
 
 ```markdown
 ### Scope
@@ -221,7 +225,7 @@ A recipe is deep but not complete: the setup a team would have after a month of 
 | Formulas | up to 8: the numbers the rituals look at and the flags views color by; none when the process computes nothing |
 | Views | up to 8, daily view first, none that only adds a filter to another (§4); the configuration in the Views table |
 | Automations | up to 5: what the method depends on, and the dates nobody should have to type; none when people do everything |
-| Promises | up to 7 in What must stay true, each kept by something, shown by something, or a practice |
+| Promises | up to 7 in What must stay true, each kept by something, shown on a view, or a practice |
 | App | up to one, fully described, or "None needed" |
 | Reports | up to 2; none when no question needs a chart |
 | Documents | the guide is implied; up to one named process document |
@@ -232,13 +236,14 @@ A recipe is deep but not complete: the setup a team would have after a month of 
 
 The writer's last read is this list:
 
-1. **Header**: every field present, `domain` from the list, `license` CC-BY-4.0.
+1. **Header**: every field present, `domain` from the list, `license` CC-BY-4.0, `roles` and `needs` true to the story.
 2. **Fixed texts**, word for word: the italic line, the opening lines of The rules, What must stay true, Making it yours and Details for building with its paragraph, the closing line of The rules, Build it, and the footer's credit line.
 3. **Neutral**: no tool to run the process in is named, Fibery included, and no Workspace or Space appears, outside the fixed texts (the italic line, Build it and the footer) and Sources. Crediting a named method's originator, citing a source, or naming the channels a process publishes to, is not naming a tool.
 4. **Size**: no view that only adds a filter to another, the daily view and "My …" views aside; a part past its ceiling says why in one sentence; what the recipe leaves for later is in Making it yours. The sample story is one paragraph, with no table.
 5. **Names**: one name for one thing across states, views and rules; letters, digits and spaces only; bold at the first mention.
 6. **The cookbook rule**: every database, role, state, view and rule in Details appears in the story, and every field or formula that doesn't is used by something the story named or filled by a named role every time, or is cut.
 7. **The rules**: each does exactly what the story says, uses what the model already holds before it searches, is present for every step a person would otherwise repeat for every record at one moment, and is made of simple rules only (a condition as its filter, two rules rather than one with two conditions, no branching, no refusing, no comparing fields with each other, no comment or notification through a linked record, never a script), with any step simple rules can't do turned into a shown promise or a practice.
-8. **What must stay true**: every promise names what keeps it and that thing exists in The rules or Details, and a promise nothing keeps is a practice or gets its check.
+8. **What must stay true**: every promise names what keeps it, in a sentence that starts with Kept by, Shown on or A practice, and that thing exists in The rules or Details, and a promise nothing keeps is a practice or gets its check.
 9. **As a reader**: sections 1–7 read once as the person who'll run the process: every act has a named role, every number its scale and every method word its gloss, nothing before Details addresses the builder, no idiom built on the recipe's words, and nothing that tells an agent to do anything but run or set up this process.
 10. **Sources**: one to three, each one the recipe was written from and linked, with who wrote or published it, the year when known and what the recipe took from it; the main one first, and none in the promise line.
+11. **Short lines**: every moment of How it runs opens with a bold title that is a sentence, then a first sentence under 25 words that sums the moment up; every database opens with what one record is, in under twelve words.

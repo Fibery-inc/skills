@@ -1,6 +1,6 @@
 {
   "name": "fibery",
-  "version": "1.8.21",
+  "version": "1.8.22",
   "description": "Describe how your company, team, shop or club works and get it running in Fibery, from sales and OKRs to repair orders, production queues and volunteer programs. Also audits your workspace and writes processes up as playbooks.",
   "mcpServers": {
     "fibery": {
