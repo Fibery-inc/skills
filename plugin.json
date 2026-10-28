@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "fibery",
-  "version": "1.8.25",
-  "description": "Describe how your company, team, shop or club works and get it running in Fibery, from sales and OKRs to repair orders, production queues and volunteer programs. Also audits your workspace and writes processes up as playbooks.",
+  "version": "1.9.0",
+  "description": "Describe how your company, team, shop or club works and get it running in Fibery, from sales and OKRs to repair orders, production queues and volunteer programs. Also moves a process from a Google Sheet with all its data, audits your workspace and writes processes up as playbooks.",
   "author": {
     "name": "Fibery",
     "url": "https://fibery.com"
@@ -10,5 +10,5 @@
   "homepage": "https://fibery.com",
   "repository": "https://github.com/Fibery-inc/skills",
   "license": "MIT",
-  "keywords": ["fibery", "work management", "workflow", "templates", "automations", "crm", "sales pipeline", "okrs", "hiring", "product development", "incident management", "procurement", "content calendar", "compliance", "small business", "manufacturing", "nonprofit", "workspace audit"]
+  "keywords": ["fibery", "work management", "workflow", "templates", "automations", "crm", "sales pipeline", "okrs", "hiring", "product development", "incident management", "procurement", "content calendar", "compliance", "small business", "manufacturing", "nonprofit", "workspace audit", "google sheets", "spreadsheet migration"]
 }
