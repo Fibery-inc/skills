@@ -68,7 +68,7 @@ Written the same way in the full design: a one-line description and settings, th
 | My candidates | list | Candidate | | Job, State, Days in stage, Average score | Recruiter is me; State is any of Applied, Screening, Interview, Offer | Days in stage desc | What's mine |
 | My interviews | list | Interview | | Candidate, Type, Scheduled at, Meeting link | Interviewer is me; State is Scheduled, or State is Done with Scorecards empty | Scheduled at asc | Mine this week, and the verdicts I owe |
 | Offers out | list | Offer | | Candidate, Sent on, Deadline, Days to deadline, Base salary | State is Sent | Deadline asc | What's waiting on a signature |
-| Jobs | grid | Job | | State, Hiring manager, Department, Priority, Openings, Hired count, Openings left; children: Candidate via Candidates showing State, Days in stage, Source | | Priority asc | Every job with its pipeline |
+| Jobs | list | Job | | State, Hiring manager, Department, Priority, Openings, Hired count, Openings left; children: Candidate via Candidates showing State, Days in stage, Source | | Priority asc | Every job with its pipeline |
 | Closed | grid | Candidate | | Job, State, Source, Rejection reason, Applied on, Stage changed on | State is any of Hired, Rejected, Withdrawn | Stage changed on desc | Who joined, who we lost, and why |
 | New candidate | form | Candidate | | Name (required), Email (required), Job (required), Phone, LinkedIn, Source (default: Inbound), Resume | | | Intake |
 | How to run the hiring pipeline | document | | | the guide, one screen | | | |

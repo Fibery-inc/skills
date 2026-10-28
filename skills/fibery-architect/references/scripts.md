@@ -159,7 +159,7 @@ const VIEWS = () => [
     {database: C, fields: [fld("Name"), fld("Job"), fld("Days in stage"), fld("Recruiter")], colorCoding: [{color: "#D40915", filter: flag("Stuck")}, {color: "#FBA32F", filter: and(flag("Stuck", false), empty("reference", "Job"))}]}]}},
   {viewType: "list", name: "My candidates", description: "Who am I recruiting right now?", config: {items: [
     {database: C, fields: [fld("Name"), fld("Job"), {field: "workflow/state"}, fld("Days in stage")], filter: and(mine("Recruiter"), wf(C, "is-none-of", ["Hired", "Rejected"])), orderBy: [{field: f("Days in stage"), direction: "desc"}]}]}},
-  {viewType: "grid", name: "Jobs", description: "How full is every role?", config: {rowHeight: "short", items: [
+  {viewType: "list", name: "Jobs", description: "How full is every role?", config: {items: [
     {database: J, fields: [fld("Name"), {field: "workflow/state"}, fld("Openings"), fld("Hired"), fld("Open seats")], filter: wf(J, "is-any-of", ["Open"])},
     {database: C, fields: [fld("Name"), {field: "workflow/state"}, fld("Source")], groupBy: {parentIndex: 0, parentField: f("Candidates")}}]}},
   {viewType: "calendar", name: "Interviews", description: "Who interviews when?", config: {items: [
