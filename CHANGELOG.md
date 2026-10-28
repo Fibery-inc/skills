@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.27 — 2026-10-28
+
+fibery-architect's script 1 makes the whole structure with Fibery MCP's new `create_schema`: every Space, database and field, the selects and their options, the relations, workflows, comments, icons and avatars, in one call that skips what exists and checks the whole spec before it changes anything. Before the call the script numbers an inverse name that's taken, on `fibery/user` or on an existing database ("Recruiting 2"), since `create_schema` refuses the whole spec over one; after it come the guide's document, `NO_DESCRIPTION` and the read-back of option emojis, as before. The template's data is the call's input, so the template is shorter (6.2K characters instead of 8.4K) and has no time budget: the structure takes a second or two instead of up to ten calls, and a refused spec leaves nothing half made. The build guide's §1 table maps the spec to the new shapes, and §8 and §9 add `create_schema`'s result and its refusal, which replaces the row on a link's taken inverse. On edge, the Hiring template's script 1 made its Space in 1.6 s and, run again, made nothing in 0.5 s; scripts 2 to 6 ran on it unchanged with nothing failed; a second Space got its taken people and link inverses numbered.
+
 ## 1.8.26 — 2026-10-28
 
 Fibery MCP replaced `create_space`, `create_workflow_field` and `update_workflow_field` with `create_spaces`, `create_workflow_fields` and `update_workflow_fields`, on production and edge alike, so fibery-architect's script 1 stopped at the first new Space: inside `execute_code` the old names are undefined. Script 1 now makes its new Spaces in one `create_spaces` call and every missing workflow in one `create_workflow_fields` call; the build guide's table of results names the new tools, and fibery-health's fix for a state's type uses `update_workflow_fields`. On edge: the new script 1 made a Space, the guide's document and a workflow, with nothing failed.

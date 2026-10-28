@@ -7,95 +7,76 @@ The templates of the build guide's scripts, under its section numbers (1 to 6, a
 ```js
 const S = "Hiring"; const f = n => `${S}/${n}`;
 const C = f("Candidate"), J = f("Job");
-const SPACES = [{name: S, color: "#2978FB", description: "Candidates from application to offer. Built by fibery-architect from the design Hiring pipeline, 2026-10-12."}];
-const DATABASES = [
-  {name: C, color: "#2978FB", description: "One record per person applying for a job."},
-  {name: J, color: "#B04E31", description: "One record per open role."}
-];
-const PRIMITIVE = [
-  {database: C, name: f("Email"), fieldType: "fibery/text", meta: {"ui/type": "email"}},
-  {database: C, name: f("Salary expectation"), fieldType: "fibery/decimal", meta: {"ui/number-format": "Money", "ui/number-currency-code": "USD"}, description: "What the candidate asked for, per year"},
-  {database: C, name: f("Notice period"), fieldType: "fibery/int", meta: {"ui/number-format": "Number", "ui/number-unit": "wk"}},
-  {database: C, name: f("Stage changed on"), fieldType: "fibery/date", description: "Set by Stage changed when the state changes"},
-  {database: C, name: f("Next interview"), fieldType: "fibery/date-time"},
-  {database: J, name: f("Openings"), fieldType: "fibery/int", description: "How many people this role hires"},
-  {database: J, name: f("Hiring window"), fieldType: "fibery/date-range"}
-];
-const SINGLE = [{database: C, name: f("Source"), defaultOption: "Website", options: [{name: "Referral", color: "#4FAF54", icon: ":handshake:"}, {name: "Job board", color: "#2978FB", icon: ":clipboard:"}, {name: "Website", color: "#99A2AB", icon: ":globe_with_meridians:"}]}];
-const MULTI = [{database: C, name: f("Skills"), options: [{name: "Design", color: "#E72065"}, {name: "Engineering", color: "#2978FB"}, {name: "Sales", color: "#FBA32F"}]}];
-const FILES = [{database: C, name: f("Resume"), allowMultipleFiles: false}];
-const RELATIONS = [{database: C, name: f("Job"), relationDatabase: J, relationFieldName: f("Candidates"), cardinality: "many-to-one"}];
-const PEOPLE = [{database: C, name: f("Recruiter"), relationFieldName: "user/Recruiting", cardinality: "many-to-many"}];
-const LINKS = [];
-const WORKFLOWS = [
-  {database: C, defaultOption: "Applied", options: [{name: "Applied", type: "Not started", color: "#99A2AB"}, {name: "Screening", type: "Started", color: "#2978FB"}, {name: "Interview", type: "Started", color: "#673DB6"}, {name: "Offer", type: "Started", color: "#FBA32F"}, {name: "Hired", type: "Finished", color: "#4FAF54"}, {name: "Rejected", type: "Finished", color: "#D40915"}]},
-  {database: J, defaultOption: "Open", options: [{name: "Open", type: "Started", color: "#2978FB"}, {name: "Filled", type: "Finished", color: "#4FAF54"}, {name: "Closed", type: "Finished", color: "#99A2AB"}]}
-];
-const COMMENTS = [C, J];
-const ICONS = [], AVATARS = [], NO_DESCRIPTION = [];
+const SCHEMA = {
+  spaces: {[S]: {color: "#2978FB", description: "Candidates from application to offer. Built by fibery-architect from the design Hiring pipeline, 2026-10-12."}},
+  databases: {
+    [C]: {color: "#2978FB", description: "One record per person applying for a job.", comments: true, fields: {
+      "Email": "email",
+      "Salary expectation": {type: "money", description: "What the candidate asked for, per year"},
+      "Notice period": {type: "int", meta: {"ui/number-unit": "wk"}},
+      "Stage changed on": {type: "date", description: "Set by Stage changed when the state changes"},
+      "Next interview": "date-time",
+      "Source": {select: [{name: "Referral", color: "#4FAF54", icon: ":handshake:"}, {name: "Job board", color: "#2978FB", icon: ":clipboard:"}, {name: "Website", color: "#99A2AB", icon: ":globe_with_meridians:"}], default: "Website"},
+      "Skills": {multiSelect: [{name: "Design", color: "#E72065"}, {name: "Engineering", color: "#2978FB"}, {name: "Sales", color: "#FBA32F"}]},
+      "Resume": "file",
+      "Job": {relation: J, back: "Candidates", cardinality: "many-to-one"},
+      "Recruiter": {relation: "fibery/user", back: "Recruiting", cardinality: "many-to-many"}
+    }, workflow: [
+      {name: "Applied", type: "Not started", color: "#99A2AB"}, {name: "Screening", type: "Started", color: "#2978FB"}, {name: "Interview", type: "Started", color: "#673DB6"},
+      {name: "Offer", type: "Started", color: "#FBA32F"}, {name: "Hired", type: "Finished", color: "#4FAF54"}, {name: "Rejected", type: "Finished", color: "#D40915"}
+    ]},
+    [J]: {color: "#B04E31", description: "One record per open role.", comments: true, fields: {
+      "Openings": {type: "int", description: "How many people this role hires"},
+      "Hiring window": "date-range"
+    }, workflow: [{name: "Open", type: "Started", color: "#2978FB"}, {name: "Filled", type: "Finished", color: "#4FAF54"}, {name: "Closed", type: "Finished", color: "#99A2AB"}]}
+  }
+};
+const NO_DESCRIPTION = [];
 const GUIDE = {viewType: "document", name: "How to run hiring", description: "The process, and how this Space runs it."};
 
-const fails = [], made = [], t0 = Date.now();
+const fails = [], made = [];
 const run = async (label, p) => { try { const r = await p; made.push(label); return r; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
 const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const fieldsOf = async dbs => {
   const out = {}; let cur = null;
-  for (const line of (await schema_detailed({databases: dbs})).schema.split("\n")) {
+  for (const line of dbs.length ? (await schema_detailed({databases: dbs})).schema.split("\n") : []) {
     const d = line.match(/^(\S[^:]*):/); if (d) { cur = d[1]; out[cur] = new Map(); continue; }
     const m = line.match(/^ {4}([^:]+): (.*)$/); if (cur && m) out[cur].set(m[1], m[2]);
   }
   return out;
 };
-const tree = (await schema({})).schema;
-const foreign = SPACES.flatMap(sp => (tree.match(new RegExp(`^\\s*${esc(sp.name)}/[^,\\n]+(?=,)`, "gm")) || []).map(x => x.trim()).filter(n => !DATABASES.some(d => d.name === n)));
+const tree = (await schema({})).schema, exists = db => new RegExp(`^\\s*${esc(db)},`, "m").test(tree);
+const dbs = Object.keys(SCHEMA.databases), fieldsIn = db => Object.entries(SCHEMA.databases[db].fields || {});
+const foreign = Object.keys(SCHEMA.spaces).flatMap(sp => (tree.match(new RegExp(`^\\s*${esc(sp)}/[^,\\n]+(?=,)`, "gm")) || []).map(x => x.trim()).filter(n => !dbs.includes(n)));
 if (foreign.length) { log("STOP, a Space with this name holds other databases: " + foreign.join(", ")); throw new Error("the Space isn't this build's"); }
-const newSpaces = SPACES.filter(sp => !new RegExp(`^\\s*- name: ${esc(sp.name)}$`, "m").test(tree));
-const newDbs = DATABASES.filter(d => !new RegExp(`^\\s*${esc(d.name)},`, "m").test(tree));
-const pre = [];
-if (newSpaces.length) pre.push(await run("spaces", create_spaces({spaces: newSpaces})));
-if (newDbs.length) pre.push(await run("databases", create_databases({databases: newDbs})));
-if (pre.some(r => !r)) { fails.forEach(x => log("FAIL " + x)); throw new Error("a Space or database wasn't created"); }
-const moved = pre.flatMap(r => r.fixLogs || []);
-if (moved.length) { log("STOP, a name went elsewhere: " + JSON.stringify(moved)); throw new Error("fixLogs on a Space or database"); }
+// create_schema refuses the whole spec over one taken inverse, and a person's lands on every user: number those first.
+const rels = dbs.flatMap(db => fieldsIn(db).filter(([, x]) => x.relation).map(([name, x]) => [db, name, x]));
+const has = await fieldsOf([...new Set([...dbs, ...rels.map(([, , x]) => x.relation)])].filter(db => db === "fibery/user" || exists(db)));
+const renamed = [];
+for (const [db, name, x] of rels) {
+  const on = has[x.relation], sp = x.relation === "fibery/user" ? "user" : x.relation.split("/")[0];
+  if (!on || (has[db] && has[db].has(`${db.split("/")[0]}/${name}`))) continue;
+  let back = x.back, n = 2;
+  while (on.has(`${sp}/${back}`)) back = `${x.back} ${n++}`;
+  on.set(`${sp}/${back}`, db);
+  if (back !== x.back) { renamed.push(`${name} → ${back}`); x.back = back; }
+}
+let r;
+try { r = await create_schema(SCHEMA); } catch (e) { log("STOP, create_schema: " + String(e.message || e)); throw new Error("the structure wasn't made"); }
 // A Space lists its views in the order they were made, so the guide is made before any other.
 const hasGuide = (await query_views({space: S, withConfig: false})).views.some(v => v.name === GUIDE.name);
 if (!hasGuide) await run("guide", create_view({space: S, ...GUIDE}));
-const dbs = DATABASES.map(d => d.name), has = await fieldsOf([...dbs, "fibery/user"]);
-const missing = list => list.filter(x => !has[x.database].has(x.name));
-const renamed = [], people = missing(PEOPLE).map(p => {
-  let inv = p.relationFieldName, n = 2;
-  while (has["fibery/user"].has(inv)) inv = `${p.relationFieldName} ${n++}`;
-  if (inv !== p.relationFieldName) renamed.push(`${p.relationFieldName} → ${inv}`);
-  return {...p, relationDatabase: "fibery/user", relationFieldName: inv};
-});
-const fieldList = [PRIMITIVE, SINGLE, MULTI, FILES, RELATIONS, PEOPLE, LINKS].flat();
-const before = `Spaces ${SPACES.length - newSpaces.length}, databases ${dbs.length - newDbs.length}, fields ${fieldList.length - missing(fieldList).length}, workflows ${WORKFLOWS.filter(w => has[w.database].has("workflow/state")).length}, guide ${hasGuide ? 1 : 0}`;
-const calls = [], call = (label, list, fn) => { if (list.length) calls.push([label, () => fn(list)]); };
-const desc = db => `${db.split("/")[0]}/Description`;
-NO_DESCRIPTION.filter(db => has[db].has(desc(db))).forEach(db => call("no description " + db, [db], () => delete_fields({fields: [{database: db, field: desc(db)}]})));
-call("comments", COMMENTS.filter(db => !has[db].has("comments/comments")), l => create_comments_fields({databases: l}));
-call("icons", ICONS.filter(db => !has[db].has("icon/icon")), l => create_icon_fields({databases: l}));
-call("avatars", AVATARS.filter(db => !has[db].has("avatar/avatars")), l => create_avatars_fields({databases: l}));
-call("primitive fields", missing(PRIMITIVE), l => create_primitive_fields({fields: l}));
-call("single selects", missing(SINGLE), l => create_single_select_fields({fields: l}));
-call("multi selects", missing(MULTI), l => create_multi_select_fields({fields: l}));
-call("files fields", missing(FILES), l => create_files_fields({fields: l}));
-call("relations", missing(RELATIONS), l => create_relation_fields({fields: l}));
-call("people fields", people, l => create_relation_fields({fields: l}));
-missing(LINKS).forEach(l => call("link " + l.name, [l], x => create_relation_fields({fields: x})));
-call("workflows", WORKFLOWS.filter(w => !has[w.database].has("workflow/state")), l => create_workflow_fields({fields: l}));
-const results = [];
-for (let i = 0, slow = 5000; i < calls.length && Date.now() - t0 + slow < 45000; i++) { const s0 = Date.now(); results.push(await run(calls[i][0], calls[i][1]())); slow = Math.max(slow, Date.now() - s0); }
-const left = calls.length - results.length;
+const desc = db => `${db.split("/")[0]}/Description`, now = await fieldsOf(NO_DESCRIPTION);
+for (const db of NO_DESCRIPTION.filter(db => now[db].has(desc(db)))) await run("no description " + db, delete_fields({fields: [{database: db, field: desc(db)}]}));
 const off = [];
-await Promise.all([...SINGLE, ...MULTI].filter(s => s.options.some(o => o.icon)).map(s => query({query: {"q/from": `${s.name}_${s.database}`, "q/select": {n: "enum/name", i: "enum/icon"}, "q/limit": "q/no-limit"}}).then(r => r.result.forEach(x => {
-  const o = s.options.find(o => o.name === x.n);
-  if (o && o.icon && x.i && x.i !== `:${o.icon.replace(/:/g, "")}:`) off.push(`${s.name.split("/").pop()}.${x.n} ${o.icon} → ${x.i}`);
-}), () => {})));
-const fix = results.flatMap(r => (r && r.fixLogs) || []).filter(x => !/default format|Added field title/.test(x));
-log(`made: ${made.join(", ") || "nothing"}; there before: ${before}`);
-if (left) log(`time is up with ${left} calls left: run this script again, as it is, to finish`);
-if (renamed.length) log("people fields renamed: " + renamed.join("; "));
+await Promise.all(dbs.flatMap(db => fieldsIn(db).filter(([, x]) => (x.select || x.multiSelect || []).some(o => o.icon)).map(([name, x]) => query({query: {"q/from": `${db.split("/")[0]}/${name}_${db}`, "q/select": {n: "enum/name", i: "enum/icon"}, "q/limit": "q/no-limit"}}).then(q => q.result.forEach(o => {
+  const want = (x.select || x.multiSelect).find(w => w.name === o.n);
+  if (want && want.icon && o.i && o.i !== `:${want.icon.replace(/:/g, "")}:`) off.push(`${name}.${o.n} ${want.icon} → ${o.i}`);
+}), () => {}))));
+const count = l => Object.entries(l.map(x => x.split(" ")[0].replace("relation", "field")).reduce((m, k) => ({...m, [k]: (m[k] || 0) + 1}), {})).map(([k, n]) => `${k} ${n}`).join(", ");
+const fix = (r.fixLogs || []).filter(x => !/default format|Added field title/.test(x));
+log(`made: ${[count(r.created), ...made].filter(Boolean).join(", ") || "nothing"}; there before: ${[count(r.unchanged), hasGuide ? "guide" : ""].filter(Boolean).join(", ") || "nothing"}`);
+if (renamed.length) log("inverse fields renamed: " + renamed.join("; "));
 if (fix.length) log("fixLogs: " + JSON.stringify(fix));
 if (off.length) log("icons stored differently, resend any that isn't the same emoji: " + off.join("; "));
 log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
