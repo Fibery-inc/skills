@@ -52,7 +52,7 @@ if (foreign.length) { log("STOP, a Space with this name holds other databases: "
 const newSpaces = SPACES.filter(sp => !new RegExp(`^\\s*- name: ${esc(sp.name)}$`, "m").test(tree));
 const newDbs = DATABASES.filter(d => !new RegExp(`^\\s*${esc(d.name)},`, "m").test(tree));
 const pre = [];
-for (const sp of newSpaces) pre.push(await run("space " + sp.name, create_space(sp)));
+if (newSpaces.length) pre.push(await run("spaces", create_spaces({spaces: newSpaces})));
 if (newDbs.length) pre.push(await run("databases", create_databases({databases: newDbs})));
 if (pre.some(r => !r)) { fails.forEach(x => log("FAIL " + x)); throw new Error("a Space or database wasn't created"); }
 const moved = pre.flatMap(r => r.fixLogs || []);
@@ -83,7 +83,7 @@ call("files fields", missing(FILES), l => create_files_fields({fields: l}));
 call("relations", missing(RELATIONS), l => create_relation_fields({fields: l}));
 call("people fields", people, l => create_relation_fields({fields: l}));
 missing(LINKS).forEach(l => call("link " + l.name, [l], x => create_relation_fields({fields: x})));
-WORKFLOWS.filter(w => !has[w.database].has("workflow/state")).forEach(w => call("workflow " + w.database, [w], ([x]) => create_workflow_field(x)));
+call("workflows", WORKFLOWS.filter(w => !has[w.database].has("workflow/state")), l => create_workflow_fields({fields: l}));
 const results = [];
 for (let i = 0, slow = 5000; i < calls.length && Date.now() - t0 + slow < 45000; i++) { const s0 = Date.now(); results.push(await run(calls[i][0], calls[i][1]())); slow = Math.max(slow, Date.now() - s0); }
 const left = calls.length - results.length;

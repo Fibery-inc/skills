@@ -90,7 +90,7 @@ A number from a sample keeps "of the newest 1,000" wherever it appears, and the 
 
 The person names the findings. Per batch: restate the change, the records it touches and its undo; wait for a yes; apply; re-run the script for that space; report before and after.
 
-- **State types**: `update_workflow_field` with `updateOptions: [{"name": "...", "type": "Not started" | "Started" | "Finished"}]`. A parking state only after the person confirms it means paused. Undo: the old type.
+- **State types**: `update_workflow_fields` with `fields: [{"database": "...", "update": {"updateOptions": [{"name": "...", "type": "Not started" | "Started" | "Finished"}]}}]`, every database in one call. A parking state only after the person confirms it means paused. Undo: the old type.
 - **Delete** an empty database or space, or an unused or test field (show its filled count and a few values first): only when no formula, automation or view uses it (formulas in `schema_detailed`, automations in the `automation` lines and, for a relation, in the database it points to, views in `query_views`), and never on an integration mirror. A relation field goes from both sides. Undo: the Activity Log.
 - **Disable a rule**: `update_automation` with `enabled: false`. Undo: enable it.
 - **Triage view** for judgment calls (records missing a link): a grid named "Health: <finding>", filtered to exactly those records, most important first. Load `get_fibery_skill` with `views` first. Undo: delete the view.
