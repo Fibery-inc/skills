@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.28 — 2026-10-28
+
+Two fixes from the timed builds of TNR program and Purchase requests on 1.8.27. fibery-architect's build guide §6 shows a whole mention in its example, copied from a log, and says a shortened one (`[[Pipeline]]`) stays plain text: a build had written some that way and had to write those guide blocks again. §7 has the app's upload set the app id and the token in the same command as the request, since a shell call doesn't keep the variables of the one before: a build's first upload answered "Unauthorized".
+
 ## 1.8.27 — 2026-10-28
 
 fibery-architect's script 1 makes the whole structure with Fibery MCP's new `create_schema`: every Space, database and field, the selects and their options, the relations, workflows, comments, icons and avatars, in one call that skips what exists and checks the whole spec before it changes anything. Before the call the script numbers an inverse name that's taken, on `fibery/user` or on an existing database ("Recruiting 2"), since `create_schema` refuses the whole spec over one; after it come the guide's document, `NO_DESCRIPTION` and the read-back of option emojis, as before. The template's data is the call's input, so the template is shorter (6.2K characters instead of 8.4K) and has no time budget: the structure takes a second or two instead of up to ten calls, and a refused spec leaves nothing half made. The build guide's §1 table maps the spec to the new shapes, and §8 and §9 add `create_schema`'s result and its refusal, which replaces the row on a link's taken inverse. On edge, the Hiring template's script 1 made its Space in 1.6 s and, run again, made nothing in 0.5 s; scripts 2 to 6 ran on it unchanged with nothing failed; a second Space got its taken people and link inverses numbered.
