@@ -105,7 +105,7 @@ These are the recipe format's ceilings (`recipe-writer/references/recipe-format.
   | move it through stages | the workflow, not a select called "Status" |
   | assign a person, or several | person, or people (a role with a "My …" view is people) |
   | plan around a day or a period | date, date-time, date range, date-time range |
-  | count or measure | integer; decimal (precision, unit); money (currency, precision); percent |
+  | count or measure | integer (unit); decimal (precision, unit); money (currency, precision); percent |
   | tick | checkbox |
   | link to another record | relation (a database in this Space), or link (an existing database) |
   | attach | files |
@@ -114,7 +114,7 @@ These are the recipe format's ceilings (`recipe-writer/references/recipe-format.
   | point at a place | location |
   | see a fact computed from other fields or linked records | formula |
 
-- A field's name says what goes in it; a description is added only where the name leaves a question: a scale or unit, what counts, or that a rule fills it. Select and workflow fields can't carry one in Fibery, so their guidance goes into the option names and the database's description.
+- A field's name says what goes in it; a description is added only where the name leaves a question: a scale or a period, what counts, or that a rule fills it. Select and workflow fields can't carry one in Fibery, so their guidance goes into the option names and the database's description.
 
 In the spec, one subsection per database, written the way a recipe's Details for building writes it:
 
@@ -149,7 +149,7 @@ A **link** is a relation to an existing database: type `link`, the target exactl
 
 ### Formulas
 
-Each with a consumer, named in the spec; a formula nothing uses is cut. Worth having: rollups a card shows (counts, sums, averages, progress); ages and durations the daily view sorts by (days in stage, days to due); conditions rules filter on (all scopes done, over SLA); a linked fact a card can't do without, since views show only a database's own fields; a date a timeline needs when it's derived. Each is one line in words, as in the snippet above: what it computes, its result (a whole number, a decimal with its places, yes or no, text, a date), its value when inputs are missing, and where it's used. A formula can't come back blank, so the missing case gets a value (0, no, or a date far enough away that the view ignores it); a share is a whole number from 0 to 100, never a fraction; a day count reads one date field, kept by a rule that also fires on creation. Write an expression only where the words could be read two ways. A decimal's number format goes on the report's Your turn.
+Each with a consumer, named in the spec; a formula nothing uses is cut. Worth having: rollups a card shows (counts, sums, averages, progress); ages and durations the daily view sorts by (days in stage, days to due); conditions rules filter on (all scopes done, over SLA); a linked fact a card can't do without, since views show only a database's own fields; a date a timeline needs when it's derived. Each is one line in words, as in the snippet above: what it computes, its result (a whole number, a decimal with its places, either with a unit when the number alone is ambiguous, yes or no, text, a date), its value when inputs are missing, and where it's used. A formula can't come back blank, so the missing case gets a value (0, no, or a date far enough away that the view ignores it); a share is a whole number from 0 to 100, never a fraction; a day count reads one date field, kept by a rule that also fires on creation. Write an expression only where the words could be read two ways. A decimal's number format goes on the report's Your turn.
 
 ### Views
 
