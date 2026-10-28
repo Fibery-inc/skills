@@ -15,6 +15,7 @@ const DATABASES = [
 const PRIMITIVE = [
   {database: C, name: f("Email"), fieldType: "fibery/text", meta: {"ui/type": "email"}},
   {database: C, name: f("Salary expectation"), fieldType: "fibery/decimal", meta: {"ui/number-format": "Money", "ui/number-currency-code": "USD"}, description: "What the candidate asked for, per year"},
+  {database: C, name: f("Notice period"), fieldType: "fibery/int", meta: {"ui/number-format": "Number", "ui/number-unit": "wk"}},
   {database: C, name: f("Stage changed on"), fieldType: "fibery/date", description: "Set by Stage changed when the state changes"},
   {database: C, name: f("Next interview"), fieldType: "fibery/date-time"},
   {database: J, name: f("Openings"), fieldType: "fibery/int", description: "How many people this role hires"},
