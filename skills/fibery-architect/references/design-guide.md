@@ -42,7 +42,7 @@ With a question tool, the playback is written just before the last round's call,
 A Space that duplicates what the team already tracks is worse than no Space: a second Customer database, a second People list, a vocabulary nobody uses. Everything here only reads, and comes before the first question, so what the workspace leaves open is asked with the rest (SKILL.md §3).
 
 1. **`schema`** lists every Space and database. Skim it for databases this process would otherwise duplicate (people, customers, products, projects, teams, periods); a Space for the same process already (the questions say so); test or archived Spaces, never linked to; synced databases (Intercom, GitHub), fine to link to, never changed; and the workspace's vocabulary (Customer or Account, Task or To-do, Sprint or Cycle).
-2. **`schema_detailed`** for the candidates, to see what they really hold: a "Contact" may be a marketing list, an "Employee" database may be the real people directory while `fibery/user` is only who has a login. Keep the exact field names of anything you'll filter or compute through.
+2. **`schema_detailed`** for the candidates, to see what they really hold: a "Contact" may be a marketing list, an "Employee" database may be the real people directory while `fibery/user` is only who has a login. Keep the exact field names of anything you'll filter or compute through. Add two or three databases from other Spaces the team works in to the same call: their fields show how the workspace writes names (SKILL.md §2).
 3. **`schema_detailed` for `fibery/user`**, to read the `user/...` fields already there: every people field you add creates one more, and a taken name gets numbered ("Recruiting 2"). Note the taken ones in the design.
 
 **Link or create.**
