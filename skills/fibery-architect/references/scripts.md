@@ -1,6 +1,6 @@
 # Scripts
 
-The templates of the build guide's scripts, under its section numbers (1 to 6, and 7 for an app), for a small hiring Space (Job, Candidate). Each data block shows one example of each kind, not how many to build. Replace the data block at the top with the spec's content, as the build guide's section of the same number says, and copy everything from `const fails` down unchanged. Every template reads what exists before it writes and logs what it found as well as what it made, so any of them runs again as it is, after a failure, a cut-off or a fix to its data.
+The templates of the build guide's scripts, under its section numbers (1 to 6, and 7 for an app), for a small hiring Space (Job, Candidate). Each data block shows one example of each kind, not how many to build. Replace the data block at the top with the spec's content, as the build guide's section of the same number says, and copy everything from `const fails` down unchanged. Every template reads what exists before it writes and logs what it found as well as what it made, so any of them runs again as it is, after a failure, a cut-off or a fix to its data. Scripts 0, 4x and 3x, which change a Space the team already runs, are in `extend.md`.
 
 ## 1. Structure
 
@@ -49,6 +49,8 @@ const tree = (await schema({})).schema, exists = db => new RegExp(`^\\s*${esc(db
 const dbs = Object.keys(SCHEMA.databases), fieldsIn = db => Object.entries(SCHEMA.databases[db].fields || {});
 const foreign = Object.keys(SCHEMA.spaces).flatMap(sp => (tree.match(new RegExp(`^\\s*${esc(sp)}/[^,\\n]+(?=,)`, "gm")) || []).map(x => x.trim()).filter(n => !dbs.includes(n)));
 if (foreign.length) { log("STOP, a Space with this name holds other databases: " + foreign.join(", ")); throw new Error("the Space isn't this build's"); }
+const unknown = dbs.filter(db => !SCHEMA.databases[db].description && !exists(db));
+if (unknown.length) { log("STOP, no database to extend named " + unknown.join(", ")); throw new Error("a database to extend isn't there"); }
 // create_schema refuses the whole spec over one taken inverse, and a person's lands on every user: number those first.
 const rels = dbs.flatMap(db => fieldsIn(db).filter(([, x]) => x.relation).map(([name, x]) => [db, name, x]));
 const has = await fieldsOf([...new Set([...dbs, ...rels.map(([, , x]) => x.relation)])].filter(db => db === "fibery/user" || exists(db)));
@@ -64,7 +66,7 @@ for (const [db, name, x] of rels) {
 let r;
 try { r = await create_schema(SCHEMA); } catch (e) { log("STOP, create_schema: " + String(e.message || e)); throw new Error("the structure wasn't made"); }
 // A Space lists its views in the order they were made, so the guide is made before any other.
-const hasGuide = (await query_views({space: S, withConfig: false})).views.some(v => v.name === GUIDE.name);
+const hasGuide = !GUIDE || (await query_views({space: S, withConfig: false})).views.some(v => v.name === GUIDE.name);
 if (!hasGuide) await run("guide", create_view({space: S, ...GUIDE}));
 const desc = db => `${db.split("/")[0]}/Description`, now = await fieldsOf(NO_DESCRIPTION);
 for (const db of NO_DESCRIPTION.filter(db => now[db].has(desc(db)))) await run("no description " + db, delete_fields({fields: [{database: db, field: desc(db)}]}));
@@ -75,7 +77,7 @@ await Promise.all(dbs.flatMap(db => fieldsIn(db).filter(([, x]) => (x.select || 
 }), () => {}))));
 const count = l => Object.entries(l.map(x => x.split(" ")[0].replace("relation", "field")).reduce((m, k) => ({...m, [k]: (m[k] || 0) + 1}), {})).map(([k, n]) => `${k} ${n}`).join(", ");
 const fix = (r.fixLogs || []).filter(x => !/default format|Added field title/.test(x));
-log(`made: ${[count(r.created), ...made].filter(Boolean).join(", ") || "nothing"}; there before: ${[count(r.unchanged), hasGuide ? "guide" : ""].filter(Boolean).join(", ") || "nothing"}`);
+log(`made: ${[count(r.created), ...made].filter(Boolean).join(", ") || "nothing"}; there before: ${[count(r.unchanged), GUIDE && hasGuide ? "guide" : ""].filter(Boolean).join(", ") || "nothing"}`);
 if (renamed.length) log("inverse fields renamed: " + renamed.join("; "));
 if (fix.length) log("fixLogs: " + JSON.stringify(fix));
 if (off.length) log("icons stored differently, resend any that isn't the same emoji: " + off.join("; "));
@@ -434,7 +436,7 @@ for (const c of CHECKS) {
   } catch (e) { fails.push(`${c.label}: ${String(e.message || e).slice(0, 200)}`); }
 }
 const on = [];
-for (const db of RULES) for (const x of (await query_automations({automationType: "rule", database: db})).automations.filter(x => !x.enabled)) {
+for (const r of RULES) for (const x of (await query_automations({automationType: "rule", database: r.database || r})).automations.filter(x => !x.enabled && (!r.names || r.names.includes(x.name)))) {
   try { await update_automation({automationType: "rule", id: x.id, enabled: true}); on.push(x.name); } catch (e) { fails.push(`${x.name} on: ${String(e.message || e).slice(0, 200)}`); }
 }
 log(`rules turned on: ${on.join(", ") || "none was off"}`);
