@@ -151,7 +151,7 @@ const VIEWS = () => [
     {field: f("Name"), displayName: "Name", required: true}, {field: f("Email"), required: true}, fld("Job"), {field: f("Source"), defaultValue: {id: opts[C].Source.Website}}, fld("Resume")]}}
 ];
 const REPORTS = [
-  {title: "Hiring numbers", database: C, tabs: [
+  {title: "Hiring numbers", database: C, filter: "only candidates that have a Job", tabs: [
     {title: "Hiring funnel", type: "stacked-bar", x: [{expression: "[State]"}], y: [{expression: "COUNT([Id])", title: "Candidates"}], color: {expression: "[Source]"}, fieldConditions: [{field: "Applied on", operator: "range", value: "THIS YEAR"}], palette: "fibery2.0"},
     {title: "Sources that convert", type: "stacked-bar", x: [{expression: "[Source]"}], y: [{expression: "COUNT([Id])", title: "Candidates"}], color: {expression: "[State]"}, palette: "fibery2.0"}]}
 ];
@@ -176,9 +176,10 @@ const mine = field => node("collection", f(field), "contains-me");
 const days = (field, op, amount, isBeforeNow, unit = "day") => node("date", f(field), op, {amount, unit, isBeforeNow});
 const stateAxis = db => ({forDatabase: db, field: "workflow/state", database: `workflow/state_${db}`, fields: []});
 const byState = (db, colors, also) => Object.entries(colors).map(([n, color]) => ({color, filter: also ? and(wf(db, "is-any-of", [n]), also) : wf(db, "is-any-of", [n])}));
-const report = async ({title, database, tabs, mode}, id) => {
-  if (!id) { const r = await run(title, create_report({title, sources: [{database}], sourceMode: mode || "current", spaceName: S})); if (!r) return 0; id = r.id; }
-  const have = (((await run(title + " tabs", get_report({reportId: id}))) || {}).result || {}).tabs || [];
+const report = async ({title, database, filter, tabs, mode}, id) => {
+  if (!id) { const r = await run(title, create_report({title, sources: [filter ? {database, filterPrompt: filter} : {database}], sourceMode: mode || "current", spaceName: S})); if (!r) return 0; id = r.id; }
+  const got = ((await run(title + " tabs", get_report({reportId: id}))) || {}).result || {}, have = got.tabs || [];
+  if (filter) { const kept = ((got.data || {}).sources || [{}])[0].filter; log(`${title} keeps: ${kept ? JSON.stringify([kept.expression, kept.params]) : "everything"}`); }
   let done = 0;
   for (const t of tabs) if (have.some(h => h.title === t.title) || await run(`${title}: ${t.title}`, (t.metrics ? add_metric_tab : add_chart_tab)({reportId: id, ...t}))) done++;
   const blank = have.find(t => t.title === "Chart");

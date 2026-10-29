@@ -75,7 +75,7 @@ Written the same way in the full design: a one-line description and settings, th
 
 ## Reports
 
-- **Hiring numbers**, on Candidate:
+- **Hiring numbers**, on Candidate, only candidates with a Job:
   - **Hiring funnel** — candidates by State, colored by Source; only those who applied this year.
   - **Sources that convert** — candidates by Source, colored by State.
 
