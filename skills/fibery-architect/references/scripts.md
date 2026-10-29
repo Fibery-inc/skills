@@ -152,7 +152,7 @@ const VIEWS = () => [
   {viewType: "form", name: "New candidate", description: "Add someone who applied.", config: {database: C, fields: [
     {field: f("Name"), displayName: "Name", required: true}, {field: f("Email"), required: true}, fld("Job"), {field: f("Source"), defaultValue: {id: opts[C].Source.Website}}, fld("Resume")]}}
 ];
-const REPORTS = () => [
+const REPORTS = [
   {title: "Hiring numbers", database: C, filter: "only candidates that have a Job", tabs: [
     {title: "Hiring funnel", type: "stacked-bar", x: [{expression: "[State]"}], y: [{expression: "COUNT([Id])", title: "Candidates"}], color: {expression: "[Source]"}, fieldConditions: [{field: "Applied on", operator: "range", value: "THIS YEAR"}], palette: "fibery2.0"},
     {title: "Sources that convert", type: "stacked-bar", x: [{expression: "[Source]"}], y: [{expression: "COUNT([Id])", title: "Candidates"}], color: {expression: "[State]"}, palette: "fibery2.0"}]}
@@ -179,12 +179,8 @@ const days = (field, op, amount, isBeforeNow, unit = "day") => node("date", f(fi
 const stateAxis = db => ({forDatabase: db, field: "workflow/state", database: `workflow/state_${db}`, fields: []});
 const byState = (db, colors, also) => Object.entries(colors).map(([n, color]) => ({color, filter: also ? and(wf(db, "is-any-of", [n]), also) : wf(db, "is-any-of", [n])}));
 const report = async ({title, database, filter, tabs, mode}, id) => {
-  const read = async () => id && (((await get_report({reportId: id}).catch(() => null)) || {}).result);
-  let got = await read();
-  // A create_report whose filter Fibery couldn't apply leaves a report view with no report behind it.
-  if (id && !got) { await run(title + " empty view", delete_views({ids: [id]})); id = null; }
-  if (!id) { const r = await run(title, create_report({title, sources: [filter ? {database, filterPrompt: filter} : {database}], sourceMode: mode || "current", spaceName: S})); if (!r) return 0; id = r.id; got = await read() || {}; }
-  const have = got.tabs || [];
+  if (!id) { const r = await run(title, create_report({title, sources: [filter ? {database, filterPrompt: filter} : {database}], sourceMode: mode || "current", spaceName: S})); if (!r) return 0; id = r.id; }
+  const got = ((await run(title + " tabs", get_report({reportId: id}))) || {}).result || {}, have = got.tabs || [];
   if (filter) { const kept = ((got.data || {}).sources || [{}])[0].filter; log(`${title} keeps: ${kept ? JSON.stringify([kept.expression, kept.params]) : "everything"}`); }
   let done = 0;
   for (const t of tabs) if (have.some(h => h.title === t.title) || await run(`${title}: ${t.title}`, (t.metrics ? add_metric_tab : t.columns ? add_table_tab : add_chart_tab)({reportId: id, ...t}))) done++;
@@ -192,12 +188,12 @@ const report = async ({title, database, filter, tabs, mode}, id) => {
   if (done && blank) await run(title + " default tab", remove_tab({reportId: id, tabId: blank.id}));
   return done;
 };
-const views = VIEWS(), reports = REPORTS(), spaces = [...new Set([S, ...views.map(v => v.space).filter(Boolean)])];
+const views = VIEWS(), spaces = [...new Set([S, ...views.map(v => v.space).filter(Boolean)])];
 const listed = async () => (await Promise.all(spaces.map(sp => query_views({space: sp, withConfig: false})))).flatMap(r => r.views);
 const before = await listed(), todo = views.filter(v => !before.some(x => x.name === v.name)), made = [];
 let slow = 5000;
 for (let i = 0; i < todo.length && Date.now() - t0 + slow < 45000; i += 6) { const s0 = Date.now(); made.push(...await Promise.all(todo.slice(i, i + 6).map(v => run("view " + v.name, create_view({space: S, ...v})).then(r => [v, r])))); slow = Math.max(slow, Date.now() - s0); }
-const charts = Date.now() - t0 + slow < 45000 ? await Promise.all(reports.map(r => report(r, (before.find(x => x.viewType === "report" && x.name === r.title) || {}).id))) : [];
+const charts = Date.now() - t0 + slow < 45000 ? await Promise.all(REPORTS.map(r => report(r, (before.find(x => x.viewType === "report" && x.name === r.title) || {}).id))) : [];
 const all = await listed();
 for (const v of views.filter(v => v.config && (v.config.items || []).some(i => i.groupBy))) {
   const x = all.find(y => y.name === v.name); if (!x) continue;
@@ -205,8 +201,8 @@ for (const v of views.filter(v => v.config && (v.config.items || []).some(i => i
   if (roots !== 1) fails.push(`view ${v.name}: ${roots} roots`);
 }
 const noisy = made.flatMap(([v, r]) => ((r && r.result && r.result.fixLogs) || []).filter(x => !/Added field title/.test(x)).map(x => `${v.name}: ${x}`));
-const left = todo.length - made.length + (charts.length ? 0 : reports.length);
-log(`views: ${made.filter(([, r]) => r).length} made, ${views.length - todo.length} there before; reports: ${charts.filter(Boolean).length} of ${reports.length}, ${charts.reduce((a, b) => a + b, 0)} of ${reports.reduce((a, r) => a + r.tabs.length, 0)} tabs`);
+const left = todo.length - made.length + (charts.length ? 0 : REPORTS.length);
+log(`views: ${made.filter(([, r]) => r).length} made, ${views.length - todo.length} there before; reports: ${charts.filter(Boolean).length} of ${REPORTS.length}, ${charts.reduce((a, b) => a + b, 0)} of ${REPORTS.reduce((a, r) => a + r.tabs.length, 0)} tabs`);
 if (left) log(`time is up with ${left} views and reports left: run this script again, as it is, to finish`);
 if (noisy.length) log("fixLogs: " + JSON.stringify(noisy));
 log("urls: " + JSON.stringify(Object.fromEntries(all.map(v => [v.name, v.url]))));
