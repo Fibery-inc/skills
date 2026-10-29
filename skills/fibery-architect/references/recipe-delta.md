@@ -51,6 +51,7 @@ The build guide turns each of the recipe's words into Fibery's calls, and most t
 - **A role with a "My …" view** is a people field even when one person holds it, since only people fields filter on me. Walk the recipe's Views table for every "My …" view before writing the delta: script 1 makes the field, and its cardinality can't change afterwards without recreating it.
 - **Money** is in the currency of the workspace's existing money fields, or the one the person names, or USD as an assumption.
 - **A report that keeps only some linked records** (only key results whose objective is Active, only runs of strats that aren't Retired) gets a true-or-false formula on its source, built with the other formulas, since a report filters on its source's own fields.
+- **Reports on the same database** are tabs of one report (design guide, Reports); a historical one stays its own.
 - **A view that shows a linked record's field** (the customer's Phone on My calls) gets a formula on its database that reads it, since a view shows its database's own fields only.
 - **A board whose cards show a picture** ("Frames as the cover") is a gallery whose lanes are the board's columns, since a Fibery board has no cover.
 - **A grid with nested children whose levels show mostly different fields** (Shape Up's All pitches, Content calendar's Campaign posts) is a list, since a grid puts every level's fields under one header (design guide, Views).

@@ -4,7 +4,7 @@ When the person wants a Space they already run changed, not a new one: a process
 
 ## What an extension does
 
-- **Adds** databases, to the Space or to a new Space beside it for a process of its own; fields, formulas, states and options; views and reports; rules and buttons; an app; and a guide for a new process.
+- **Adds** databases, to the Space or to a new Space beside it for a process of its own; fields, formulas, states and options; views and reports, a chart on a database the Space already reports on being a new tab of that report (its title in `REPORTS`; script 3 adds only the tabs it lacks); rules and buttons; an app; and a guide for a new process.
 - **Changes**, each on the list the person approves: a database, field, option or state renamed; an option's or state's color, emoji, order or default; an existing view's fields, filters, sorts and colors; a formula; a rule's or button's triggers, filter and actions.
 - **Replaces a field** the team has outgrown, losing nothing: a new field beside it, its values copied, what used it (views, formulas, rules, buttons) moved to the new one, and the old one renamed "<name> (old)" for the person to delete once they've checked. That's how a status select becomes a workflow, a typed name becomes a link to the workspace's records or a person, and a select becomes a multi select.
 - **Never** deletes anything (a field, option, state, view, rule, record or database), merges two into one, changes a field's type in place, adds sample records or changes a value a record already has. It doesn't edit the team's documents, reports or apps either: the report says which of them still use an old field.
