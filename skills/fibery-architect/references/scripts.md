@@ -180,7 +180,9 @@ const stateAxis = db => ({forDatabase: db, field: "workflow/state", database: `w
 const byState = (db, colors, also) => Object.entries(colors).map(([n, color]) => ({color, filter: also ? and(wf(db, "is-any-of", [n]), also) : wf(db, "is-any-of", [n])}));
 const report = async ({title, database, filter, tabs, mode}, id) => {
   if (!id) { const r = await run(title, create_report({title, sources: [filter ? {database, filterPrompt: filter} : {database}], sourceMode: mode || "current", spaceName: S})); if (!r) return 0; id = r.id; }
-  const got = ((await run(title + " tabs", get_report({reportId: id}))) || {}).result || {}, have = got.tabs || [];
+  const got = ((await run(title + " not read, left as it is", get_report({reportId: id}))) || {}).result;
+  if (!got) return 0;
+  const have = got.tabs || [];
   if (filter) { const kept = ((got.data || {}).sources || [{}])[0].filter; log(`${title} keeps: ${kept ? JSON.stringify([kept.expression, kept.params]) : "everything"}`); }
   let done = 0;
   for (const t of tabs) if (have.some(h => h.title === t.title) || await run(`${title}: ${t.title}`, (t.metrics ? add_metric_tab : t.columns ? add_table_tab : add_chart_tab)({reportId: id, ...t}))) done++;
