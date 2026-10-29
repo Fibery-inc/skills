@@ -81,7 +81,7 @@ Each part below states its rule, what to put in and how it appears in `design.md
 | Fields | up to 14 on the main database and 8 on the others; each used by something or filled by a role every time |
 | Formulas | up to 8, each with a consumer; none when nothing is computed |
 | Views | up to 8, one per question, the daily view first; none that only adds a filter to another |
-| Reports | up to 2; none when no question needs a chart |
+| Reports | up to 2, one per database charted, its charts as tabs; none when no question needs one |
 | Automations | must-have only, up to 5 |
 | Custom app | considered every time, up to one, named in the spec either way |
 | Documents | the guide, plus up to one |
@@ -165,10 +165,12 @@ One per question rather than per database: the daily view first (a board of the 
 
 ### Reports
 
-What the team builds in a spreadsheet otherwise: a funnel or throughput by state, and a breakdown by the classification that matters (source, department, channel); time in stage (a historical report) only when it's the process's own KPI. Each report is one chart, never a second tab of any kind: a second chart, a table under the chart or a number beside it is another report, and a single number is a metric report. In the spec, one line each, in words: what's counted, grouped by what, colored by what, and which records. Which records is said in the source's own fields: a report that keeps only some linked records (key results of active objectives) does it through a true-or-false formula on its source, listed with the formulas.
+What the team builds in a spreadsheet otherwise: a funnel or throughput by state, and a breakdown by the classification that matters (source, department, channel); time in stage (a historical report) only when it's the process's own KPI. Charts on the same database are tabs of one report, never reports of their own: each report loads and refreshes its records apart, and several on the same records are several places to look for one answer. A second report on that database is for history only, since a report is current or historical for good. A tab is a chart, a metric for a single number, or a table of aggregated numbers, dense and never edited (Amount by Owner and quarter); a list of records people open or change is a view. The report is named for what its tabs measure together ("Hiring numbers"), never a view's name. Two filters do different jobs. The source's filter drops the records no tab ever needs, so the report loads and refreshes fewer; a report has one only when there are such records. A tab's own conditions narrow what that tab shows, within what the source keeps, and change nothing about the load. In the spec, a line per report with its database and the records its source keeps, if any, and under it a line per tab, in words: what's counted, grouped by what, colored by what, and which records besides. Which records is said in the source's own fields, a date window on the tab: a report that keeps only some linked records (key results of active objectives) does it through a true-or-false formula on its source, listed with the formulas.
 
 ```markdown
-- **Hiring funnel** — candidates by State, colored by Source; only those who applied this year.
+- **Hiring numbers**, on Candidate, only candidates with a Job:
+  - **Hiring funnel** — candidates by State, colored by Source; only those who applied this year.
+  - **Sources that convert** — candidates by Source, colored by State.
 ```
 
 ### Automations

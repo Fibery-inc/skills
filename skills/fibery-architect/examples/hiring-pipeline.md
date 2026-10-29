@@ -1,6 +1,6 @@
 # Design: Hiring pipeline
 
-A finished design at the depth fibery-architect aims for, the 80% Space, cut to what shows the format: the assumptions, two databases in full and the rest in one line each, the complete views table, and the sample story. The full design has 5 databases, 36 fields, 6 formulas, 7 views plus the guide, 2 reports, 4 automations and 36 sample records; it builds in about 10 minutes. It sits under most ceilings because the process needs no more, and what it leaves out is in the guide's Make it yours. The workspace it was written for has a `People/Person` database; if yours doesn't, the Referrer link is dropped. Dates are relative to the build day.
+A finished design at the depth fibery-architect aims for, the 80% Space, cut to what shows the format: the assumptions, two databases in full and the rest in one line each, the complete views table, and the sample story. The full design has 5 databases, 36 fields, 6 formulas, 7 views plus the guide, 1 report, 4 automations and 36 sample records; it builds in about 10 minutes. It sits under most ceilings because the process needs no more, and what it leaves out is in the guide's Make it yours. The workspace it was written for has a `People/Person` database; if yours doesn't, the Referrer link is dropped. Dates are relative to the build day.
 
 ## Assumptions
 
@@ -75,8 +75,9 @@ Written the same way in the full design: a one-line description and settings, th
 
 ## Reports
 
-- **Hiring funnel** — candidates by State; only those who applied this year.
-- **Sources that convert** — candidates by Source, colored by State.
+- **Hiring numbers**, on Candidate, only candidates with a Job:
+  - **Hiring funnel** — candidates by State, colored by Source; only those who applied this year.
+  - **Sources that convert** — candidates by Source, colored by State.
 
 ## Automations
 
@@ -89,7 +90,7 @@ Left out on purpose: a weekly "stuck candidates" reminder (red cards on Pipeline
 
 ## Documents
 
-**How to run the hiring pipeline**: one screen, under 500 words. A bold one-line promise; "How it runs here" in five steps (Capture through the New candidate form or the board; Screen, with Days in stage kept honest by Stage dates; Interview, with My interviews, which also lists the scorecards owed; Offer, through the Make offer button and Offers out; Close, with Job filled and the two reports); "Where to look" (Pipeline every morning; My candidates and My interviews for your own; Offers out, Jobs and Closed any time; the two reports); "What stays true" (every stage change is dated; a job is Filled once its openings are hired; every offer has a deadline); "Make it yours" ("Add a Take-home stage" · "Remind me about stuck candidates on Mondays" · "A scorecard comparison screen").
+**How to run the hiring pipeline**: one screen, under 500 words. A bold one-line promise; "How it runs here" in five steps (Capture through the New candidate form or the board; Screen, with Days in stage kept honest by Stage dates; Interview, with My interviews, which also lists the scorecards owed; Offer, through the Make offer button and Offers out; Close, with Job filled and Hiring numbers); "Where to look" (Pipeline every morning; My candidates and My interviews for your own; Offers out, Jobs and Closed any time; Hiring numbers); "What stays true" (every stage change is dated; a job is Filled once its openings are hired; every offer has a deadline); "Make it yours" ("Add a Take-home stage" · "Remind me about stuck candidates on Mondays" · "A scorecard comparison screen").
 
 ## Apps
 
