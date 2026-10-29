@@ -5,7 +5,7 @@ When the source is a Space, in this workspace or another. Everything here is rea
 1. **`schema`**: find the Space and its databases.
 2. **`schema_detailed`** for those databases: field types, which fields are collections, select and state values with their order, and formula text.
 3. **`query_views`** with the Space: view types, databases, fields and filters; filters come back as readable descriptions, write them in the spec's words.
-4. **`get_reports_list`** and **`get_report`**: sources, mode, tabs and expressions; a report with several tabs becomes one report per chart in the design.
+4. **`get_reports_list`** and **`get_report`**: sources, mode, tabs and expressions; a report's chart and metric tabs stay tabs of one report in the design, reports on the same database become one, and a table tab becomes a view.
 5. **`query_automations`** (`get_automations` on older servers) for each database, once for rules and once for buttons: triggers, filters and actions. Describe texts in words; a rule that runs a script is noted as one the new design can't have, since designs are native actions only, and its job becomes a shown promise or a practice.
 6. **`get_custom_apps_list`**: which apps belong to the Space; describe what each shows and does, and ask the person if you can't tell.
 7. **A small `query`** per database, only to see how the team uses it: which states hold records, which fields they actually fill. Then invent sample data in the same shape.

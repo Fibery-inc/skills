@@ -151,7 +151,9 @@ const VIEWS = () => [
     {field: f("Name"), displayName: "Name", required: true}, {field: f("Email"), required: true}, fld("Job"), {field: f("Source"), defaultValue: {id: opts[C].Source.Website}}, fld("Resume")]}}
 ];
 const REPORTS = [
-  {title: "Hiring funnel", database: C, tab: {type: "stacked-bar", x: [{expression: "[State]"}], y: [{expression: "COUNT([Id])", title: "Candidates"}], color: {expression: "[Source]"}, fieldConditions: [{field: "Job", operator: "exists", value: null}], palette: "fibery2.0"}}
+  {title: "Hiring numbers", database: C, tabs: [
+    {title: "Hiring funnel", type: "stacked-bar", x: [{expression: "[State]"}], y: [{expression: "COUNT([Id])", title: "Candidates"}], color: {expression: "[Source]"}, fieldConditions: [{field: "Applied on", operator: "range", value: "THIS YEAR"}], palette: "fibery2.0"},
+    {title: "Sources that convert", type: "stacked-bar", x: [{expression: "[Source]"}], y: [{expression: "COUNT([Id])", title: "Candidates"}], color: {expression: "[State]"}, palette: "fibery2.0"}]}
 ];
 
 const fails = [], t0 = Date.now();
@@ -174,13 +176,14 @@ const mine = field => node("collection", f(field), "contains-me");
 const days = (field, op, amount, isBeforeNow, unit = "day") => node("date", f(field), op, {amount, unit, isBeforeNow});
 const stateAxis = db => ({forDatabase: db, field: "workflow/state", database: `workflow/state_${db}`, fields: []});
 const byState = (db, colors, also) => Object.entries(colors).map(([n, color]) => ({color, filter: also ? and(wf(db, "is-any-of", [n]), also) : wf(db, "is-any-of", [n])}));
-const report = async ({title, database, tab, mode}, id) => {
-  if (!id) { const r = await run(title, create_report({title, sources: [{database}], sourceMode: mode || "current", spaceName: S})); if (!r) return false; id = r.id; }
-  const tabs = (((await run(title + " tabs", get_report({reportId: id}))) || {}).result || {}).tabs || [];
-  const chart = tabs.some(t => t.title === title) || Boolean(await run(title + " chart", add_chart_tab({reportId: id, title, ...tab})));
-  const blank = tabs.find(t => t.title === "Chart");
-  if (chart && blank) await run(title + " default tab", remove_tab({reportId: id, tabId: blank.id}));
-  return chart;
+const report = async ({title, database, tabs, mode}, id) => {
+  if (!id) { const r = await run(title, create_report({title, sources: [{database}], sourceMode: mode || "current", spaceName: S})); if (!r) return 0; id = r.id; }
+  const have = (((await run(title + " tabs", get_report({reportId: id}))) || {}).result || {}).tabs || [];
+  let done = 0;
+  for (const t of tabs) if (have.some(h => h.title === t.title) || await run(`${title}: ${t.title}`, (t.metrics ? add_metric_tab : add_chart_tab)({reportId: id, ...t}))) done++;
+  const blank = have.find(t => t.title === "Chart");
+  if (done && blank) await run(title + " default tab", remove_tab({reportId: id, tabId: blank.id}));
+  return done;
 };
 const views = VIEWS(), spaces = [...new Set([S, ...views.map(v => v.space).filter(Boolean)])];
 const listed = async () => (await Promise.all(spaces.map(sp => query_views({space: sp, withConfig: false})))).flatMap(r => r.views);
@@ -196,7 +199,7 @@ for (const v of views.filter(v => v.config && (v.config.items || []).some(i => i
 }
 const noisy = made.flatMap(([v, r]) => ((r && r.result && r.result.fixLogs) || []).filter(x => !/Added field title/.test(x)).map(x => `${v.name}: ${x}`));
 const left = todo.length - made.length + (charts.length ? 0 : REPORTS.length);
-log(`views: ${made.filter(([, r]) => r).length} made, ${views.length - todo.length} there before; reports: ${charts.filter(Boolean).length} of ${REPORTS.length} with their chart`);
+log(`views: ${made.filter(([, r]) => r).length} made, ${views.length - todo.length} there before; reports: ${charts.filter(Boolean).length} of ${REPORTS.length}, ${charts.reduce((a, b) => a + b, 0)} of ${REPORTS.reduce((a, r) => a + r.tabs.length, 0)} tabs`);
 if (left) log(`time is up with ${left} views and reports left: run this script again, as it is, to finish`);
 if (noisy.length) log("fixLogs: " + JSON.stringify(noisy));
 log("urls: " + JSON.stringify(Object.fromEntries(all.map(v => [v.name, v.url]))));

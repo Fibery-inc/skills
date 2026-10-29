@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.29 — 2026-10-29
+
+fibery-architect puts every chart on the same database in one report, a tab each, instead of a report per chart. The design and build guides said a report is one tab holding one chart, so a Space with three charts on its main database got three reports, each storing and refreshing the same records and each one more place to look. Now a report is one per database and mode, named for what its charts measure together ("Hiring numbers"), its tabs charts or a metric for a single number, a table being a view; a historical report stays apart, since its mode can't change. Each tab keeps its own `fieldConditions`, and a condition the charts share is repeated on each rather than put on the source, whose only filter is the AI `filterPrompt` that failed before. Script 3 adds a report's missing tabs one at a time in the spec's order and removes the default tab once one is there, so a rerun still repairs a rejected chart. A recipe's reports on the same database become tabs of one report with a Change row, and an existing Space read for a design keeps its tabs together. The hiring example and the template now chart Hiring funnel and Sources that convert as two tabs of Hiring numbers.
+
 ## 1.8.28 — 2026-10-28
 
 Two fixes from the timed builds of TNR program and Purchase requests on 1.8.27. fibery-architect's build guide §6 shows a whole mention in its example, copied from a log, and says a shortened one (`[[Pipeline]]`) stays plain text: a build had written some that way and had to write those guide blocks again. §7 has the app's upload set the app id and the token in the same command as the request, since a shell call doesn't keep the variables of the one before: a build's first upload answered "Unauthorized".
