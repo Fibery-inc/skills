@@ -4,6 +4,10 @@
     "fibery": {
       "type": "streamable-http",
       "url": "https://mcp.fibery.io/mcp"
+    },
+    "process-cookbook": {
+      "type": "streamable-http",
+      "url": "https://processcookbook.org/mcp"
     }
   }
 }

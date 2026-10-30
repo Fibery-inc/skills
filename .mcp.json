@@ -3,6 +3,10 @@
     "fibery": {
       "type": "http",
       "url": "https://mcp.fibery.io/mcp"
+    },
+    "process-cookbook": {
+      "type": "http",
+      "url": "https://processcookbook.org/mcp"
     }
   }
 }
