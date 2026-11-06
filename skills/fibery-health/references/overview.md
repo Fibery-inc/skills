@@ -86,7 +86,7 @@ for (const d of ALL) {
 }
 const age = z => z ? (T0 - Date.parse(z)) / D : 1e9, state = s => s.cantRead == s.dbs ? "can't read" : !s.records ? "no records" : age(s.newest) <= 30 ? "active" : age(s.newest) <= 180 ? "quiet" : "dormant", ORD = ["active", "quiet", "dormant", "no records", "can't read"];
 const done = SPS.slice(SKIP).filter(k => S[k].read + S[k].cantRead == S[k].dbs), next = SPS.slice(SKIP).find(k => !done.includes(k));
-const m = ((me && me.result) || [])[0] || {}, tot = ALL.filter(ok), described = tot.filter(d => DESC[d]).length;
+const m = (me && me.result) || {}, tot = ALL.filter(ok), described = tot.filter(d => DESC[d]).length;
 if (!SKIP) log(J({workspace: String(m.url).split("/")[2], user: m["user/name"], role: String(m["fibery/role"]).replace("role/", ""), spaces: SP.length, databases: ALL.length, described: described + " of " + tot.length, cantRead: ALL.length - tot.length}));
 for (const k of done.filter(k => !next || SPS.indexOf(k) < SPS.indexOf(next)).sort((a, b) => ORD.indexOf(state(S[a])) - ORD.indexOf(state(S[b])) || S[b].records - S[a].records)) { const s = S[k]; log(k + " " + J(C({state: state(s), ...s, read: 0, described: s.dbs > s.cantRead ? s.described + " of " + (s.dbs - s.cantRead) : 0, synced: s.synced ? s.synced + " of " + s.dbs : 0}))); }
 if (!SKIP) {
