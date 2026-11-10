@@ -7,75 +7,67 @@ The templates of the build guide's scripts, under its section numbers (1 to 6, a
 ```js
 const S = "Hiring"; const f = n => `${S}/${n}`;
 const C = f("Candidate"), J = f("Job");
-const SCHEMA = {
-  spaces: {[S]: {color: "#2978FB", description: "Candidates from application to offer. Built by fibery-architect from the design Hiring pipeline, 2026-10-12."}},
-  databases: {
-    [C]: {color: "#2978FB", description: "One record per person applying for a job.", comments: true, fields: {
-      "Email": "email",
-      "Salary expectation": {type: "money", description: "What the candidate asked for, per year"},
-      "Notice period": {type: "int", meta: {"ui/number-unit": "wk"}},
-      "Stage changed on": {type: "date", description: "Set by Stage changed when the state changes"},
-      "Next interview": "date-time",
-      "Source": {select: [{name: "Referral", color: "#4FAF54", icon: ":handshake:"}, {name: "Job board", color: "#2978FB", icon: ":clipboard:"}, {name: "Website", color: "#99A2AB", icon: ":globe_with_meridians:"}], default: "Website"},
-      "Skills": {multiSelect: [{name: "Design", color: "#E72065"}, {name: "Engineering", color: "#2978FB"}, {name: "Sales", color: "#FBA32F"}]},
-      "Resume": "file",
-      "Job": {relation: J, back: "Candidates", cardinality: "many-to-one"},
-      "Recruiter": {relation: "fibery/user", back: "Recruiting", cardinality: "many-to-many"}
-    }, workflow: [
-      {name: "Applied", type: "Not started", color: "#99A2AB"}, {name: "Screening", type: "Started", color: "#2978FB"}, {name: "Interview", type: "Started", color: "#673DB6"},
-      {name: "Offer", type: "Started", color: "#FBA32F"}, {name: "Hired", type: "Finished", color: "#4FAF54"}, {name: "Rejected", type: "Finished", color: "#D40915"}
-    ]},
-    [J]: {color: "#B04E31", description: "One record per open role.", comments: true, fields: {
-      "Openings": {type: "int", description: "How many people this role hires"},
-      "Hiring window": "date-range"
-    }, workflow: [{name: "Open", type: "Started", color: "#2978FB"}, {name: "Filled", type: "Finished", color: "#4FAF54"}, {name: "Closed", type: "Finished", color: "#99A2AB"}]}
-  }
-};
+const SCHEMA = {spaces: [{name: S, color: "#2978FB", databases: [
+  {name: C, color: "#2978FB", description: "One record per person applying for a job.", comments: true, fields: [
+    {name: f("Email"), type: "email"},
+    {name: f("Salary expectation"), type: "number", numberFormat: "Money", description: "What the candidate asked for, per year"},
+    {name: f("Notice period"), type: "number", numberUnit: "wk"},
+    {name: f("Stage changed on"), type: "date", description: "Set by Stage changed when the state changes"},
+    {name: f("Next interview"), type: "date-time"},
+    {name: f("Source"), type: "single-select", options: [{name: "Referral", color: "#4FAF54", icon: ":handshake:"}, {name: "Job board", color: "#2978FB", icon: ":clipboard:"}, {name: "Website", color: "#99A2AB", icon: ":globe_with_meridians:", isDefault: true}]},
+    {name: f("Skills"), type: "multi-select", options: [{name: "Design", color: "#E72065"}, {name: "Engineering", color: "#2978FB"}, {name: "Sales", color: "#FBA32F"}]},
+    {name: f("Resume"), type: "files", allowMultipleFiles: false},
+    {name: f("Job"), type: "relation", relatedDatabase: J, relatedField: f("Candidates"), cardinality: "many-to-one"},
+    {name: f("Recruiter"), type: "relation", relatedDatabase: "fibery/user", relatedField: "user/Recruiting", cardinality: "many-to-many"}
+  ], workflow: {options: [
+    {name: "Applied", type: "Not started", color: "#99A2AB"}, {name: "Screening", type: "Started", color: "#2978FB"}, {name: "Interview", type: "Started", color: "#673DB6"},
+    {name: "Offer", type: "Started", color: "#FBA32F"}, {name: "Hired", type: "Finished", color: "#4FAF54"}, {name: "Rejected", type: "Finished", color: "#D40915"}
+  ]}},
+  {name: J, color: "#B04E31", description: "One record per open role.", comments: true, fields: [
+    {name: f("Openings"), type: "number", description: "How many people this role hires"},
+    {name: f("Hiring window"), type: "date-range"}
+  ], workflow: {options: [{name: "Open", type: "Started", color: "#2978FB"}, {name: "Filled", type: "Finished", color: "#4FAF54"}, {name: "Closed", type: "Finished", color: "#99A2AB"}]}}
+]}]};
 const NO_DESCRIPTION = [];
 const GUIDE = {viewType: "document", name: "How to run hiring", description: "The process, and how this Space runs it."};
 
 const fails = [], made = [];
 const run = async (label, p) => { try { const r = await p; made.push(label); return r; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
-const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-const fieldsOf = async dbs => {
-  const out = {}; let cur = null;
-  for (const line of dbs.length ? (await schema_detailed({databases: dbs})).schema.split("\n") : []) {
-    const d = line.match(/^(\S[^:]*):/); if (d) { cur = d[1]; out[cur] = new Map(); continue; }
-    const m = line.match(/^ {4}([^:]+): (.*)$/); if (cur && m) out[cur].set(m[1], m[2]);
-  }
-  return out;
-};
-const tree = (await schema({})).schema, exists = db => new RegExp(`^\\s*${esc(db)},`, "m").test(tree);
-const dbs = Object.keys(SCHEMA.databases), fieldsIn = db => Object.entries(SCHEMA.databases[db].fields || {});
-const foreign = Object.keys(SCHEMA.spaces).flatMap(sp => (tree.match(new RegExp(`^\\s*${esc(sp)}/[^,\\n]+(?=,)`, "gm")) || []).map(x => x.trim()).filter(n => !dbs.includes(n)));
+const short = n => n.split("/").pop();
+const read = async (dbs, forQuerying = true) => dbs.length ? (await get_databases({databases: dbs, forQuerying, format: "json"})).spaces.flatMap(s => s.databases) : [];
+const fieldsOf = async dbs => Object.fromEntries((await read(dbs)).map(d => [d.name, new Set(d.fields.map(x => x.name))]));
+const there = (await get_spaces({format: "json"})).spaces, exists = db => there.some(s => s.databases.some(d => d.name === db));
+const spec = Object.fromEntries(SCHEMA.spaces.flatMap(s => s.databases || []).map(d => [d.name, d])), dbs = Object.keys(spec);
+// A new Space has a color and a new database a description; one without is one to extend, and must exist.
+const foreign = there.filter(s => SCHEMA.spaces.some(x => x.color && x.name === s.name)).flatMap(s => s.databases.map(d => d.name)).filter(n => !dbs.includes(n));
 if (foreign.length) { log("STOP, a Space with this name holds other databases: " + foreign.join(", ")); throw new Error("the Space isn't this build's"); }
-const unknown = dbs.filter(db => !SCHEMA.databases[db].description && !exists(db));
-if (unknown.length) { log("STOP, no database to extend named " + unknown.join(", ")); throw new Error("a database to extend isn't there"); }
-// create_schema refuses the whole spec over one taken inverse, and a person's lands on every user: number those first.
-const rels = dbs.flatMap(db => fieldsIn(db).filter(([, x]) => x.relation).map(([name, x]) => [db, name, x]));
-const has = await fieldsOf([...new Set([...dbs, ...rels.map(([, , x]) => x.relation)])].filter(db => db === "fibery/user" || exists(db)));
+const unknown = [...SCHEMA.spaces.filter(s => !s.color && !there.some(x => x.name === s.name)).map(s => s.name), ...dbs.filter(db => !spec[db].description && !exists(db))];
+if (unknown.length) { log("STOP, nothing to extend named " + unknown.join(", ")); throw new Error("a Space or database to extend isn't there"); }
+// create_spaces refuses the whole spec over one taken inverse, and a person's lands on every user: number those first.
+const rels = dbs.flatMap(db => (spec[db].fields || []).filter(x => x.type === "relation").map(x => [db, x]));
+const has = await fieldsOf([...new Set([...dbs, ...rels.map(([, x]) => x.relatedDatabase)])].filter(db => db === "fibery/user" || exists(db)));
 const renamed = [];
-for (const [db, name, x] of rels) {
-  const on = has[x.relation], sp = x.relation === "fibery/user" ? "user" : x.relation.split("/")[0];
-  if (!on || (has[db] && has[db].has(`${db.split("/")[0]}/${name}`))) continue;
-  let back = x.back, n = 2;
-  while (on.has(`${sp}/${back}`)) back = `${x.back} ${n++}`;
-  on.set(`${sp}/${back}`, db);
-  if (back !== x.back) { renamed.push(`${name} → ${back}`); x.back = back; }
+for (const [db, x] of rels) {
+  const on = has[x.relatedDatabase];
+  if (!on || (has[db] && has[db].has(x.name))) continue;
+  let back = x.relatedField, n = 2;
+  while (on.has(back)) back = `${x.relatedField} ${n++}`;
+  on.add(back);
+  if (back !== x.relatedField) { renamed.push(`${short(x.name)} → ${short(back)}`); x.relatedField = back; }
 }
 let r;
-try { r = await create_schema(SCHEMA); } catch (e) { log("STOP, create_schema: " + String(e.message || e)); throw new Error("the structure wasn't made"); }
+try { r = await create_spaces(SCHEMA); } catch (e) { log("STOP, create_spaces: " + String(e.message || e)); throw new Error("the structure wasn't made"); }
 // A Space lists its views in the order they were made, so the guide is made before any other.
 const hasGuide = !GUIDE || (await query_views({space: S, withConfig: false})).views.some(v => v.name === GUIDE.name);
 if (!hasGuide) await run("guide", create_view({space: S, ...GUIDE}));
 const desc = db => `${db.split("/")[0]}/Description`, now = await fieldsOf(NO_DESCRIPTION);
-for (const db of NO_DESCRIPTION.filter(db => now[db].has(desc(db)))) await run("no description " + db, delete_fields({fields: [{database: db, field: desc(db)}]}));
-const off = [];
-await Promise.all(dbs.flatMap(db => fieldsIn(db).filter(([, x]) => (x.select || x.multiSelect || []).some(o => o.icon)).map(([name, x]) => query({query: {"q/from": `${db.split("/")[0]}/${name}_${db}`, "q/select": {n: "enum/name", i: "enum/icon"}, "q/limit": "q/no-limit"}}).then(q => q.result.forEach(o => {
-  const want = (x.select || x.multiSelect).find(w => w.name === o.n);
-  if (want && want.icon && o.i && o.i !== `:${want.icon.replace(/:/g, "")}:`) off.push(`${name}.${o.n} ${want.icon} → ${o.i}`);
-}), () => {}))));
-const count = l => Object.entries(l.map(x => x.split(" ")[0].replace("relation", "field")).reduce((m, k) => ({...m, [k]: (m[k] || 0) + 1}), {})).map(([k, n]) => `${k} ${n}`).join(", ");
+for (const db of NO_DESCRIPTION.filter(db => now[db] && now[db].has(desc(db)))) await run("no description " + db, delete_fields({fields: [{database: db, name: desc(db)}]}));
+const iconed = dbs.filter(db => (spec[db].fields || []).some(x => (x.options || []).some(o => o.icon)));
+const off = (await read(iconed, false)).flatMap(d => d.fields.flatMap(got => {
+  const want = (spec[d.name].fields || []).find(x => x.name === got.name);
+  return want ? (got.options || []).map(o => [o, (want.options || []).find(w => w.name === o.name)]).filter(([o, w]) => w && w.icon && o.icon && o.icon !== `:${w.icon.replace(/:/g, "")}:`).map(([o, w]) => `${short(got.name)}.${o.name} ${w.icon} → ${o.icon}`) : [];
+}));
+const count = l => Object.entries((l || []).map(x => x.split(" ")[0].replace("relation", "field")).reduce((m, k) => ({...m, [k]: (m[k] || 0) + 1}), {})).map(([k, n]) => `${k} ${n}`).join(", ");
 const fix = (r.fixLogs || []).filter(x => !/default format|Added field title/.test(x));
 log(`made: ${[count(r.created), ...made].filter(Boolean).join(", ") || "nothing"}; there before: ${[count(r.unchanged), GUIDE && hasGuide ? "guide" : ""].filter(Boolean).join(", ") || "nothing"}`);
 if (renamed.length) log("inverse fields renamed: " + renamed.join("; "));
@@ -103,14 +95,7 @@ const LEVELS = [
 const fails = [], made = [], t0 = Date.now();
 const run = async (label, p) => { try { const r = await p; made.push(label); return r; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
 const formulas = LEVELS.flat(), dbs = [...new Set(formulas.map(x => x.database))];
-const fieldsOf = async () => {
-  const out = {}; let cur = null;
-  for (const line of (await schema_detailed({databases: dbs})).schema.split("\n")) {
-    const d = line.match(/^(\S[^:]*):/); if (d) { cur = d[1]; out[cur] = new Map(); continue; }
-    const m = line.match(/^ {4}([^:]+): (.*)$/); if (cur && m) out[cur].set(m[1], m[2]);
-  }
-  return out;
-};
+const fieldsOf = async () => Object.fromEntries((await get_databases({databases: dbs, forQuerying: true, format: "json"})).spaces.flatMap(s => s.databases).map(d => [d.name, new Map(d.fields.map(x => [x.name, x]))]));
 const has = await fieldsOf(), before = formulas.filter(x => has[x.database].has(x.name)).length;
 // Four at a time, each level after the one it reads, while the next batch fits.
 let left = 0, last = 15000;
@@ -124,7 +109,8 @@ for (const level of LEVELS) {
   }
 }
 const after = await fieldsOf();
-formulas.forEach(x => { const line = after[x.database].get(x.name); log(line ? `${x.name}: ${line.replace(" # read-only; formula: ", " = ")}` : `${x.name}: missing`); });
+const typed = x => x.resultType === "number" ? `number, ${x.numberPrecision ? x.numberPrecision + " places" : "whole"}` : x.resultType;
+formulas.forEach(x => { const t = after[x.database].get(x.name); log(t ? `${x.name}: ${typed(t)} = ${t.formula}` : `${x.name}: missing`); });
 log(`made: ${made.join(", ") || "nothing"}; formulas there before: ${before}`);
 if (left) log(`time is up with ${left} calls left: run this script again, as it is, to finish`);
 log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
@@ -154,7 +140,7 @@ const VIEWS = () => [
 ];
 const REPORTS = [
   {title: "Hiring numbers", database: C, filter: "only candidates that have a Job", tabs: [
-    {title: "Hiring funnel", type: "stacked-bar", x: [{expression: "[State]"}], y: [{expression: "COUNT([Id])", title: "Candidates"}], color: {expression: "[Source]"}, fieldConditions: [{field: "Applied on", operator: "range", value: "THIS YEAR"}], palette: "fibery2.0"},
+    {title: "Hiring funnel", type: "stacked-bar", x: [{expression: "[State]"}], y: [{expression: "COUNT([Id])", title: "Candidates"}], color: {expression: "[Source]"}, fieldConditions: [{field: "Creation Date", operator: "range", value: "THIS YEAR"}], palette: "fibery2.0"},
     {title: "Sources that convert", type: "stacked-bar", x: [{expression: "[Source]"}], y: [{expression: "COUNT([Id])", title: "Candidates"}], color: {expression: "[State]"}, palette: "fibery2.0"}]}
 ];
 
@@ -247,45 +233,41 @@ const run = async (label, p) => { try { return await p; } catch (e) { fails.push
 const add = (what, n = 1) => r => { if (r) filled[what] = (filled[what] || 0) + n; return r; };
 const rows = async (from, select) => (await query({query: {"q/from": from, "q/select": select, "q/limit": "q/no-limit"}})).result;
 const sp = db => db.split("/")[0];
-const me = (await get_me({})).result[0]["fibery/id"];
-const dbs = Object.keys(RECORDS), types = {};
-let cur = null;
-for (const line of (await schema_detailed({databases: dbs})).schema.split("\n")) {
-  const d = line.match(/^(\S[^:]*):/); if (d) { cur = d[1]; types[cur] = {}; continue; }
-  const m = line.match(/^ {4}([^:]+): (.+?)(?: # (.*))?$/); if (cur && m) types[cur][m[1]] = {type: m[2], many: /collection/.test(m[3] || "")};
-}
-const target = (db, key) => (types[db][`${sp(db)}/${key}`] || {}).type;
+const me = (await get_me({})).result["fibery/id"];
+const dbs = Object.keys(RECORDS);
+const types = Object.fromEntries((await get_databases({databases: dbs, forQuerying: true, format: "json"})).spaces.flatMap(s => s.databases).map(d => [d.name, Object.fromEntries(d.fields.map(x => [x.name, x]))]));
+const field = (db, key) => types[db][`${sp(db)}/${key}`] || {};
+const target = (db, key) => field(db, key).relatedDatabase;
 const kind = (db, key) => {
   if (key === "state" || key === "comments") return key;
-  const t = types[db][`${sp(db)}/${key}`];
-  if (!t) return "unknown";
-  if (t.type === "Collaboration~Documents/Document") return "text";
-  if (t.type === "fibery/file") return "file";
-  if (t.type === "fibery/user") return t.many ? "people" : "person";
-  if (t.type.endsWith(`_${db}`)) return t.many ? "multi" : "select";
-  if (t.type.startsWith("fibery/")) return "value";
-  return t.many ? "many" : "one";
+  const t = field(db, key), many = /-to-many$/.test(t.cardinality || "");
+  if (!t.type) return "unknown";
+  if (t.type === "rich-text") return "text";
+  if (t.type === "files") return "file";
+  if (t.type === "single-select") return "select";
+  if (t.type === "multi-select") return "multi";
+  if (t.relatedDatabase === "fibery/user") return many ? "people" : "person";
+  if (t.type === "relation") return many ? "many" : "one";
+  return "value";
 };
 const value = (db, key, v) => {
-  const t = target(db, key), at = ([d, h]) => `${day(d)}T${h}:00.000Z`;
-  if (t === "fibery/date" && typeof v === "number") return day(v);
-  if (t === "fibery/date-time" && Array.isArray(v)) return at(v);
-  if (t === "fibery/date-range" && Array.isArray(v)) return {start: day(v[0]), end: day(v[1] + 1)};
-  if (t === "fibery/date-time-range" && Array.isArray(v)) return {start: at(v[0]), end: at(v[1])};
+  const t = field(db, key).type, at = ([d, h]) => `${day(d)}T${h}:00.000Z`;
+  if (t === "date" && typeof v === "number") return day(v);
+  if (t === "date-time" && Array.isArray(v)) return at(v);
+  if (t === "date-range" && Array.isArray(v)) return {start: day(v[0]), end: day(v[1] + 1)};
+  if (t === "date-time-range" && Array.isArray(v)) return {start: at(v[0]), end: at(v[1])};
   return v;
 };
-const opt = {}, ids = {};
-const options = async (db, key) => opt[db + key] = opt[db + key] || Object.fromEntries((await rows(`${sp(db)}/${key}_${db}`, {id: "fibery/id", n: "enum/name"})).map(r => [r.n, r.id]));
+const opt = (db, key) => Object.fromEntries((field(db, key).options || []).map(o => [o.name, o.id])), ids = {};
 const byName = async db => ids[db] = Object.fromEntries((await rows(db, {id: "fibery/id", n: `${sp(db)}/Name`})).map(r => [r.n, r.id]));
 for (const db of dbs) await byName(db);
 const fresh = Object.fromEntries(dbs.map(db => [db, RECORDS[db].filter(r => !ids[db][r.Name + X])]));
-for (const db of dbs) for (const k of new Set(RECORDS[db].flatMap(r => Object.keys(r)))) if (["select", "multi"].includes(kind(db, k))) await options(db, k);
 await Promise.all(dbs.filter(db => fresh[db].length).map(db => run("create " + db, create_entities({database: db, entities: fresh[db].map(r => {
   const e = {[`${sp(db)}/Name`]: r.Name + X};
   for (const [k, v] of Object.entries(r)) {
     const kd = kind(db, k), F = `${sp(db)}/${k}`;
     if (kd === "value" && k !== "Name") e[F] = value(db, k, v);
-    if (kd === "select") e[F] = opt[db + k][v];
+    if (kd === "select") e[F] = opt(db, k)[v];
     if (kd === "person") e[F] = v === "me" ? me : v;
   }
   return e;
@@ -309,7 +291,7 @@ for (const db of dbs) {
     if (kd === "one" || kd === "person") select[`k${i}`] = [F, "fibery/id"];
     if (kd === "many" || kd === "people" || kd === "multi") select[`k${i}`] = {"q/from": F, "q/select": {id: "fibery/id"}, "q/limit": "q/no-limit"};
     if (kd === "text") select[`k${i}`] = [F, "Collaboration~Documents/secret"];
-    if (kd === "file") select[`k${i}`] = types[db][F].many ? {"q/from": F, "q/select": {id: "fibery/id"}, "q/limit": 1} : [F, "fibery/id"];
+    if (kd === "file") select[`k${i}`] = types[db][F].allowMultipleFiles ? {"q/from": F, "q/select": {id: "fibery/id"}, "q/limit": 1} : [F, "fibery/id"];
     if (kd === "comments") select.cs = {"q/from": "comments/comments", "q/select": {id: "fibery/id"}, "q/limit": 1};
   });
   const now = Object.fromEntries((await rows(db, select)).map(r => [r.n, r])), links = [];
@@ -324,7 +306,7 @@ for (const db of dbs) {
       if (kd === "state" && has.state !== v) writes.push(() => run(who, set_state({database: db, entityId: id, state: v})).then(add("states")));
       if (kd === "many") items(v.map(n => ref(db, k, n, who)), "links");
       if (kd === "people") items(v.map(n => n === "me" ? me : n), "people");
-      if (kd === "multi") items(v.map(n => opt[db + k][n]), "options");
+      if (kd === "multi") items(v.map(n => opt(db, k)[n]), "options");
       if (kd === "text" && got) writes.push(() => fill(who, got, v));
       if (kd === "comments" && !(has.cs || []).length) v.forEach(c => writes.push(() => run(who, add_comment({database: db, entityId: id, content: c})).then(add("comments"))));
       if (kd === "file" && !(Array.isArray(got) ? got.length : got)) [].concat(v).forEach(url => writes.push(() => run(who, add_file_from_url({database: db, field: F, entityId: id, url, fileName: r.Name + ".png"})).then(add("pictures"))));

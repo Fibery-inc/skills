@@ -63,8 +63,8 @@ Then stop: the list is the turn's last message, never a question tool's, whose d
 
 The scripts of a new build, without the sample records, and three of an extension's own: script 0 changes what exists in place, script 4x copies values and moves the rules that read them, script 3x edits views, formulas and other rules. Each message once the one before has answered; a script with nothing to do is skipped:
 
-1. **Script 0** (below): renames, then options and states added, changed, reordered or given a default. A replaced field is renamed "<name> (old)" here, which frees its name. Every name after this, in this script and the next ones, is the name after the renames; renaming a database also renames the relation fields named after it (measured).
-2. **Script 1**: what's new in the structure. `spaces` holds only a new Space; an existing database is a key with only what's new, its new `fields` and, for one without states, its `workflow`, without `color` or `description`, and the script stops when no database has that name, so a misspelt one is never created. `GUIDE` is the new process's guide, or `null`. `create_schema` calls an existing field "unchanged" even when its type differs (measured), which is why a name is freed before it's reused.
+1. **Script 0** (below): renames, then options and states added, changed, reordered or given a default. A replaced field is renamed "<name> (old)" here, which frees its name. Every name after this, in this script and the next ones, is the name after the renames; renaming a database also renames the relation fields and the views named after it (measured: Job to Role turned the view Jobs into Roles).
+2. **Script 1**: what's new in the structure. `spaces` lists the Space of every database it touches: a new Space as in a new build, the existing one by `name` alone, without `color`; an existing database holds only what's new, its new `fields` and, for one without states, its `workflow`, without `color` or `description`, and the script stops when no Space or database has that name, so a misspelt one is never created. `GUIDE` is the new process's guide, or `null`. `create_spaces` calls an existing field "unchanged" even when its type differs (measured), which is why a name is freed before it's reused.
 3. **Script 2**: the new formulas.
 4. **Script 4x** (below), only for Moves, alone, and again until it logs no "time is up": the copies, then the rules and buttons that used the old fields.
 5. **Scripts 3, 3x and 5, and the app script**, in one message: new views and reports, every other edit to an existing view, formula, rule or button (script 3x, below), new rules and buttons (made off), the app.
@@ -76,61 +76,60 @@ Fixes, reruns and "time is up" work as in a new build. Nothing is deleted to sta
 
 ### Script 0: what exists, changed in place
 
-The data: `RENAME_DATABASES`, `RENAME_FIELDS` (full names, the replaced fields among them) and `RENAME_OPTIONS` (an option, or a state with `field: "workflow/state"`); then `STATES` and `OPTIONS`, each `{database, add, update, order, defaultOption}`, with the select's `field` for an option. `add` appends `{name, color, icon}` (a state `{name, type, color}`) at the end; `update` changes an option's color or emoji, or a state's type or color, never a name; `order` is every name in the new order; `defaultOption` is the one new records get. `STATES` names only databases that already have states: a workflow the build adds comes from script 1. A new option takes an emoji only when the select's options have them.
+The data: `RENAME_DATABASES`, `RENAME_FIELDS` (full names, the replaced fields among them) and `RENAME_OPTIONS` (an option, or a state with `field: "workflow/state"`), each `{from, to}` as `rename_databases` and `rename_fields` take it; then `STATES` and `OPTIONS`, each `{database, add, update, order, defaultOption}`, with the select's `field` for an option. `add` appends `{name, color, icon}` (a state `{name, type, color}`) at the end; `update` changes an option's color or emoji, or a state's type or color, never a name; `order` is every name in the new order; `defaultOption` is the one new records get. `STATES` names only databases that already have states: a workflow the build adds comes from script 1. A new option takes an emoji only when the select's options have them.
 
 ```js
 const S = "Hiring"; const f = n => `${S}/${n}`;
 const C = f("Candidate"), J = f("Job");
-const RENAME_DATABASES = [{oldName: f("Position"), newName: J}];
+const RENAME_DATABASES = [{from: f("Position"), to: J}];
 const RENAME_FIELDS = [
-  {database: C, oldName: f("Status"), newName: f("Status (old)")},
-  {database: C, oldName: f("Referred by"), newName: f("Referred by (old)")}
+  {database: C, from: f("Status"), to: f("Status (old)")},
+  {database: C, from: f("Referred by"), to: f("Referred by (old)")}
 ];
-const RENAME_OPTIONS = [{database: C, field: f("Seniority"), oldName: "Mid-level", newName: "Mid"}];
+const RENAME_OPTIONS = [{database: C, field: f("Seniority"), from: "Mid-level", to: "Mid"}];
 const STATES = [{database: J, add: [{name: "On hold", type: "Started", color: "#FBA32F"}], order: ["Open", "On hold", "Filled", "Closed"]}];
 const OPTIONS = [{database: C, field: f("Seniority"), add: [{name: "Lead", color: "#9C2BAF"}], defaultOption: "Junior"}];
 
 const fails = [], made = [], seen = [];
 const run = async (label, p) => { try { const r = await p; made.push(label); return r; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
 const rows = async (from, select) => (await query({query: {"q/from": from, "q/select": select, "q/limit": "q/no-limit"}})).result;
-const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const fieldsOf = async dbs => {
-  const out = Object.fromEntries(dbs.map(db => [db, new Map()])); let cur = null;
-  for (const line of dbs.length ? (await schema_detailed({databases: dbs})).schema.split("\n") : []) {
-    const d = line.match(/^(\S[^:]*):/); if (d) { cur = out[d[1]] ? d[1] : null; continue; }
-    const m = line.match(/^ {4}([^:]+): (.*)$/); if (cur && m) out[cur].set(m[1], m[2]);
+  const out = Object.fromEntries(dbs.map(db => [db, new Map()]));
+  for (const d of dbs.length ? (await get_databases({databases: dbs, format: "json"})).spaces.flatMap(s => s.databases) : []) {
+    d.fields.forEach(x => out[d.name].set(x.name, x));
+    if (d.workflow) out[d.name].set("workflow/state", {type: "workflow", options: d.workflow.options});
   }
   return out;
 };
-const tree = (await schema({})).schema, exists = db => new RegExp(`^\\s*${esc(db)},`, "m").test(tree);
+const there = (await get_spaces({format: "json"})).spaces, exists = db => there.some(s => s.databases.some(d => d.name === db));
 for (const x of RENAME_DATABASES) {
-  if (exists(x.newName)) seen.push(`database ${x.newName}`);
-  else if (exists(x.oldName)) await run(`database ${x.oldName} → ${x.newName}`, rename_databases({databases: [x]}));
-  else fails.push(`database ${x.oldName}: not found`);
+  if (exists(x.to)) seen.push(`database ${x.to}`);
+  else if (exists(x.from)) await run(`database ${x.from} → ${x.to}`, rename_databases({databases: [x]}));
+  else fails.push(`database ${x.from}: not found`);
 }
 const dbs = [...new Set([...RENAME_FIELDS, ...RENAME_OPTIONS, ...STATES, ...OPTIONS].map(x => x.database))];
 let has = await fieldsOf(dbs);
 for (const x of RENAME_FIELDS) {
-  if (has[x.database].has(x.newName)) seen.push(`field ${x.newName}`);
-  else if (has[x.database].has(x.oldName)) await run(`field ${x.oldName} → ${x.newName}`, rename_fields({fields: [x]}));
-  else fails.push(`field ${x.oldName}: not found`);
+  if (has[x.database].has(x.to)) seen.push(`field ${x.to}`);
+  else if (has[x.database].has(x.from)) await run(`field ${x.from} → ${x.to}`, rename_fields({fields: [x]}));
+  else fails.push(`field ${x.from}: not found`);
 }
 has = await fieldsOf(dbs);
 const enumOf = (db, field) => field === "workflow/state" ? `workflow/state_${db}` : `${field}_${db}`;
 const list = async (db, field) => (await rows(enumOf(db, field), {id: "fibery/id", n: "enum/name", c: "enum/color", r: "fibery/rank", ...(field === "workflow/state" ? {t: "workflow/Type"} : {i: "enum/icon"})})).sort((a, b) => a.r - b.r);
 // Renamed through its own record, an option or state keeps its id, so the records and filters that hold it keep it.
 for (const x of RENAME_OPTIONS) {
-  const l = await list(x.database, x.field).catch(e => { fails.push(`option ${x.oldName}: ${String(e.message || e).slice(0, 200)}`); return null; });
+  const l = await list(x.database, x.field).catch(e => { fails.push(`option ${x.from}: ${String(e.message || e).slice(0, 200)}`); return null; });
   if (!l) continue;
-  const o = l.find(o => o.n === x.oldName);
-  if (l.some(o => o.n === x.newName)) seen.push(`option ${x.newName}`);
-  else if (o) await run(`option ${x.oldName} → ${x.newName}`, update_entities({database: enumOf(x.database, x.field), entities: [{id: o.id, "enum/name": x.newName}]}));
-  else fails.push(`option ${x.oldName}: not found`);
+  const o = l.find(o => o.n === x.from);
+  if (l.some(o => o.n === x.to)) seen.push(`option ${x.to}`);
+  else if (o) await run(`option ${x.from} → ${x.to}`, update_entities({database: enumOf(x.database, x.field), entities: [{id: o.id, "enum/name": x.to}]}));
+  else fails.push(`option ${x.from}: not found`);
 }
 const same = (a, b) => String(a || "").toLowerCase() === String(b || "").toLowerCase();
 const options = async (x, field) => {
   const state = field === "workflow/state", short = state ? `states of ${x.database.split("/").pop()}` : field.split("/").pop();
-  const call = state ? update_workflow_fields : /collection/.test(has[x.database].get(field) || "") ? update_multi_select_fields : update_single_select_fields;
+  const call = state ? update_workflow_fields : (has[x.database].get(field) || {}).type === "multi-select" ? update_multi_select_fields : update_single_select_fields;
   const send = (label, more) => run(`${short} ${label}`, call({fields: [{database: x.database, ...(state ? {} : {name: field}), ...more}]}));
   let l = await list(x.database, field);
   const add = (x.add || []).filter(a => !l.some(o => o.n === a.name));
@@ -145,9 +144,9 @@ const options = async (x, field) => {
     else if (l.map(o => o.n).join("|") === x.order.join("|")) seen.push(`${short} order`);
     else await send("reordered", {update: {options: x.order.map(n => { const o = l.find(o => o.n === n); return state ? {name: n, type: o.t, color: o.c} : {name: n, color: o.c, ...(o.i ? {icon: o.i} : {})}; })}});
   }
-  const def = ((has[x.database].get(field) || "").match(/default: ([^;]+)$/) || [])[1];
+  const def = (((has[x.database].get(field) || {}).options || []).find(o => o.isDefault) || {}).name;
   if (x.defaultOption && def === x.defaultOption) seen.push(`${short} default`);
-  else if (x.defaultOption) await send(`default ${x.defaultOption}`, {defaultOption: x.defaultOption, update: {addOptions: []}});
+  else if (x.defaultOption) await send(`default ${x.defaultOption}`, {update: {updateOptions: [{name: x.defaultOption, isDefault: true}]}});
 };
 for (const x of STATES) await options(x, "workflow/state").catch(e => fails.push(`states of ${x.database}: ${String(e.message || e).slice(0, 200)}`));
 for (const x of OPTIONS) await options(x, x.field).catch(e => fails.push(`${x.field}: ${String(e.message || e).slice(0, 200)}`));
@@ -198,28 +197,27 @@ const stateValue = (db, name) => ({type: "value", value: {"fibery/id": st[db][na
 const tpl = prompt => ({type: "template", prompt});
 const formula = prompt => ({type: "formula", prompt});
 const types = {};
-let cur = null;
-for (const line of MOVES.length ? (await schema_detailed({databases: [...new Set(MOVES.map(m => m.database))]})).schema.split("\n") : []) {
-  const d = line.match(/^(\S[^:]*):/); if (d) { cur = d[1]; types[cur] = {}; continue; }
-  const m = line.match(/^ {4}([^:]+): (.+?)(?: # (.*))?$/); if (cur && m) types[cur][m[1]] = {type: m[2], many: /collection/.test(m[3] || ""), note: m[3] || ""};
+for (const d of MOVES.length ? (await get_databases({databases: [...new Set(MOVES.map(m => m.database))], format: "json"})).spaces.flatMap(s => s.databases) : []) {
+  types[d.name] = Object.fromEntries(d.fields.map(x => [x.name, x]));
+  if (d.workflow) types[d.name]["workflow/state"] = {type: "workflow", options: d.workflow.options};
 }
-const isEnum = (db, t) => t.endsWith(`_${db}`) || t.startsWith("workflow/state_");
+const toMany = x => /-to-many$/.test(x.cardinality || "") || x.type === "multi-select";
 const lower = o => Object.fromEntries(Object.entries(o).map(([k, v]) => [String(k).trim().toLowerCase(), v]));
 const writes = [], copied = {};
 for (const m of MOVES) {
   const from = (types[m.database] || {})[m.from], to = (types[m.database] || {})[m.to], key = `${short(m.from)} → ${short(m.to)}`;
   if (!from || !to) { fails.push(`${key}: no such field`); continue; }
-  const title = from.type === "fibery/user" ? "user/name" : isEnum(m.database, from.type) ? "enum/name" : `${sp(from.type)}/Name`;
-  const pick = from.type.startsWith("fibery/") && from.type !== "fibery/user" ? m.from : from.many ? {"q/from": m.from, "q/select": {n: title}, "q/limit": "q/no-limit"} : [m.from, title];
-  const kind = m.to === "workflow/state" ? "state" : isEnum(m.database, to.type) ? (to.many ? "multi" : "select") : to.type === "fibery/user" ? (to.many ? "people" : "person") : to.type.startsWith("fibery/") ? "value" : (to.many ? "links" : "link");
+  const title = from.relatedDatabase === "fibery/user" ? "user/name" : from.options ? "enum/name" : `${sp(from.relatedDatabase || "")}/Name`;
+  const pick = !from.options && !from.relatedDatabase ? m.from : toMany(from) ? {"q/from": m.from, "q/select": {n: title}, "q/limit": "q/no-limit"} : [m.from, title];
+  const link = to.relatedDatabase, kind = m.to === "workflow/state" ? "state" : to.options ? (toMany(to) ? "multi" : "select") : link === "fibery/user" ? (toMany(to) ? "people" : "person") : to.type === "relation" ? (toMany(to) ? "links" : "link") : "value";
   const many = ["multi", "people", "links"].includes(kind);
   const now = many ? {"q/from": m.to, "q/select": {id: "fibery/id"}, "q/limit": "q/no-limit"} : kind === "value" ? m.to : [m.to, "fibery/id"];
   const recs = await rows(m.database, {id: "fibery/id", v: pick, now});
-  const target = kind === "value" ? null : ["state", "select", "multi"].includes(kind) ? lower(await enumIds(to.type))
+  const target = kind === "value" ? null : ["state", "select", "multi"].includes(kind) ? lower(Object.fromEntries(to.options.map(o => [o.name, o.id])))
     : ["person", "people"].includes(kind) ? Object.fromEntries((await rows("fibery/user", {id: "fibery/id", n: "user/name", e: "user/email"})).flatMap(u => [[String(u.n).trim().toLowerCase(), u.id], [String(u.e).trim().toLowerCase(), u.id]]))
-    : lower(Object.fromEntries((await rows(to.type, {id: "fibery/id", n: `${sp(to.type)}/Name`})).map(r => [r.n, r.id])));
+    : lower(Object.fromEntries((await rows(link, {id: "fibery/id", n: `${sp(link)}/Name`})).map(r => [r.n, r.id])));
   // A new workflow puts every record in its first state: only a record still there gets its old value, so a state someone set since stays.
-  const first = kind === "state" && target[((to.note.match(/default: ([^;]+)$/) || [])[1] || "").trim().toLowerCase()];
+  const first = kind === "state" && (to.options.find(o => o.isDefault) || {}).id;
   const conv = v => typeof m.map === "function" ? m.map(v) : m.map && m.map[v] !== undefined ? m.map[v] : v;
   const vals = r => [].concat(r.v === null || r.v === undefined ? [] : r.v).map(v => v && v.n !== undefined ? v.n : v).flatMap(v => [].concat(conv(v))).filter(v => v !== null && v !== undefined && v !== "");
   const look = v => kind === "value" ? v : target[String(v).trim().toLowerCase()];
@@ -227,8 +225,8 @@ for (const m of MOVES) {
   if (m.create && ["link", "links"].includes(kind)) {
     const missing = new Map();
     recs.forEach(r => vals(r).forEach(v => { const n = String(v).trim(); if (n && !look(n) && !missing.has(n.toLowerCase())) missing.set(n.toLowerCase(), n); }));
-    if (missing.size && await run(`${short(to.type)} records ${[...missing.values()].join(", ")}`, create_entities({database: to.type, entities: [...missing.values()].map(n => ({[`${sp(to.type)}/Name`]: n}))})))
-      (await rows(to.type, {id: "fibery/id", n: `${sp(to.type)}/Name`})).forEach(r => target[String(r.n).trim().toLowerCase()] = r.id);
+    if (missing.size && await run(`${short(link)} records ${[...missing.values()].join(", ")}`, create_entities({database: link, entities: [...missing.values()].map(n => ({[`${sp(link)}/Name`]: n}))})))
+      (await rows(link, {id: "fibery/id", n: `${sp(link)}/Name`})).forEach(r => target[String(r.n).trim().toLowerCase()] = r.id);
   }
   const single = [];
   for (const r of recs) {
@@ -321,14 +319,8 @@ const tpl = prompt => ({type: "template", prompt});
 const formula = prompt => ({type: "formula", prompt});
 const says = (text, s) => String(text).includes(s) || String(text).includes(`[${short(s)}]`);
 const due = (text, x) => (!x.when || says(text, x.when)) && !(x.unless && says(text, x.unless));
-const read = async () => {
-  const out = {}; let cur = null;
-  for (const line of EDIT_FORMULAS.length ? (await schema_detailed({databases: [...new Set(EDIT_FORMULAS.map(x => x.database))]})).schema.split("\n") : []) {
-    const d = line.match(/^(\S[^:]*):/); if (d) { cur = d[1]; out[cur] = {}; continue; }
-    const m = line.match(/^ {4}([^:]+): (.*)$/); if (cur && m) out[cur][m[1]] = m[2];
-  }
-  return out;
-};
+const read = async () => Object.fromEntries((EDIT_FORMULAS.length ? (await get_databases({databases: [...new Set(EDIT_FORMULAS.map(x => x.database))], forQuerying: true, format: "json"})).spaces.flatMap(s => s.databases) : []).map(d => [d.name, Object.fromEntries(d.fields.filter(x => x.type === "formula").map(x => [x.name, x]))]));
+const typed = x => x.resultType === "number" ? `number, ${x.numberPrecision ? x.numberPrecision + " places" : "whole"}` : x.resultType;
 let left = 0;
 const views = (await query_views({space: S, withConfig: false})).views;
 for (const v of EDIT_VIEWS()) {
@@ -339,7 +331,7 @@ for (const v of EDIT_VIEWS()) {
   await run(`view ${v.name}`, update_view({viewType: v.viewType, id: x.id, config: v.config}));
 }
 const types = await read();
-const formulas = EDIT_FORMULAS.filter(x => { const t = (types[x.database] || {})[x.name]; if (!t) { fails.push(`formula ${short(x.name)}: not found`); return false; } if (!due(t, x)) { seen.push(`formula ${short(x.name)}`); return false; } return true; });
+const formulas = EDIT_FORMULAS.filter(x => { const t = (types[x.database] || {})[x.name]; if (!t) { fails.push(`formula ${short(x.name)}: not found`); return false; } if (!due(t.formula, x)) { seen.push(`formula ${short(x.name)}`); return false; } return true; });
 for (let i = 0, last = 15000; i < formulas.length; i += 4) {
   if (Date.now() - t0 + last > 45000) { left += formulas.length - i; break; }
   const s0 = Date.now();
@@ -364,7 +356,7 @@ for (const e of edited) {
   log(`${e.name}: ${readable({when: (a.triggers || []).map(t => [t.trigger, t.args]), if: a.filter, do: (a.actions || []).map(x => [x.name, x.args])})}`.slice(0, 900));
 }
 const after = formulas.length ? await read() : {};
-formulas.forEach(x => log(`${short(x.name)}: ${String((after[x.database] || {})[x.name] || "missing").replace(" # read-only; formula: ", " = ")}`));
+formulas.forEach(x => { const t = (after[x.database] || {})[x.name]; log(`${short(x.name)}: ${t ? `${typed(t)} = ${t.formula}` : "missing"}`); });
 log(`edited: ${made.join(", ") || "nothing"}; there before: ${seen.join(", ") || "nothing"}`);
 if (left) log(`time is up with ${left} edits left: run this script again, as it is, to finish`);
 log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
