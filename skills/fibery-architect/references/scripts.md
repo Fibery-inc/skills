@@ -29,6 +29,7 @@ const SCHEMA = {spaces: [{name: S, color: "#2978FB", databases: [
   ], workflow: {options: [{name: "Open", type: "Started", color: "#2978FB"}, {name: "Filled", type: "Finished", color: "#4FAF54"}, {name: "Closed", type: "Finished", color: "#99A2AB"}]}}
 ]}]};
 const NO_DESCRIPTION = [];
+const DEFAULTS = [{database: J, name: f("Openings"), defaultValue: 1}];
 const GUIDE = {viewType: "document", name: "How to run hiring", description: "The process, and how this Space runs it."};
 
 const fails = [], made = [];
@@ -78,6 +79,7 @@ for (const [db, x] of rels) {
 }
 let r;
 try { r = await create_spaces(SCHEMA); } catch (e) { log("STOP, create_spaces: " + String(e.message || e)); throw new Error("the structure wasn't made"); }
+if (DEFAULTS.length) try { await set_default_field_values({fields: DEFAULTS}); } catch (e) { fails.push("defaults: " + String(e.message || e).slice(0, 200)); }
 // A Space lists its views in the order they were made, so the guide is made before any other.
 const hasGuide = !GUIDE || (await query_views({space: S, withConfig: false})).views.some(v => v.name === GUIDE.name);
 if (!hasGuide) await run("guide", create_view({space: S, ...GUIDE}));
@@ -299,6 +301,8 @@ const toon = text => {
 const sp = db => db.split("/")[0];
 const me = (await get_me({})).result["fibery/id"];
 const dbs = Object.keys(RECORDS);
+const twice = [...new Set(dbs.flatMap(db => RECORDS[db].map(r => r.Name).filter((n, i, a) => a.indexOf(n) !== i).map(n => `${db}: ${n}`)))];
+if (twice.length) { log("STOP, names repeat, and records are found by name: " + twice.join("; ")); throw new Error("sample names must be unique within a database"); }
 const types = Object.fromEntries(toon(await get_databases({databases: dbs, forQuerying: true})).spaces.flatMap(s => s.databases).map(d => [d.name, Object.fromEntries([...d.fields.map(x => [x.name, x]), ["workflow/state", d.workflow || {}]])]));
 const field = (db, key) => types[db][key === "state" ? "workflow/state" : `${sp(db)}/${key}`] || {};
 const target = (db, key) => field(db, key).relatedDatabase;
@@ -459,7 +463,7 @@ const before = await read(), todo = list.filter(a => !before[key(a)]), made = []
 for (let i = 0, last = 15000; i < todo.length; i += 4) {
   if (made.length && Date.now() - t0 + last > 45000) break;
   const s0 = Date.now();
-  // A rule starts off, so none fires on the sample records written beside this script; script 6 turns them on.
+  // A rule starts off, so none fires on a sample record still being written or fixed; script 6 turns them on.
   made.push(...await Promise.all(todo.slice(i, i + 4).map(a => run(a.name, create_automation(a)).then(r => r && a.automationType === "rule" ? run(a.name + " off", update_automation({automationType: "rule", id: r.automation.id, enabled: false})).then(() => r) : r))));
   last = Math.max(last, Date.now() - s0);
 }
@@ -510,7 +514,7 @@ log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 
 ## 7. The app
 
-Only when the design has an app, in the message with scripts 3 to 5 (build guide §7). `APPS` holds `{name, kind: "view", spaceName}` for a page in the Space or `{name, kind: "layout", databaseName}` for a tab on every record page; `APP_TOUCHES` the databases and fields the app's code uses.
+Only when the design has an app, in the message with scripts 3 and 5 (build guide §7). `APPS` holds `{name, kind: "view", spaceName}` for a page in the Space or `{name, kind: "layout", databaseName}` for a tab on every record page; `APP_TOUCHES` the databases and fields the app's code uses.
 
 ```js
 const S = "Hiring"; const f = n => `${S}/${n}`;

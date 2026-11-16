@@ -112,6 +112,7 @@ Each part below states its rule, what to put in and how it appears in `design.md
   | point at a place | location |
   | see a fact computed from other fields or linked records | formula |
 
+- A default goes after the type where every new record should start with a value ("integer, default 1", "checkbox, default on"). The build sets it; only a date that starts as today is left to the person, on Your turn.
 - A field's name says what goes in it; a description is added only where the name leaves a question: a scale or a period, what counts, or that a rule fills it. Select and workflow fields can't carry one in Fibery, so their guidance goes into the option names and the database's description.
 
 In the spec, one subsection per database:

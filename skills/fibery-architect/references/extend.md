@@ -1,6 +1,6 @@
 # Extending a Space the team runs
 
-When the person wants a Space they already run changed, not a new one: a process added to it ("add interviews to our Hiring space"), fields, states, options, views or rules added to its databases, or a part of it rebuilt ("turn Status into a workflow", "Company should link to our customers"). People work in that Space, so nothing in it changes before the person has seen the exact list of changes and said yes. Whatever this file doesn't say works as in a new build, by the build guide and `scripts.md`.
+When the person wants a Space they already run changed, not a new one: a process added to it ("add interviews to our Hiring space"), fields, states, options, views or rules added to its databases, or a part of it rebuilt ("turn Status into a workflow", "Company should link to our customers"). People work in that Space, so nothing in it changes before the person has seen the exact list of changes and said yes. Whatever this file doesn't say works as in a new build, by the build guide and `scripts.md`. A Space this skill built that still holds only its examples isn't run by anyone yet: its changes go by `tweaks.md`, not this file.
 
 ## What an extension does
 
