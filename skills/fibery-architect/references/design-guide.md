@@ -1,6 +1,6 @@
 # Design guide
 
-Everything that happens before the build: learning the process, reading the workspace, deciding what goes into the Space and where to stop, and writing it down as `design.md`. Nobody approves it, since the person had their say in the questions: it is the **spec** the build reads, what the Space is in plain words, the way a recipe's Details for building says it, under a short list of what you assumed in their place. The spec decides everything a person would notice (names, types, states, what each view shows and filters, what each rule does); turning the words into calls is the build guide's job.
+Everything that happens before the build: learning the process, reading the workspace, deciding what goes into the Space and where to stop, and writing it down as `design.md`. Nobody approves it, since the person had their say in the questions: it is the **spec** the build reads, what the Space is in plain words, under a short list of what you assumed in their place. The spec decides everything a person would notice (names, types, states, what each view shows and filters, what each rule does); turning the words into calls is the build guide's job.
 
 ## Contents
 
@@ -35,7 +35,7 @@ Stages, roles and existing databases change the structure; the rest you design f
 
 With a question tool, the playback is written just before the last round's call, whose first question is "Is that right?". Their answer is the last before the build: if they correct it, correct the model and go on. If they add a lot, keep what a role would fill every time and park the rest in "Make it yours".
 
-**When to stop.** When you can name the databases, their stages, the roles, the daily view and what already exists in Fibery. Signs you've gone on too long: exceptions that happen once a year, or things the person answered with "whatever you think". When the person is vague or absent ("just build it"), choose defaults from the standard and the closest recipe, and list every assumption at the top of `design.md`; an assumption they can see and reverse is fine, a question that stalls the work is not.
+**When to stop.** When you can name the databases, their stages, the roles, the daily view and what already exists in Fibery. Signs you've gone on too long: exceptions that happen once a year, or things the person answered with "whatever you think". When the person is vague or absent ("just build it"), choose defaults from the standard, and list every assumption at the top of `design.md`; an assumption they can see and reverse is fine, a question that stalls the work is not.
 
 ## 2. Read the workspace
 
@@ -88,8 +88,6 @@ Each part below states its rule, what to put in and how it appears in `design.md
 | People fields | up to six; people for a role with a "My …" view, person for one without |
 | Sample data | 25–40 records, 8–15 on the main database, never trimmed and never past 50 |
 
-These are the recipe format's ceilings (`recipe-writer/references/recipe-format.md` §11), because a recipe is written to this standard and a build adds nothing to it. The one exception is the sample records: a recipe leaves them to the build, and they fill the views rather than adding any. A change to one table is a change to both.
-
 ### Databases and fields
 
 - Start from the nouns people use in a sentence about their work: "a candidate applies for a job and goes through interviews". Each noun with its own stages, owner, dates or fields is a database; a noun that only labels something is a select; nouns that always travel together merge. Singular names, in the team's words.
@@ -116,7 +114,7 @@ These are the recipe format's ceilings (`recipe-writer/references/recipe-format.
 
 - A field's name says what goes in it; a description is added only where the name leaves a question: a scale or a period, what counts, or that a rule fills it. Select and workflow fields can't carry one in Fibery, so their guidance goes into the option names and the database's description.
 
-In the spec, one subsection per database, written the way a recipe's Details for building writes it:
+In the spec, one subsection per database:
 
 ```markdown
 ### Candidate

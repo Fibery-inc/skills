@@ -9,7 +9,7 @@ When the person wants a Space they already run changed, not a new one: a process
 - **Replaces a field** the team has outgrown, losing nothing: a new field beside it, its values copied, what used it (views, formulas, rules, buttons) moved to the new one, and the old one renamed "<name> (old)" for the person to delete once they've checked. That's how a status select becomes a workflow, a typed name becomes a link to the workspace's records or a person, and a select becomes a multi select.
 - **Never** deletes anything (a field, option, state, view, rule, record or database), merges two into one, changes a field's type in place, adds sample records or changes a value a record already has. It doesn't edit the team's documents, reports or apps either: the report says which of them still use an old field.
 
-A recipe describes a whole Space, so none is mapped onto a Space that exists: a process added to a Space is designed from the process, as the design guide says, its databases new and linked to the Space's own.
+A process added to a Space is designed from the process, as the design guide says, its databases new and linked to the Space's own.
 
 ## 1. Read
 
