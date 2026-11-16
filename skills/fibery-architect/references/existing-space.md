@@ -11,10 +11,31 @@ const fails = [];
 const rows = async (from, select) => (await query({query: {"q/from": from, "q/select": select, "q/limit": "q/no-limit"}})).result;
 const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const short = n => n.split("/").pop(), sp = db => db.split("/")[0];
-const dbs = (((await get_spaces({format: "json"})).spaces.find(s => s.name === S) || {}).databases || []).map(d => d.name);
+// get_spaces and get_databases answer in TOON text: read it back into the objects it encodes.
+const toon = text => {
+  if (typeof text !== "string") return text;
+  const L = text.split("\n").filter(l => l.trim()).map(l => [l.search(/\S/), l.trim()]), H = /^("(?:[^"\\]|\\.)*"|[^:"[]*?)(?:\[#?(\d+)([\t|]?)\](?:\{(.*)\})?)?:(?: (.*))?$/;
+  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
+  const cells = (s, dl) => { const a = []; let c = "", q = false; for (let k = 0; k < s.length; k++) { if (q && s[k] === "\\") { c += s[k] + s[++k]; continue; } if (s[k] === '"') q = !q; if (s[k] === dl && !q) { a.push(val(c)); c = ""; } else c += s[k]; } return [...a, val(c)]; };
+  const key = k => k[0] === '"' ? JSON.parse(k) : k;
+  let i = 0;
+  const node = (m, d) => {
+    if (m[2] === undefined) return m[5] !== undefined ? val(m[5]) : block(d + 2, {});
+    const n = +m[2], dl = m[3] || ",", a = [];
+    if (m[4] !== undefined) { const f = cells(m[4], dl); while (a.length < n) a.push(Object.fromEntries(cells(L[i++][1], dl).map((v, j) => [f[j], v]))); }
+    else if (m[5]) return cells(m[5], dl);
+    else while (a.length < n) { const s = L[i++][1].replace(/^-\s?/, ""), x = s.match(H); a.push(!x ? val(s) : x[1] ? block(d + 4, {[key(x[1])]: node(x, d + 4)}) : node(x, d + 2)); }
+    return a;
+  };
+  const block = (d, o) => { while (i < L.length && L[i][0] === d) { const m = L[i++][1].match(H); o[key(m[1])] = node(m, d); } return o; };
+  const o = block(0, {});
+  if (i < L.length) throw new Error(`TOON not read from line ${i + 1}: ${L[i][1].slice(0, 80)}`);
+  return o;
+};
+const dbs = ((toon(await get_spaces({})).spaces.find(s => s.name === S) || {}).databases || []).map(d => d.name);
 if (!dbs.length) throw new Error(`no Space named ${S}`);
 const fields = {}, names = {};
-for (const d of (await get_databases({databases: dbs, format: "json"})).spaces.flatMap(s => s.databases)) {
+for (const d of toon(await get_databases({databases: dbs})).spaces.flatMap(s => s.databases)) {
   fields[d.name] = new Map(d.fields.filter(x => !/^(fibery|Collaboration~Documents)\//.test(x.name)).map(x => [x.name, x]));
   if (d.workflow) fields[d.name].set("workflow/state", {type: "workflow", options: d.workflow.options});
 }

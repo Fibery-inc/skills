@@ -34,9 +34,30 @@ const GUIDE = {viewType: "document", name: "How to run hiring", description: "Th
 const fails = [], made = [];
 const run = async (label, p) => { try { const r = await p; made.push(label); return r; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
 const short = n => n.split("/").pop();
-const read = async (dbs, forQuerying = true) => dbs.length ? (await get_databases({databases: dbs, forQuerying, format: "json"})).spaces.flatMap(s => s.databases) : [];
+// get_spaces and get_databases answer in TOON text: read it back into the objects it encodes.
+const toon = text => {
+  if (typeof text !== "string") return text;
+  const L = text.split("\n").filter(l => l.trim()).map(l => [l.search(/\S/), l.trim()]), H = /^("(?:[^"\\]|\\.)*"|[^:"[]*?)(?:\[#?(\d+)([\t|]?)\](?:\{(.*)\})?)?:(?: (.*))?$/;
+  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
+  const cells = (s, dl) => { const a = []; let c = "", q = false; for (let k = 0; k < s.length; k++) { if (q && s[k] === "\\") { c += s[k] + s[++k]; continue; } if (s[k] === '"') q = !q; if (s[k] === dl && !q) { a.push(val(c)); c = ""; } else c += s[k]; } return [...a, val(c)]; };
+  const key = k => k[0] === '"' ? JSON.parse(k) : k;
+  let i = 0;
+  const node = (m, d) => {
+    if (m[2] === undefined) return m[5] !== undefined ? val(m[5]) : block(d + 2, {});
+    const n = +m[2], dl = m[3] || ",", a = [];
+    if (m[4] !== undefined) { const f = cells(m[4], dl); while (a.length < n) a.push(Object.fromEntries(cells(L[i++][1], dl).map((v, j) => [f[j], v]))); }
+    else if (m[5]) return cells(m[5], dl);
+    else while (a.length < n) { const s = L[i++][1].replace(/^-\s?/, ""), x = s.match(H); a.push(!x ? val(s) : x[1] ? block(d + 4, {[key(x[1])]: node(x, d + 4)}) : node(x, d + 2)); }
+    return a;
+  };
+  const block = (d, o) => { while (i < L.length && L[i][0] === d) { const m = L[i++][1].match(H); o[key(m[1])] = node(m, d); } return o; };
+  const o = block(0, {});
+  if (i < L.length) throw new Error(`TOON not read from line ${i + 1}: ${L[i][1].slice(0, 80)}`);
+  return o;
+};
+const read = async (dbs, forQuerying = true) => dbs.length ? toon(await get_databases({databases: dbs, forQuerying})).spaces.flatMap(s => s.databases) : [];
 const fieldsOf = async dbs => Object.fromEntries((await read(dbs)).map(d => [d.name, new Set(d.fields.map(x => x.name))]));
-const there = (await get_spaces({format: "json"})).spaces, exists = db => there.some(s => s.databases.some(d => d.name === db));
+const there = toon(await get_spaces({})).spaces, exists = db => there.some(s => s.databases.some(d => d.name === db));
 const spec = Object.fromEntries(SCHEMA.spaces.flatMap(s => s.databases || []).map(d => [d.name, d])), dbs = Object.keys(spec);
 // A new Space has a color and a new database a description; one without is one to extend, and must exist.
 const foreign = there.filter(s => SCHEMA.spaces.some(x => x.color && x.name === s.name)).flatMap(s => s.databases.map(d => d.name)).filter(n => !dbs.includes(n));
@@ -94,8 +115,29 @@ const LEVELS = [
 
 const fails = [], made = [], t0 = Date.now();
 const run = async (label, p) => { try { const r = await p; made.push(label); return r; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
+// get_spaces and get_databases answer in TOON text: read it back into the objects it encodes.
+const toon = text => {
+  if (typeof text !== "string") return text;
+  const L = text.split("\n").filter(l => l.trim()).map(l => [l.search(/\S/), l.trim()]), H = /^("(?:[^"\\]|\\.)*"|[^:"[]*?)(?:\[#?(\d+)([\t|]?)\](?:\{(.*)\})?)?:(?: (.*))?$/;
+  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
+  const cells = (s, dl) => { const a = []; let c = "", q = false; for (let k = 0; k < s.length; k++) { if (q && s[k] === "\\") { c += s[k] + s[++k]; continue; } if (s[k] === '"') q = !q; if (s[k] === dl && !q) { a.push(val(c)); c = ""; } else c += s[k]; } return [...a, val(c)]; };
+  const key = k => k[0] === '"' ? JSON.parse(k) : k;
+  let i = 0;
+  const node = (m, d) => {
+    if (m[2] === undefined) return m[5] !== undefined ? val(m[5]) : block(d + 2, {});
+    const n = +m[2], dl = m[3] || ",", a = [];
+    if (m[4] !== undefined) { const f = cells(m[4], dl); while (a.length < n) a.push(Object.fromEntries(cells(L[i++][1], dl).map((v, j) => [f[j], v]))); }
+    else if (m[5]) return cells(m[5], dl);
+    else while (a.length < n) { const s = L[i++][1].replace(/^-\s?/, ""), x = s.match(H); a.push(!x ? val(s) : x[1] ? block(d + 4, {[key(x[1])]: node(x, d + 4)}) : node(x, d + 2)); }
+    return a;
+  };
+  const block = (d, o) => { while (i < L.length && L[i][0] === d) { const m = L[i++][1].match(H); o[key(m[1])] = node(m, d); } return o; };
+  const o = block(0, {});
+  if (i < L.length) throw new Error(`TOON not read from line ${i + 1}: ${L[i][1].slice(0, 80)}`);
+  return o;
+};
 const formulas = LEVELS.flat(), dbs = [...new Set(formulas.map(x => x.database))];
-const fieldsOf = async () => Object.fromEntries((await get_databases({databases: dbs, forQuerying: true, format: "json"})).spaces.flatMap(s => s.databases).map(d => [d.name, new Map(d.fields.map(x => [x.name, x]))]));
+const fieldsOf = async () => Object.fromEntries(toon(await get_databases({databases: dbs, forQuerying: true})).spaces.flatMap(s => s.databases).map(d => [d.name, new Map(d.fields.map(x => [x.name, x]))]));
 const has = await fieldsOf(), before = formulas.filter(x => has[x.database].has(x.name)).length;
 // Four at a time, each level after the one it reads, while the next batch fits.
 let left = 0, last = 15000;
@@ -232,11 +274,32 @@ const fails = [], filled = {}, t0 = Date.now();
 const run = async (label, p) => { try { return await p; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
 const add = (what, n = 1) => r => { if (r) filled[what] = (filled[what] || 0) + n; return r; };
 const rows = async (from, select) => (await query({query: {"q/from": from, "q/select": select, "q/limit": "q/no-limit"}})).result;
+// get_spaces and get_databases answer in TOON text: read it back into the objects it encodes.
+const toon = text => {
+  if (typeof text !== "string") return text;
+  const L = text.split("\n").filter(l => l.trim()).map(l => [l.search(/\S/), l.trim()]), H = /^("(?:[^"\\]|\\.)*"|[^:"[]*?)(?:\[#?(\d+)([\t|]?)\](?:\{(.*)\})?)?:(?: (.*))?$/;
+  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
+  const cells = (s, dl) => { const a = []; let c = "", q = false; for (let k = 0; k < s.length; k++) { if (q && s[k] === "\\") { c += s[k] + s[++k]; continue; } if (s[k] === '"') q = !q; if (s[k] === dl && !q) { a.push(val(c)); c = ""; } else c += s[k]; } return [...a, val(c)]; };
+  const key = k => k[0] === '"' ? JSON.parse(k) : k;
+  let i = 0;
+  const node = (m, d) => {
+    if (m[2] === undefined) return m[5] !== undefined ? val(m[5]) : block(d + 2, {});
+    const n = +m[2], dl = m[3] || ",", a = [];
+    if (m[4] !== undefined) { const f = cells(m[4], dl); while (a.length < n) a.push(Object.fromEntries(cells(L[i++][1], dl).map((v, j) => [f[j], v]))); }
+    else if (m[5]) return cells(m[5], dl);
+    else while (a.length < n) { const s = L[i++][1].replace(/^-\s?/, ""), x = s.match(H); a.push(!x ? val(s) : x[1] ? block(d + 4, {[key(x[1])]: node(x, d + 4)}) : node(x, d + 2)); }
+    return a;
+  };
+  const block = (d, o) => { while (i < L.length && L[i][0] === d) { const m = L[i++][1].match(H); o[key(m[1])] = node(m, d); } return o; };
+  const o = block(0, {});
+  if (i < L.length) throw new Error(`TOON not read from line ${i + 1}: ${L[i][1].slice(0, 80)}`);
+  return o;
+};
 const sp = db => db.split("/")[0];
 const me = (await get_me({})).result["fibery/id"];
 const dbs = Object.keys(RECORDS);
-const types = Object.fromEntries((await get_databases({databases: dbs, forQuerying: true, format: "json"})).spaces.flatMap(s => s.databases).map(d => [d.name, Object.fromEntries(d.fields.map(x => [x.name, x]))]));
-const field = (db, key) => types[db][`${sp(db)}/${key}`] || {};
+const types = Object.fromEntries(toon(await get_databases({databases: dbs, forQuerying: true})).spaces.flatMap(s => s.databases).map(d => [d.name, Object.fromEntries([...d.fields.map(x => [x.name, x]), ["workflow/state", d.workflow || {}]])]));
+const field = (db, key) => types[db][key === "state" ? "workflow/state" : `${sp(db)}/${key}`] || {};
 const target = (db, key) => field(db, key).relatedDatabase;
 const kind = (db, key) => {
   if (key === "state" || key === "comments") return key;
@@ -258,17 +321,25 @@ const value = (db, key, v) => {
   if (t === "date-time-range" && Array.isArray(v)) return {start: at(v[0]), end: at(v[1])};
   return v;
 };
-const opt = (db, key) => Object.fromEntries((field(db, key).options || []).map(o => [o.name, o.id])), ids = {};
+const opt = (db, key) => new Set((field(db, key).options || []).map(o => o.name)), ids = {};
 const byName = async db => ids[db] = Object.fromEntries((await rows(db, {id: "fibery/id", n: `${sp(db)}/Name`})).map(r => [r.n, r.id]));
 for (const db of dbs) await byName(db);
+// Selects and states are written by name: one Fibery doesn't have would fail its whole database's write, so it's dropped and reported.
+for (const db of dbs) for (const r of RECORDS[db]) for (const [k, v] of Object.entries(r)) {
+  if (!["select", "state", "multi"].includes(kind(db, k))) continue;
+  const bad = [].concat(v).filter(n => !opt(db, k).has(n));
+  if (bad.length) { fails.push(`${r.Name} ${k}: no option ${bad.join(", ")}`); if (Array.isArray(v)) r[k] = v.filter(n => !bad.includes(n)); else delete r[k]; }
+}
 const fresh = Object.fromEntries(dbs.map(db => [db, RECORDS[db].filter(r => !ids[db][r.Name + X])]));
 await Promise.all(dbs.filter(db => fresh[db].length).map(db => run("create " + db, create_entities({database: db, entities: fresh[db].map(r => {
   const e = {[`${sp(db)}/Name`]: r.Name + X};
   for (const [k, v] of Object.entries(r)) {
     const kd = kind(db, k), F = `${sp(db)}/${k}`;
     if (kd === "value" && k !== "Name") e[F] = value(db, k, v);
-    if (kd === "select") e[F] = opt(db, k)[v];
+    if (kd === "select" || kd === "multi") e[F] = v;
+    if (kd === "state") e["workflow/state"] = v;
     if (kd === "person") e[F] = v === "me" ? me : v;
+    if (kd === "people") e[F] = v.map(n => n === "me" ? me : n);
   }
   return e;
 })}))));
@@ -289,32 +360,36 @@ for (const db of dbs) {
     const kd = kind(db, k), F = `${sp(db)}/${k}`;
     if (kd === "state") select.state = ["workflow/state", "enum/name"];
     if (kd === "one" || kd === "person") select[`k${i}`] = [F, "fibery/id"];
-    if (kd === "many" || kd === "people" || kd === "multi") select[`k${i}`] = {"q/from": F, "q/select": {id: "fibery/id"}, "q/limit": "q/no-limit"};
+    if (kd === "many" || kd === "people" || kd === "multi") select[`k${i}`] = {"q/from": F, "q/select": {id: kd === "multi" ? "enum/name" : "fibery/id"}, "q/limit": "q/no-limit"};
     if (kd === "text") select[`k${i}`] = [F, "Collaboration~Documents/secret"];
     if (kd === "file") select[`k${i}`] = types[db][F].allowMultipleFiles ? {"q/from": F, "q/select": {id: "fibery/id"}, "q/limit": 1} : [F, "fibery/id"];
     if (kd === "comments") select.cs = {"q/from": "comments/comments", "q/select": {id: "fibery/id"}, "q/limit": 1};
   });
-  const now = Object.fromEntries((await rows(db, select)).map(r => [r.n, r])), links = [];
+  const now = Object.fromEntries((await rows(db, select)).map(r => [r.n, r])), changes = [];
   for (const r of RECORDS[db]) {
-    const id = ids[db][r.Name + X], has = now[r.Name + X] || {}, isNew = fresh[db].includes(r), link = {id};
+    const id = ids[db][r.Name + X], has = now[r.Name + X] || {}, isNew = fresh[db].includes(r), change = {"fibery/id": id}, tally = {};
     for (const [k, v] of Object.entries(r)) {
       const kd = kind(db, k), F = `${sp(db)}/${k}`, who = `${r.Name} ${k}`, got = has[`k${keys.indexOf(k)}`];
       const there = Array.isArray(got) ? got.map(x => x.id) : [];
-      const items = (list, what) => { const l = list.filter(x => x && !there.includes(x)); if (l.length) writes.push(() => run(who, add_collection_items({database: db, field: F, entityId: id, items: l})).then(add(what, l.length))); };
-      if (kd === "one" && !got) { const t = ref(db, k, v, who); if (t) link[F] = t; }
-      if (kd === "person" && !got) link[F] = v === "me" ? me : v;
-      if (kd === "state" && has.state !== v) writes.push(() => run(who, set_state({database: db, entityId: id, state: v})).then(add("states")));
+      const put = (to, val, what, n = 1) => { change[to] = val; tally[what] = (tally[what] || 0) + n; };
+      const items = (list, what) => { const l = list.filter(x => x && !there.includes(x)); if (l.length) put(F, {add: l}, what, l.length); };
+      if (kd === "one" && !got) { const t = ref(db, k, v, who); if (t) put(F, t, "links"); }
+      if (kd === "person" && !got) put(F, v === "me" ? me : v, "people");
+      if (kd === "state" && has.state !== v) put("workflow/state", v, "states");
       if (kd === "many") items(v.map(n => ref(db, k, n, who)), "links");
       if (kd === "people") items(v.map(n => n === "me" ? me : n), "people");
-      if (kd === "multi") items(v.map(n => opt(db, k)[n]), "options");
+      if (kd === "multi") items(v, "options");
       if (kd === "text" && got) writes.push(() => fill(who, got, v));
       if (kd === "comments" && !(has.cs || []).length) v.forEach(c => writes.push(() => run(who, add_comment({database: db, entityId: id, content: c})).then(add("comments"))));
       if (kd === "file" && !(Array.isArray(got) ? got.length : got)) [].concat(v).forEach(url => writes.push(() => run(who, add_file_from_url({database: db, field: F, entityId: id, url, fileName: r.Name + ".png"})).then(add("pictures"))));
       if (kd === "unknown" && isNew) fails.push(`${who}: no such field`);
     }
-    if (Object.keys(link).length > 1) links.push(link);
+    if (Object.keys(change).length > 1) changes.push([change, tally]);
   }
-  if (links.length) writes.push(() => run("links " + db, update_entities({database: db, entities: links})).then(add("links", links.length)));
+  for (let i = 0; i < changes.length; i += 25) {
+    const part = changes.slice(i, i + 25);
+    writes.push(() => run("update " + db, update_entities({database: db, entities: part.map(([e]) => e)})).then(r => { if (r) part.forEach(([, t]) => Object.entries(t).forEach(([what, n]) => filled[what] = (filled[what] || 0) + n)); }));
+  }
 }
 let next = 0, slow = 5000;
 while (next < writes.length && Date.now() - t0 + slow < 45000) { const batch = writes.slice(next, next + 20), s0 = Date.now(); next += batch.length; await Promise.all(batch.map(w => w())); slow = Math.max(slow, Date.now() - s0); }

@@ -93,15 +93,36 @@ const OPTIONS = [{database: C, field: f("Seniority"), add: [{name: "Lead", color
 const fails = [], made = [], seen = [];
 const run = async (label, p) => { try { const r = await p; made.push(label); return r; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
 const rows = async (from, select) => (await query({query: {"q/from": from, "q/select": select, "q/limit": "q/no-limit"}})).result;
+// get_spaces and get_databases answer in TOON text: read it back into the objects it encodes.
+const toon = text => {
+  if (typeof text !== "string") return text;
+  const L = text.split("\n").filter(l => l.trim()).map(l => [l.search(/\S/), l.trim()]), H = /^("(?:[^"\\]|\\.)*"|[^:"[]*?)(?:\[#?(\d+)([\t|]?)\](?:\{(.*)\})?)?:(?: (.*))?$/;
+  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
+  const cells = (s, dl) => { const a = []; let c = "", q = false; for (let k = 0; k < s.length; k++) { if (q && s[k] === "\\") { c += s[k] + s[++k]; continue; } if (s[k] === '"') q = !q; if (s[k] === dl && !q) { a.push(val(c)); c = ""; } else c += s[k]; } return [...a, val(c)]; };
+  const key = k => k[0] === '"' ? JSON.parse(k) : k;
+  let i = 0;
+  const node = (m, d) => {
+    if (m[2] === undefined) return m[5] !== undefined ? val(m[5]) : block(d + 2, {});
+    const n = +m[2], dl = m[3] || ",", a = [];
+    if (m[4] !== undefined) { const f = cells(m[4], dl); while (a.length < n) a.push(Object.fromEntries(cells(L[i++][1], dl).map((v, j) => [f[j], v]))); }
+    else if (m[5]) return cells(m[5], dl);
+    else while (a.length < n) { const s = L[i++][1].replace(/^-\s?/, ""), x = s.match(H); a.push(!x ? val(s) : x[1] ? block(d + 4, {[key(x[1])]: node(x, d + 4)}) : node(x, d + 2)); }
+    return a;
+  };
+  const block = (d, o) => { while (i < L.length && L[i][0] === d) { const m = L[i++][1].match(H); o[key(m[1])] = node(m, d); } return o; };
+  const o = block(0, {});
+  if (i < L.length) throw new Error(`TOON not read from line ${i + 1}: ${L[i][1].slice(0, 80)}`);
+  return o;
+};
 const fieldsOf = async dbs => {
   const out = Object.fromEntries(dbs.map(db => [db, new Map()]));
-  for (const d of dbs.length ? (await get_databases({databases: dbs, format: "json"})).spaces.flatMap(s => s.databases) : []) {
+  for (const d of dbs.length ? toon(await get_databases({databases: dbs})).spaces.flatMap(s => s.databases) : []) {
     d.fields.forEach(x => out[d.name].set(x.name, x));
     if (d.workflow) out[d.name].set("workflow/state", {type: "workflow", options: d.workflow.options});
   }
   return out;
 };
-const there = (await get_spaces({format: "json"})).spaces, exists = db => there.some(s => s.databases.some(d => d.name === db));
+const there = toon(await get_spaces({})).spaces, exists = db => there.some(s => s.databases.some(d => d.name === db));
 for (const x of RENAME_DATABASES) {
   if (exists(x.to)) seen.push(`database ${x.to}`);
   else if (exists(x.from)) await run(`database ${x.from} → ${x.to}`, rename_databases({databases: [x]}));
@@ -116,21 +137,21 @@ for (const x of RENAME_FIELDS) {
 }
 has = await fieldsOf(dbs);
 const enumOf = (db, field) => field === "workflow/state" ? `workflow/state_${db}` : `${field}_${db}`;
+const tool = (db, field) => field === "workflow/state" ? update_workflow_fields : (has[db].get(field) || {}).type === "multi-select" ? update_multi_select_fields : update_single_select_fields;
 const list = async (db, field) => (await rows(enumOf(db, field), {id: "fibery/id", n: "enum/name", c: "enum/color", r: "fibery/rank", ...(field === "workflow/state" ? {t: "workflow/Type"} : {i: "enum/icon"})})).sort((a, b) => a.r - b.r);
-// Renamed through its own record, an option or state keeps its id, so the records and filters that hold it keep it.
+// Renamed with newName, an option or state keeps its id, so the records and filters that hold it keep it.
 for (const x of RENAME_OPTIONS) {
   const l = await list(x.database, x.field).catch(e => { fails.push(`option ${x.from}: ${String(e.message || e).slice(0, 200)}`); return null; });
   if (!l) continue;
   const o = l.find(o => o.n === x.from);
   if (l.some(o => o.n === x.to)) seen.push(`option ${x.to}`);
-  else if (o) await run(`option ${x.from} → ${x.to}`, update_entities({database: enumOf(x.database, x.field), entities: [{id: o.id, "enum/name": x.to}]}));
+  else if (o) await run(`option ${x.from} → ${x.to}`, tool(x.database, x.field)({fields: [{database: x.database, ...(x.field === "workflow/state" ? {} : {name: x.field}), update: {updateOptions: [{name: x.from, newName: x.to}]}}]}));
   else fails.push(`option ${x.from}: not found`);
 }
 const same = (a, b) => String(a || "").toLowerCase() === String(b || "").toLowerCase();
 const options = async (x, field) => {
   const state = field === "workflow/state", short = state ? `states of ${x.database.split("/").pop()}` : field.split("/").pop();
-  const call = state ? update_workflow_fields : (has[x.database].get(field) || {}).type === "multi-select" ? update_multi_select_fields : update_single_select_fields;
-  const send = (label, more) => run(`${short} ${label}`, call({fields: [{database: x.database, ...(state ? {} : {name: field}), ...more}]}));
+  const send = (label, more) => run(`${short} ${label}`, tool(x.database, field)({fields: [{database: x.database, ...(state ? {} : {name: field}), ...more}]}));
   let l = await list(x.database, field);
   const add = (x.add || []).filter(a => !l.some(o => o.n === a.name));
   if (add.length) await send(`added: ${add.map(a => a.name).join(", ")}`, {update: {addOptions: add}});
@@ -179,6 +200,27 @@ const EDIT_RULES = () => [
 const fails = [], made = [], seen = [], t0 = Date.now();
 const run = async (label, p) => { try { const r = await p; made.push(label); return r; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
 const rows = async (from, select) => (await query({query: {"q/from": from, "q/select": select, "q/limit": "q/no-limit"}})).result;
+// get_spaces and get_databases answer in TOON text: read it back into the objects it encodes.
+const toon = text => {
+  if (typeof text !== "string") return text;
+  const L = text.split("\n").filter(l => l.trim()).map(l => [l.search(/\S/), l.trim()]), H = /^("(?:[^"\\]|\\.)*"|[^:"[]*?)(?:\[#?(\d+)([\t|]?)\](?:\{(.*)\})?)?:(?: (.*))?$/;
+  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
+  const cells = (s, dl) => { const a = []; let c = "", q = false; for (let k = 0; k < s.length; k++) { if (q && s[k] === "\\") { c += s[k] + s[++k]; continue; } if (s[k] === '"') q = !q; if (s[k] === dl && !q) { a.push(val(c)); c = ""; } else c += s[k]; } return [...a, val(c)]; };
+  const key = k => k[0] === '"' ? JSON.parse(k) : k;
+  let i = 0;
+  const node = (m, d) => {
+    if (m[2] === undefined) return m[5] !== undefined ? val(m[5]) : block(d + 2, {});
+    const n = +m[2], dl = m[3] || ",", a = [];
+    if (m[4] !== undefined) { const f = cells(m[4], dl); while (a.length < n) a.push(Object.fromEntries(cells(L[i++][1], dl).map((v, j) => [f[j], v]))); }
+    else if (m[5]) return cells(m[5], dl);
+    else while (a.length < n) { const s = L[i++][1].replace(/^-\s?/, ""), x = s.match(H); a.push(!x ? val(s) : x[1] ? block(d + 4, {[key(x[1])]: node(x, d + 4)}) : node(x, d + 2)); }
+    return a;
+  };
+  const block = (d, o) => { while (i < L.length && L[i][0] === d) { const m = L[i++][1].match(H); o[key(m[1])] = node(m, d); } return o; };
+  const o = block(0, {});
+  if (i < L.length) throw new Error(`TOON not read from line ${i + 1}: ${L[i][1].slice(0, 80)}`);
+  return o;
+};
 const enumIds = async from => Object.fromEntries((await rows(from, {id: "fibery/id", n: "enum/name"})).map(r => [r.n, r.id]));
 const sp = db => db.split("/")[0], short = n => n.split("/").pop();
 const st = {}, opts = {};
@@ -197,7 +239,7 @@ const stateValue = (db, name) => ({type: "value", value: {"fibery/id": st[db][na
 const tpl = prompt => ({type: "template", prompt});
 const formula = prompt => ({type: "formula", prompt});
 const types = {};
-for (const d of MOVES.length ? (await get_databases({databases: [...new Set(MOVES.map(m => m.database))], format: "json"})).spaces.flatMap(s => s.databases) : []) {
+for (const d of MOVES.length ? toon(await get_databases({databases: [...new Set(MOVES.map(m => m.database))]})).spaces.flatMap(s => s.databases) : []) {
   types[d.name] = Object.fromEntries(d.fields.map(x => [x.name, x]));
   if (d.workflow) types[d.name]["workflow/state"] = {type: "workflow", options: d.workflow.options};
 }
@@ -210,14 +252,14 @@ for (const m of MOVES) {
   const title = from.relatedDatabase === "fibery/user" ? "user/name" : from.options ? "enum/name" : `${sp(from.relatedDatabase || "")}/Name`;
   const pick = !from.options && !from.relatedDatabase ? m.from : toMany(from) ? {"q/from": m.from, "q/select": {n: title}, "q/limit": "q/no-limit"} : [m.from, title];
   const link = to.relatedDatabase, kind = m.to === "workflow/state" ? "state" : to.options ? (toMany(to) ? "multi" : "select") : link === "fibery/user" ? (toMany(to) ? "people" : "person") : to.type === "relation" ? (toMany(to) ? "links" : "link") : "value";
-  const many = ["multi", "people", "links"].includes(kind);
-  const now = many ? {"q/from": m.to, "q/select": {id: "fibery/id"}, "q/limit": "q/no-limit"} : kind === "value" ? m.to : [m.to, "fibery/id"];
+  const many = ["multi", "people", "links"].includes(kind), named = ["state", "select", "multi"].includes(kind);
+  const now = many ? {"q/from": m.to, "q/select": {id: named ? "enum/name" : "fibery/id"}, "q/limit": "q/no-limit"} : kind === "value" ? m.to : [m.to, named ? "enum/name" : "fibery/id"];
   const recs = await rows(m.database, {id: "fibery/id", v: pick, now});
-  const target = kind === "value" ? null : ["state", "select", "multi"].includes(kind) ? lower(Object.fromEntries(to.options.map(o => [o.name, o.id])))
+  const target = kind === "value" ? null : named ? lower(Object.fromEntries(to.options.map(o => [o.name, o.name])))
     : ["person", "people"].includes(kind) ? Object.fromEntries((await rows("fibery/user", {id: "fibery/id", n: "user/name", e: "user/email"})).flatMap(u => [[String(u.n).trim().toLowerCase(), u.id], [String(u.e).trim().toLowerCase(), u.id]]))
     : lower(Object.fromEntries((await rows(link, {id: "fibery/id", n: `${sp(link)}/Name`})).map(r => [r.n, r.id])));
   // A new workflow puts every record in its first state: only a record still there gets its old value, so a state someone set since stays.
-  const first = kind === "state" && (to.options.find(o => o.isDefault) || {}).id;
+  const first = kind === "state" && (to.options.find(o => o.isDefault) || {}).name;
   const conv = v => typeof m.map === "function" ? m.map(v) : m.map && m.map[v] !== undefined ? m.map[v] : v;
   const vals = r => [].concat(r.v === null || r.v === undefined ? [] : r.v).map(v => v && v.n !== undefined ? v.n : v).flatMap(v => [].concat(conv(v))).filter(v => v !== null && v !== undefined && v !== "");
   const look = v => kind === "value" ? v : target[String(v).trim().toLowerCase()];
@@ -228,19 +270,19 @@ for (const m of MOVES) {
     if (missing.size && await run(`${short(link)} records ${[...missing.values()].join(", ")}`, create_entities({database: link, entities: [...missing.values()].map(n => ({[`${sp(link)}/Name`]: n}))})))
       (await rows(link, {id: "fibery/id", n: `${sp(link)}/Name`})).forEach(r => target[String(r.n).trim().toLowerCase()] = r.id);
   }
-  const single = [];
+  const changes = [];
   for (const r of recs) {
     const vs = vals(r); if (!vs.length) continue;
     const ids = vs.map(look);
     vs.forEach((v, i) => { if (ids[i] === undefined) c.unmatched.set(String(v), (c.unmatched.get(String(v)) || 0) + 1); });
     const ok = [...new Set(ids.filter(x => x !== undefined))];
     if (!ok.length) continue;
-    if (many) { const there = (r.now || []).map(x => x.id), add = ok.filter(x => !there.includes(x)); if (!add.length) c.there++; else writes.push(() => run(key, add_collection_items({database: m.database, field: m.to, entityId: r.id, items: add})).then(x => { if (x) c.copied++; })); }
-    else if (kind === "state") { if (r.now === ok[0]) c.there++; else if (r.now !== first) c.own++; else single.push({id: r.id, [m.to]: ok[0]}); }
+    if (many) { const there = (r.now || []).map(x => x.id), add = ok.filter(x => !there.includes(x)); if (!add.length) c.there++; else changes.push({"fibery/id": r.id, [m.to]: {add}}); }
+    else if (kind === "state") { if (r.now === ok[0]) c.there++; else if (r.now !== first) c.own++; else changes.push({"fibery/id": r.id, [m.to]: ok[0]}); }
     else if (r.now !== null && r.now !== undefined && r.now !== "") c.there++;
-    else single.push({id: r.id, [m.to]: ok[0]});
+    else changes.push({"fibery/id": r.id, [m.to]: ok[0]});
   }
-  for (let i = 0; i < single.length; i += 25) { const part = single.slice(i, i + 25); writes.push(() => run(key, update_entities({database: m.database, entities: part})).then(x => { if (x) c.copied += part.length; })); }
+  for (let i = 0; i < changes.length; i += 25) { const part = changes.slice(i, i + 25); writes.push(() => run(key, update_entities({database: m.database, entities: part})).then(x => { if (x) c.copied += part.length; })); }
 }
 let next = 0, slow = 5000;
 while (next < writes.length && Date.now() - t0 + slow < 45000) { const batch = writes.slice(next, next + 10), s0 = Date.now(); next += batch.length; await Promise.all(batch.map(w => w())); slow = Math.max(slow, Date.now() - s0); }
@@ -296,6 +338,27 @@ const EDIT_RULES = () => [];
 const fails = [], made = [], seen = [], t0 = Date.now();
 const run = async (label, p) => { try { const r = await p; made.push(label); return r; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
 const rows = async (from, select) => (await query({query: {"q/from": from, "q/select": select, "q/limit": "q/no-limit"}})).result;
+// get_spaces and get_databases answer in TOON text: read it back into the objects it encodes.
+const toon = text => {
+  if (typeof text !== "string") return text;
+  const L = text.split("\n").filter(l => l.trim()).map(l => [l.search(/\S/), l.trim()]), H = /^("(?:[^"\\]|\\.)*"|[^:"[]*?)(?:\[#?(\d+)([\t|]?)\](?:\{(.*)\})?)?:(?: (.*))?$/;
+  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
+  const cells = (s, dl) => { const a = []; let c = "", q = false; for (let k = 0; k < s.length; k++) { if (q && s[k] === "\\") { c += s[k] + s[++k]; continue; } if (s[k] === '"') q = !q; if (s[k] === dl && !q) { a.push(val(c)); c = ""; } else c += s[k]; } return [...a, val(c)]; };
+  const key = k => k[0] === '"' ? JSON.parse(k) : k;
+  let i = 0;
+  const node = (m, d) => {
+    if (m[2] === undefined) return m[5] !== undefined ? val(m[5]) : block(d + 2, {});
+    const n = +m[2], dl = m[3] || ",", a = [];
+    if (m[4] !== undefined) { const f = cells(m[4], dl); while (a.length < n) a.push(Object.fromEntries(cells(L[i++][1], dl).map((v, j) => [f[j], v]))); }
+    else if (m[5]) return cells(m[5], dl);
+    else while (a.length < n) { const s = L[i++][1].replace(/^-\s?/, ""), x = s.match(H); a.push(!x ? val(s) : x[1] ? block(d + 4, {[key(x[1])]: node(x, d + 4)}) : node(x, d + 2)); }
+    return a;
+  };
+  const block = (d, o) => { while (i < L.length && L[i][0] === d) { const m = L[i++][1].match(H); o[key(m[1])] = node(m, d); } return o; };
+  const o = block(0, {});
+  if (i < L.length) throw new Error(`TOON not read from line ${i + 1}: ${L[i][1].slice(0, 80)}`);
+  return o;
+};
 const enumIds = async from => Object.fromEntries((await rows(from, {id: "fibery/id", n: "enum/name"})).map(r => [r.n, r.id]));
 const sp = db => db.split("/")[0], short = n => n.split("/").pop();
 const st = {}, opts = {};
@@ -319,7 +382,7 @@ const tpl = prompt => ({type: "template", prompt});
 const formula = prompt => ({type: "formula", prompt});
 const says = (text, s) => String(text).includes(s) || String(text).includes(`[${short(s)}]`);
 const due = (text, x) => (!x.when || says(text, x.when)) && !(x.unless && says(text, x.unless));
-const read = async () => Object.fromEntries((EDIT_FORMULAS.length ? (await get_databases({databases: [...new Set(EDIT_FORMULAS.map(x => x.database))], forQuerying: true, format: "json"})).spaces.flatMap(s => s.databases) : []).map(d => [d.name, Object.fromEntries(d.fields.filter(x => x.type === "formula").map(x => [x.name, x]))]));
+const read = async () => Object.fromEntries((EDIT_FORMULAS.length ? toon(await get_databases({databases: [...new Set(EDIT_FORMULAS.map(x => x.database))], forQuerying: true})).spaces.flatMap(s => s.databases) : []).map(d => [d.name, Object.fromEntries(d.fields.filter(x => x.type === "formula").map(x => [x.name, x]))]));
 const typed = x => x.resultType === "number" ? `number, ${x.numberPrecision ? x.numberPrecision + " places" : "whole"}` : x.resultType;
 let left = 0;
 const views = (await query_views({space: S, withConfig: false})).views;
