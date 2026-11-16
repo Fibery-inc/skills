@@ -1,6 +1,6 @@
 # Scripts
 
-The templates of the build guide's scripts, under its section numbers (1 to 6, and 7 for an app), for a small hiring Space (Job, Candidate). Each data block shows one example of each kind, not how many to build. Replace the data block at the top with the spec's content, as the build guide's section of the same number says, and copy everything from `const fails` down unchanged. Every template reads what exists before it writes and logs what it found as well as what it made, so any of them runs again as it is, after a failure, a cut-off or a fix to its data. Scripts 0, 4x and 3x, which change a Space the team already runs, are in `extend.md`.
+The templates of the build guide's scripts, under its section numbers (1 to 6, and 7 for an app), for a small hiring Space (Job, Candidate). Each data block shows one example of each kind, not how many to build. Replace the data block at the top with the spec's content, as the build guide's section of the same number says, and copy everything from `const fails` down unchanged. Every template reads what exists before it writes and logs what it found as well as what it made, so any of them runs again as it is, after a failure, a cut-off or a fix to its data. Scripts 0, 4x and 3x, which change a Space the team already runs, are in `extend.md`. The script that removes the examples is the last one here.
 
 ## 1. Structure
 
@@ -90,6 +90,7 @@ const off = (await read(iconed, false)).flatMap(d => d.fields.flatMap(got => {
 }));
 const count = l => Object.entries((l || []).map(x => x.split(" ")[0].replace("relation", "field")).reduce((m, k) => ({...m, [k]: (m[k] || 0) + 1}), {})).map(([k, n]) => `${k} ${n}`).join(", ");
 const fix = (r.fixLogs || []).filter(x => !/default format|Added field title/.test(x));
+try { const v = (await query_views({space: S, withConfig: false})).views[0]; if (v) log("space: " + v.url.replace(/\/([^/]+)\/[^/]+$/, "/fibery/space/$1")); } catch (e) {}
 log(`made: ${[count(r.created), ...made].filter(Boolean).join(", ") || "nothing"}; there before: ${[count(r.unchanged), GUIDE && hasGuide ? "guide" : ""].filter(Boolean).join(", ") || "nothing"}`);
 if (renamed.length) log("inverse fields renamed: " + renamed.join("; "));
 if (fix.length) log("fixLogs: " + JSON.stringify(fix));
@@ -252,7 +253,7 @@ log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 const S = "Hiring"; const f = n => `${S}/${n}`;
 const C = f("Candidate"), J = f("Job");
 const X = " (example)";
-const day = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+const day = n => utils.day(n);
 const cover = (text, color) => `https://placehold.co/640x360/${color.slice(1)}/FFFFFF/png?text=${encodeURIComponent(text)}`;
 const RECORDS = {
   [J]: [
@@ -317,7 +318,7 @@ const value = (db, key, v) => {
   const t = field(db, key).type, at = ([d, h]) => `${day(d)}T${h}:00.000Z`;
   if (t === "date" && typeof v === "number") return day(v);
   if (t === "date-time" && Array.isArray(v)) return at(v);
-  if (t === "date-range" && Array.isArray(v)) return {start: day(v[0]), end: day(v[1] + 1)};
+  if (t === "date-range" && Array.isArray(v)) return utils.dateRange(day(v[0]), day(v[1]));
   if (t === "date-time-range" && Array.isArray(v)) return {start: at(v[0]), end: at(v[1])};
   return v;
 };
@@ -393,13 +394,14 @@ for (const db of dbs) {
 }
 let next = 0, slow = 5000;
 while (next < writes.length && Date.now() - t0 + slow < 45000) { const batch = writes.slice(next, next + 20), s0 = Date.now(); next += batch.length; await Promise.all(batch.map(w => w())); slow = Math.max(slow, Date.now() - s0); }
-for (const c of CHECKS) {
+// A run that stopped early hasn't written every link, so its checks would name records that are fine.
+for (const c of next < writes.length ? [] : CHECKS) {
   const bad = (await rows(c.from, {n: `${sp(c.from)}/Name`, ...c.select})).filter(c.bad).map(r => r.n);
   log(`check ${c.label}: ${bad.length ? "BROKEN by " + bad.join(", ") : "holds"}`);
 }
 log("records: " + dbs.map(db => `${db} ${fresh[db].length} made, ${RECORDS[db].length - fresh[db].length} there before`).join("; "));
 log("filled: " + (Object.entries(filled).map(([k, n]) => `${n} ${k}`).join(", ") || "nothing was missing"));
-if (next < writes.length) log(`time is up with ${writes.length - next} writes left: run this script again, as it is, to finish`);
+if (next < writes.length) log(`time is up with ${writes.length - next} writes left and the checks not run: run this script again, as it is, to finish`);
 log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 ```
 
@@ -413,7 +415,7 @@ const AUTOMATIONS = () => [
   {automationType: "button", database: C, name: "Make offer", description: "Moves the candidate to Offer and notes who approved it. Press it on candidates in Interview.",
     actions: [{action: "Update", args: {fields: [{name: "workflow/state", value: stateValue(C, "Offer")}]}},
               {action: "Add comment", args: {value: tpl("A short note: an offer approved by the user who clicked the button, with today's date")}}]},
-  {automationType: "rule", database: C, name: "Interview reminder", description: "Every day at 08:00 UTC, tells the recruiters of candidates interviewing today.",
+  {automationType: "rule", database: C, name: "Interview reminder", description: "Every day at 09:00 Berlin time (08:00 UTC), tells the recruiters of candidates interviewing today.",
     triggers: [{trigger: "time-based", args: {schedule: {startingFrom: tomorrowAt(8), repeatEvery: 1, settings: {unit: "day", time: {hour: 8, minute: 0}}}}}],
     filter: and(wf(C, "is-any-of", ["Screening", "Interview"]), days("Next interview", "is", 0, false)),
     actions: [{action: "Notify Recruiter", args: {subject: tpl("The words 'Interview today:' followed by the candidate's Name"), message: tpl("A short reminder that this candidate interviews today, with the Next interview time")}}]},
@@ -440,7 +442,7 @@ const stateValue = (db, name) => ({type: "value", value: {"fibery/id": st[db][na
 const tpl = prompt => ({type: "template", prompt});
 const formula = prompt => ({type: "formula", prompt});
 const two = n => String(n).padStart(2, "0");
-const tomorrowAt = (h, m = 0) => `${new Date(Date.now() + 864e5).toISOString().slice(0, 10)}T${two(h)}:${two(m)}:00.000Z`;
+const tomorrowAt = (h, m = 0) => `${utils.day(1)}T${two(h)}:${two(m)}:00.000Z`;
 const list = AUTOMATIONS(), keys = [...new Set(list.map(a => `${a.database}|${a.automationType}`))];
 const key = a => `${a.database}|${a.automationType}|${a.name}`;
 const read = async () => {
@@ -538,5 +540,25 @@ for (const db of new Set(APP_TOUCHES.map(t => [].concat(t)[0]))) {
 }
 log("ids for the app: " + JSON.stringify(Object.fromEntries(APP_TOUCHES.map(t => [[].concat(t).join("|"), ids[[].concat(t).join("|")] || "not made yet"]))));
 log(`made: ${made.join(", ") || "nothing"}`);
+log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
+```
+
+## Removing the examples
+
+Only when the person asks ("remove the examples"), and with no other file to read. `DATABASES` holds the full names of the Space's databases, from `design.md` or `get_spaces`; `X` is the mark script 4 put on the sample records. It deletes the records whose names end with the mark and nothing else, and logs how many went and how many stayed in each database. Then tell the person in one line, with the totals, and that Fibery's Activity tab can bring them back.
+
+```js
+const DATABASES = ["Hiring/Candidate", "Hiring/Job"];
+const X = " (example)";
+
+const fails = [];
+for (const db of DATABASES) {
+  try {
+    const all = (await query({query: {"q/from": db, "q/select": {id: "fibery/id", n: `${db.split("/")[0]}/Name`}, "q/limit": "q/no-limit"}})).result;
+    const ids = all.filter(r => String(r.n || "").endsWith(X)).map(r => r.id);
+    for (let i = 0; i < ids.length; i += 100) await delete_entities({database: db, ids: ids.slice(i, i + 100)});
+    log(`${db}: ${ids.length} examples removed, ${all.length - ids.length} records kept`);
+  } catch (e) { fails.push(`${db}: ${String(e.message || e).slice(0, 200)}`); }
+}
 log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 ```

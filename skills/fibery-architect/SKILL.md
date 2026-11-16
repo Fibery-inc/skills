@@ -25,17 +25,19 @@ Paths are relative to this skill's folder. What to read, and when:
 | `references/scripts.md` | with the build guide: the scripts' templates, under the same numbers |
 | `examples/hiring-pipeline.md` | once, before writing your first design: a finished design at the depth expected |
 
-Read what the build needs before the questions, in one message: the design guide and the example, the build guide and `scripts.md`, so it starts the moment the person answers.
+Read what the build needs before the questions, in one message: the design guide and the example, the build guide and `scripts.md`, so it starts the moment the person answers. A question (§1) needs the design guide alone; the rest is read once they ask for the build.
 
 ## 1. Understand the process
 
 | The person gives you | Do this |
 |---|---|
-| An idea ("set up our hiring process") | Ask only the questions whose answers change the structure, at most three: usually the stages and the roles. If they said "just build it", ask nothing. |
+| An idea ("set up our hiring process") | Ask only the questions whose answers change the structure (§3): usually the stages and the roles. If they said "just build it", ask nothing. |
 | A request to be interviewed, or a vague idea | The design guide §1: a few questions at a time, in their words, playing the model back before you design. |
 | A process document, SOP or notes | Read it fully before asking anything; the design guide §1 table says what each part of it becomes. |
 | An existing Fibery Space (theirs or another workspace's) to copy or improve | Read it as `references/existing-space.md` describes, then design a new Space from it, copied or improved as asked; the existing Space is never changed. |
 | A Space they run, to add to or change: a process, fields, states, options, views or rules, or a part rebuilt ("add interviews to our Hiring space", "turn Status into a workflow") | An extension: `references/extend.md`, from the read to the report. Nothing in the Space changes before the person approves the list of changes. |
+| A question, not a request to build ("how should I model client onboarding in Fibery?", "what would a CRM look like for us?") | Answer in the conversation and build nothing. Read the design guide alone, and the workspace when Fibery MCP is connected (§2). Then give the model in a few lines, as the design guide's playback does: the things that become databases and what one record of each is, the stages, who does what, the view people open every morning, and what would link to databases they already have. No spec and no `design.md`. The last line offers to build it. On a yes, read the rest and go on from §3, asking only what the answer left open. |
+| "Remove the examples", in a Space this skill built | The last script in `references/scripts.md`, and no other file: it deletes the records whose names end with " (example)" in that Space's databases, and nothing else. Then one line with how many went and how many records stayed. |
 
 The names they use become database, field and state names: a team runs a Space that speaks their language and abandons one that doesn't.
 
@@ -44,6 +46,8 @@ The names they use become database, field and state names: a team runs a Space t
 Do this before asking anything: a Space that duplicates what the team already tracks is worse than no Space, and what the workspace leaves open goes into the same questions (§3). The design guide §2 says how to learn, reading only, what exists, what to **link** (the workspace's system of record for a noun: customers, employees, products), what to **create** (the nouns specific to this process), and which names are taken.
 
 New database and field names are written the way the names nearest to them are: Title Case ("Date of Birth", short words lowercase in the middle), sentence case ("Date of birth") or lowercase. Only names people gave count: not Fibery's own fields (Name, Description, State, Creation Date, Created By and the like), not names Fibery made ("Meeting collection"), and not one-word names, which show no case. A field follows the other fields of its database (an existing one's, for a link's inverse or a people field's `user/<name>`); in a new database, or one whose fields show no case, the fields of the other databases in its Space; in a new Space, those of the workspace's other Spaces. A database name follows the other database names in its Space, and in a new Space those `get_spaces` lists. With nothing to go by, or a split between two cases, Title Case. Acronyms and proper names keep theirs, and the case of this skill's examples isn't the workspace's. Note the case in the Assumptions.
+
+Language works the same way. You write to the person in the language they write in: the questions, the line while it builds, the report with its labels. The Space is in the language its team reads, which is the language of the names people gave in the workspace, or the person's when there is nothing to go by: every name, option and state, the descriptions, the guide with its title and headings, the sample records, and the texts the rules write. The English this skill shows is an example to translate ("How to run …", "Where to look", "My candidates"), with two exceptions kept as written in every Space, since they are how it is recognized later: the mark on sample records, " (example)", and the guide's last line, "Built by fibery-architect …". Note the language in the Assumptions when it isn't the person's.
 
 ## 3. Ask once
 
@@ -63,6 +67,8 @@ Save it as `design.md` in the working folder when you can write files; otherwise
 
 Follow `references/build-guide.md` in its order (an extension, `references/extend.md` §3): six `execute_code` scripts, each started from its template, and the guide's two direct calls, so a build is about ten tool calls, not a hundred. The structure comes first and the formulas second; then the views and reports, the sample records, the rules and buttons and the empty app, all at once, with the rules off so none fires on the sample data; last the guide, whose text mentions the views, with the checks that read formulas and the rules turned on. A helper writes the app's code only when the client can run one in the background, alongside the guide; otherwise you write it after the guide. The build guide's first section has the rules every script follows: above all, a script looks every id up by name, does only what's missing and logs what it found, so one that failed, was cut off or logged "time is up" runs again as it is, and a `fixLogs` line that renames a Space or database stops the build. Don't delete anything to start over unless the person asks; then delete only the new Spaces.
 
+A new build says one thing on the way. When script 1 has logged, write one line before you send script 2: the Space exists, linked with the address that log gives, and its views, examples and guide are arriving over the next minutes, so the person can open it and watch it fill. Nothing else until the report.
+
 There is no separate verification pass: the scripts check the formula types, the nested views, the stored rule texts and the sample data's promises, and the guide's last call opens the first view after the guide, once, to see the Space the way the person will; fix what looks wrong before the report. Never change a record to test an automation.
 
 ## 6. Report
@@ -75,19 +81,20 @@ A few lines for the person who will run the Space, each only when it has somethi
 >
 > **Worth a look:** the Colony portrait tab on any colony: I couldn't open it, so I haven't seen it run.
 >
-> The examples are marked "(example)".
+> The examples are marked "(example)"; say "remove the examples" when you start for real.
 
 - **Ready**, always: the Space ready in its workspace (several Spaces, each with its reason), then the guide and the first view after it, both linked; the only other links are the forms in Your turn.
 - **Your turn**: what the person sets by hand so the Space works for the team, each with where in Fibery: who may open the Space; a form to share with people outside the workspace, linked; a number or date field's minimum, maximum and default, including every default and range the design gives ("Date: today by default", "0 to 100"); a formula's number format, when it came back decimal; a Description's template, the headings a new record starts with (the build names them in the database's description, and the hero record's Description uses them). Never the Space icon, and never a failure.
 - **Not built**: a rule native actions couldn't do (build guide §5) or a part that failed, each with what's done by hand instead.
 - **Worth a look**: what the build couldn't check itself, usually the app, with why in a few words.
-- The last line says the sample records are marked "(example)".
+- The last line says the sample records are marked "(example)", and that "remove the examples" deletes them when the team starts for real (§1).
 
-Nothing else goes in: no counts, no list of views or of what the Space tracks, no assumptions, nothing about what reaches outside the Space, how the build was checked, its time or scripts, and no offers. All of it is in `design.md` for when the person asks: the Assumptions at its top, and **Build notes** at its end, written now, a line each: what was created (N databases, N fields, N formulas, N views, N reports, N automations, N documents, N apps, N sample records; the fields the build added, people fields and links in, a relation once, Name, Description, the state, comments and formulas out; the views without the documents); the scripts and minutes; each link with the field it added to its existing database, the field each people field added to every person, and any rule that writes to existing records; what was checked and what wasn't; the app considered when none was built; and any promise the sample data couldn't keep.
+Nothing else goes in: no counts, no list of views or of what the Space tracks, no assumptions, nothing about what reaches outside the Space, how the build was checked, its time or scripts, and no offers. All of it is in `design.md` for when the person asks: the Assumptions at its top, and **Build notes** at its end, written now, a line each: what was created (N databases, N fields, N formulas, N views, N reports, N automations, N documents, N apps, N sample records; the fields the build added, people fields and links in, a relation once, Name, Description, the state, comments and formulas out; the views without the documents); the scripts sent, reruns and fixes among them; each link with the field it added to its existing database, the field each people field added to every person, and any rule that writes to existing records; what was checked and what wasn't; the app considered when none was built; and any promise the sample data couldn't keep.
 
 ## Boundaries
 
 - Never change, rename or delete anything that existed before the build, except in an extension, which makes exactly the changes the person approved and deletes nothing (`references/extend.md`). A new Space's build adds exactly three kinds of things outside it, all written down in `design.md`'s Build notes: the inverse field of each link on the existing database, the `user/<name>` field of each people field on the workspace's people, and a rule that writes to records of a linked database when the team's own records change, which exists only when the person asked for one, before the build or after it. The build itself never reads existing records into sample data, writes to them, or links sample records to them.
+- The only records ever deleted are the sample data, when the person asks to remove the examples (§1): records the build made, found by their mark, never one without it.
 - Never put real people, customers, emails or record contents into sample data; sample data is invented, people are `me`.
 - No migration from other tools in this version: neither their structure (a Notion or Airtable base, a Jira project, a spreadsheet) nor their records. If that's what the person has, say so, design from their process as they describe it, and point them to Fibery's import for the records afterwards.
 - If the workspace already has a Space for this process, say so with the questions (after "just build it", in `design.md`'s Assumptions) and build alongside it (a new Space, links allowed), unless the person asks for that one to be extended.
