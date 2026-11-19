@@ -39,7 +39,7 @@ const short = n => n.split("/").pop();
 const toon = text => {
   if (typeof text !== "string") return text;
   const L = text.split("\n").filter(l => l.trim()).map(l => [l.search(/\S/), l.trim()]), H = /^("(?:[^"\\]|\\.)*"|[^:"[]*?)(?:\[#?(\d+)([\t|]?)\](?:\{(.*)\})?)?:(?: (.*))?$/;
-  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
+  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : s === "[]" ? [] : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
   const cells = (s, dl) => { const a = []; let c = "", q = false; for (let k = 0; k < s.length; k++) { if (q && s[k] === "\\") { c += s[k] + s[++k]; continue; } if (s[k] === '"') q = !q; if (s[k] === dl && !q) { a.push(val(c)); c = ""; } else c += s[k]; } return [...a, val(c)]; };
   const key = k => k[0] === '"' ? JSON.parse(k) : k;
   let i = 0;
@@ -122,7 +122,7 @@ const run = async (label, p) => { try { const r = await p; made.push(label); ret
 const toon = text => {
   if (typeof text !== "string") return text;
   const L = text.split("\n").filter(l => l.trim()).map(l => [l.search(/\S/), l.trim()]), H = /^("(?:[^"\\]|\\.)*"|[^:"[]*?)(?:\[#?(\d+)([\t|]?)\](?:\{(.*)\})?)?:(?: (.*))?$/;
-  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
+  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : s === "[]" ? [] : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
   const cells = (s, dl) => { const a = []; let c = "", q = false; for (let k = 0; k < s.length; k++) { if (q && s[k] === "\\") { c += s[k] + s[++k]; continue; } if (s[k] === '"') q = !q; if (s[k] === dl && !q) { a.push(val(c)); c = ""; } else c += s[k]; } return [...a, val(c)]; };
   const key = k => k[0] === '"' ? JSON.parse(k) : k;
   let i = 0;
@@ -166,9 +166,7 @@ log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 ```js
 const S = "Hiring"; const f = n => `${S}/${n}`;
 const C = f("Candidate"), J = f("Job");
-const STATES = [C, J];
-const OPTIONS = [[C, "Source"]];
-const VIEWS = () => [
+const VIEWS = [
   {viewType: "board", name: "Pipeline", description: "Where is every candidate?", config: {x: [stateAxis(C)], y: [], cardSize: "comfortable", items: [
     {database: C, fields: [fld("Name"), fld("Job"), fld("Days in stage"), fld("Recruiter")], colorCoding: [{color: "#D40915", filter: flag("Stuck")}, {color: "#FBA32F", filter: and(flag("Stuck", false), empty("reference", "Job"))}]}]}},
   {viewType: "list", name: "My candidates", description: "Who am I recruiting right now?", config: {items: [
@@ -181,7 +179,7 @@ const VIEWS = () => [
   {viewType: "timeline", name: "Hiring windows", description: "When should each role be filled?", config: {y: [], oneItemPerLane: false, items: [
     {database: J, fields: [fld("Name"), fld("Open seats")], startDate: f("Hiring window"), endDate: f("Hiring window"), colorCoding: byState(J, {Open: "#2978FB", Filled: "#4FAF54", Closed: "#99A2AB"})}]}},
   {viewType: "form", name: "New candidate", description: "Add someone who applied.", config: {database: C, fields: [
-    {field: f("Name"), displayName: "Name", required: true}, {field: f("Email"), required: true}, fld("Job"), {field: f("Source"), defaultValue: {id: opts[C].Source.Website}}, fld("Resume")]}}
+    {field: f("Name"), displayName: "Name", required: true}, {field: f("Email"), required: true}, fld("Job"), fld("Source"), fld("Resume")]}}
 ];
 const REPORTS = [
   {title: "Hiring numbers", database: C, filter: "only candidates that have a Job", tabs: [
@@ -191,24 +189,20 @@ const REPORTS = [
 
 const fails = [], t0 = Date.now();
 const run = async (label, p) => { try { return await p; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
-const rows = async (from, select) => (await query({query: {"q/from": from, "q/select": select, "q/limit": "q/no-limit"}})).result;
-const enumIds = async from => Object.fromEntries((await rows(from, {id: "fibery/id", n: "enum/name"})).map(r => [r.n, r.id]));
-const st = {}, opts = {};
-for (const db of STATES) st[db] = await enumIds(`workflow/state_${db}`);
-for (const [db, field] of OPTIONS) (opts[db] = opts[db] || {})[field] = await enumIds(`${db.split("/")[0]}/${field}_${db}`);
-const node = (nodeType, field, operator, value) => ({nodeType, args: value === undefined ? {fieldPath: [field], operator} : {fieldPath: [field], operator, value}});
-const fld = n => ({field: f(n)});
-const wf = (db, op, names) => node("workflow", "workflow/state", op, names.map(n => st[db][n]));
-const sel = (db, field, op, names) => node("single-select", f(field), op, names.map(n => opts[db][field][n]));
-const and = (...filters) => ({nodeType: "logical", args: {operator: "and", filters}});
-const or = (...filters) => ({nodeType: "logical", args: {operator: "or", filters}});
-const flag = (field, value = true) => node("bool", f(field), "is", value);
-const num = (field, op, value) => node("number", f(field), op, value);
-const empty = (nodeType, field, operator = "is-empty") => node(nodeType, f(field), operator);
-const mine = field => node("collection", f(field), "contains-me");
-const days = (field, op, amount, isBeforeNow, unit = "day") => node("date", f(field), op, {amount, unit, isBeforeNow});
-const stateAxis = db => ({forDatabase: db, field: "workflow/state", database: `workflow/state_${db}`, fields: []});
-const byState = (db, colors, also) => Object.entries(colors).map(([n, color]) => ({color, filter: also ? and(wf(db, "is-any-of", [n]), also) : wf(db, "is-any-of", [n])}));
+// Declarations, not arrows: the data above calls them before this line runs. A view takes state and option names.
+function node(nodeType, field, operator, value) { return {nodeType, args: value === undefined ? {fieldPath: [field], operator} : {fieldPath: [field], operator, value}}; }
+function fld(n) { return {field: f(n)}; }
+function wf(db, op, names) { return node("workflow", "workflow/state", op, names); }
+function sel(db, field, op, names) { return node("single-select", f(field), op, names); }
+function and(...filters) { return {nodeType: "logical", args: {operator: "and", filters}}; }
+function or(...filters) { return {nodeType: "logical", args: {operator: "or", filters}}; }
+function flag(field, value = true) { return node("bool", f(field), "is", value); }
+function num(field, op, value) { return node("number", f(field), op, value); }
+function empty(nodeType, field, operator = "is-empty") { return node(nodeType, f(field), operator); }
+function mine(field) { return node("collection", f(field), "contains-me"); }
+function days(field, op, amount, isBeforeNow, unit = "day") { return node("date", f(field), op, {amount, unit, isBeforeNow}); }
+function stateAxis(db) { return {forDatabase: db, field: "workflow/state", database: `workflow/state_${db}`, fields: []}; }
+function byState(db, colors, also) { return Object.entries(colors).map(([n, color]) => ({color, filter: also ? and(wf(db, "is-any-of", [n]), also) : wf(db, "is-any-of", [n])})); }
 const report = async ({title, database, filter, tabs, mode}, id) => {
   if (!id) { const r = await run(title, create_report({title, sources: [filter ? {database, filterPrompt: filter} : {database}], sourceMode: mode || "current", spaceName: S})); if (!r) return 0; id = r.id; }
   const got = ((await run(title + " not read, left as it is", get_report({reportId: id}))) || {}).result;
@@ -221,30 +215,31 @@ const report = async ({title, database, filter, tabs, mode}, id) => {
   if (done && blank) await run(title + " default tab", remove_tab({reportId: id, tabId: blank.id}));
   return done;
 };
-const views = VIEWS(), spaces = [...new Set([S, ...views.map(v => v.space).filter(Boolean)])];
+const spaces = [...new Set([S, ...VIEWS.map(v => v.space).filter(Boolean)])];
 const listed = async () => (await Promise.all(spaces.map(sp => query_views({space: sp, withConfig: false})))).flatMap(r => r.views);
-const before = await listed(), todo = views.filter(v => !before.some(x => x.name === v.name)), made = [];
+const before = await listed(), todo = VIEWS.filter(v => !before.some(x => x.name === v.name)), made = [];
 let slow = 5000;
 for (let i = 0; i < todo.length && Date.now() - t0 + slow < 45000; i += 6) { const s0 = Date.now(); made.push(...await Promise.all(todo.slice(i, i + 6).map(v => run("view " + v.name, create_view({space: S, ...v})).then(r => [v, r])))); slow = Math.max(slow, Date.now() - s0); }
 const charts = Date.now() - t0 + slow < 45000 ? await Promise.all(REPORTS.map(r => report(r, (before.find(x => x.viewType === "report" && x.name === r.title) || {}).id))) : [];
 const all = await listed();
-for (const v of views.filter(v => v.config && (v.config.items || []).some(i => i.groupBy))) {
+for (const v of VIEWS.filter(v => v.config && (v.config.items || []).some(i => i.groupBy))) {
   const x = all.find(y => y.name === v.name); if (!x) continue;
   const roots = (await query_views({id: x.id, withConfig: true})).views[0].config.items.filter((it, k) => !it.groupBy || it.groupBy.parentIndex === k).length;
   if (roots !== 1) fails.push(`view ${v.name}: ${roots} roots`);
 }
 const noisy = made.flatMap(([v, r]) => ((r && r.result && r.result.fixLogs) || []).filter(x => !/Added field title/.test(x)).map(x => `${v.name}: ${x}`));
 const left = todo.length - made.length + (charts.length ? 0 : REPORTS.length);
-log(`views: ${made.filter(([, r]) => r).length} made, ${views.length - todo.length} there before; reports: ${charts.filter(Boolean).length} of ${REPORTS.length}, ${charts.reduce((a, b) => a + b, 0)} of ${REPORTS.reduce((a, r) => a + r.tabs.length, 0)} tabs`);
+log(`views: ${made.filter(([, r]) => r).length} made, ${VIEWS.length - todo.length} there before; reports: ${charts.filter(Boolean).length} of ${REPORTS.length}, ${charts.reduce((a, b) => a + b, 0)} of ${REPORTS.reduce((a, r) => a + r.tabs.length, 0)} tabs`);
 if (left) log(`time is up with ${left} views and reports left: run this script again, as it is, to finish`);
 if (noisy.length) log("fixLogs: " + JSON.stringify(noisy));
 log("urls: " + JSON.stringify(Object.fromEntries(all.map(v => [v.name, v.url]))));
 const mentions = await Promise.all(all.map(v => run("mention " + v.name, get_entity_mention({database: "fibery/view", entityId: v.id, label: v.name})).then(r => [v.name, r && r.mention])));
 log("mentions: " + JSON.stringify(Object.fromEntries(mentions)));
 for (const d of all.filter(v => v.viewType === "document")) {
-  const secret = (await query_views({id: d.id, withConfig: true})).views[0].config.documentSecret, doc = String((await read_document({secret})).document || "");
-  const n = Number((doc.match(/rootBlockIds\[(\d+)\]/) || [])[1] || 0), first = (doc.match(/rootBlockIds\[1\]: (\S+)/) || [])[1];
-  log(`document ${d.name}: secret ${secret}, ${n === 1 && /,""|content: ""/.test(doc) ? "empty, block " + first : "has text"}`);
+  const v = (await query_views({id: d.id, withConfig: true})).views[0], secret = v.config.documentSecret;
+  // An empty document is one empty paragraph: "version: 0\n<id> paragraph parentId=null | ".
+  const block = !String(v.content || "").trim() && (String((await read_document({secret})).document || "").match(/^version: \d+\n(\S+) paragraph parentId=null \| ?$/) || [])[1];
+  log(`document ${d.name}: secret ${secret}, ${block ? "empty, block " + block : "has text"}`);
 }
 log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 ```
@@ -275,13 +270,13 @@ const CHECKS = [
 
 const fails = [], filled = {}, t0 = Date.now();
 const run = async (label, p) => { try { return await p; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
-const add = (what, n = 1) => r => { if (r) filled[what] = (filled[what] || 0) + n; return r; };
+const add = (what, n = 1) => r => { if (r && n) filled[what] = (filled[what] || 0) + n; return r; };
 const rows = async (from, select) => (await query({query: {"q/from": from, "q/select": select, "q/limit": "q/no-limit"}})).result;
 // get_spaces and get_databases answer in TOON text: read it back into the objects it encodes.
 const toon = text => {
   if (typeof text !== "string") return text;
   const L = text.split("\n").filter(l => l.trim()).map(l => [l.search(/\S/), l.trim()]), H = /^("(?:[^"\\]|\\.)*"|[^:"[]*?)(?:\[#?(\d+)([\t|]?)\](?:\{(.*)\})?)?:(?: (.*))?$/;
-  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
+  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : s === "[]" ? [] : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
   const cells = (s, dl) => { const a = []; let c = "", q = false; for (let k = 0; k < s.length; k++) { if (q && s[k] === "\\") { c += s[k] + s[++k]; continue; } if (s[k] === '"') q = !q; if (s[k] === dl && !q) { a.push(val(c)); c = ""; } else c += s[k]; } return [...a, val(c)]; };
   const key = k => k[0] === '"' ? JSON.parse(k) : k;
   let i = 0;
@@ -336,28 +331,23 @@ for (const db of dbs) for (const r of RECORDS[db]) for (const [k, v] of Object.e
   if (bad.length) { fails.push(`${r.Name} ${k}: no option ${bad.join(", ")}`); if (Array.isArray(v)) r[k] = v.filter(n => !bad.includes(n)); else delete r[k]; }
 }
 const fresh = Object.fromEntries(dbs.map(db => [db, RECORDS[db].filter(r => !ids[db][r.Name + X])]));
+// Rich text goes in with the record, as Markdown, and only then: a record that exists never gets its text again.
 await Promise.all(dbs.filter(db => fresh[db].length).map(db => run("create " + db, create_entities({database: db, entities: fresh[db].map(r => {
   const e = {[`${sp(db)}/Name`]: r.Name + X};
   for (const [k, v] of Object.entries(r)) {
     const kd = kind(db, k), F = `${sp(db)}/${k}`;
     if (kd === "value" && k !== "Name") e[F] = value(db, k, v);
-    if (kd === "select" || kd === "multi") e[F] = v;
+    if (kd === "select" || kd === "multi" || kd === "text") e[F] = v;
     if (kd === "state") e["workflow/state"] = v;
     if (kd === "person") e[F] = v === "me" ? me : v;
     if (kd === "people") e[F] = v.map(n => n === "me" ? me : n);
   }
   return e;
-})}))));
+})})).then(add("texts", fresh[db].reduce((n, r) => n + Object.keys(r).filter(k => kind(db, k) === "text").length, 0)))));
 for (const db of dbs) await byName(db);
 const lost = dbs.flatMap(db => fresh[db].filter(r => !ids[db][r.Name + X]).map(r => r.Name));
 if (lost.length) { fails.forEach(x => log("FAIL " + x)); throw new Error("not created: " + lost.join(", ")); }
 const ref = (db, key, name, who) => { const id = (ids[target(db, key)] || {})[name + X]; if (!id) fails.push(`${who}: no ${key} named ${name}`); return id; };
-// A new document holds one empty paragraph: replace it, or the text opens with a blank line.
-const fill = (who, secret, content) => run(who, read_document({secret})).then(d => {
-  const t = String((d && d.document) || ""), n = Number((t.match(/rootBlockIds\[(\d+)\]/) || [])[1] || 0), empty = n === 1 && /,""|content: ""/.test(t) && (t.match(/rootBlockIds\[1\]: (\S+)/) || [])[1];
-  if (!d || (n && !empty)) return null;
-  return run(who, empty ? replace_document_blocks({secret, blocks: [{blockId: empty, content}]}) : insert_document_blocks({secret, inserts: [{parent: {blockId: null, position: "end"}, content}]})).then(add("texts"));
-});
 const writes = [];
 for (const db of dbs) {
   const keys = [...new Set(RECORDS[db].flatMap(r => Object.keys(r)))], select = {n: `${sp(db)}/Name`};
@@ -366,7 +356,6 @@ for (const db of dbs) {
     if (kd === "state") select.state = ["workflow/state", "enum/name"];
     if (kd === "one" || kd === "person") select[`k${i}`] = [F, "fibery/id"];
     if (kd === "many" || kd === "people" || kd === "multi") select[`k${i}`] = {"q/from": F, "q/select": {id: kd === "multi" ? "enum/name" : "fibery/id"}, "q/limit": "q/no-limit"};
-    if (kd === "text") select[`k${i}`] = [F, "Collaboration~Documents/secret"];
     if (kd === "file") select[`k${i}`] = types[db][F].allowMultipleFiles ? {"q/from": F, "q/select": {id: "fibery/id"}, "q/limit": 1} : [F, "fibery/id"];
     if (kd === "comments") select.cs = {"q/from": "comments/comments", "q/select": {id: "fibery/id"}, "q/limit": 1};
   });
@@ -384,7 +373,6 @@ for (const db of dbs) {
       if (kd === "many") items(v.map(n => ref(db, k, n, who)), "links");
       if (kd === "people") items(v.map(n => n === "me" ? me : n), "people");
       if (kd === "multi") items(v, "options");
-      if (kd === "text" && got) writes.push(() => fill(who, got, v));
       if (kd === "comments" && !(has.cs || []).length) v.forEach(c => writes.push(() => run(who, add_comment({database: db, entityId: id, content: c})).then(add("comments"))));
       if (kd === "file" && !(Array.isArray(got) ? got.length : got)) [].concat(v).forEach(url => writes.push(() => run(who, add_file_from_url({database: db, field: F, entityId: id, url, fileName: r.Name + ".png"})).then(add("pictures"))));
       if (kd === "unknown" && isNew) fails.push(`${who}: no such field`);

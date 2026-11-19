@@ -5,15 +5,15 @@ When the person wants a Space they already run changed, not a new one: a process
 ## What an extension does
 
 - **Adds** databases, to the Space or to a new Space beside it for a process of its own; fields, formulas, states and options; views and reports, a chart on a database the Space already reports on being a new tab of that report (its title in `REPORTS`; script 3 adds only the tabs it lacks); rules and buttons; an app; and a guide for a new process.
-- **Changes**, each on the list the person approves: a database, field, option or state renamed; an option's or state's color, emoji, order or default; an existing view's fields, filters, sorts and colors; a formula; a rule's or button's triggers, filter and actions.
-- **Replaces a field** the team has outgrown, losing nothing: a new field beside it, its values copied, what used it (views, formulas, rules, buttons) moved to the new one, and the old one renamed "<name> (old)" for the person to delete once they've checked. That's how a status select becomes a workflow, a typed name becomes a link to the workspace's records or a person, and a select becomes a multi select.
-- **Never** deletes anything (a field, option, state, view, rule, record or database), merges two into one, changes a field's type in place, adds sample records or changes a value a record already has. It doesn't edit the team's documents, reports or apps either: the report says which of them still use an old field.
+- **Changes**, each on the list the person approves: a database, field, option or state renamed; an option's or state's color, emoji, order or default; an existing view's fields, filters, sorts and colors; a formula; a rule's or button's triggers, filter and actions; a whole number made a decimal or a date a date-time, converted in place with its values.
+- **Replaces a field** the team has outgrown, losing nothing: a new field beside it, its values copied, what used it (views, formulas, rules, buttons) moved to the new one, and the old one renamed "<name> (old)" for the person to delete once they've checked. That's how a status select becomes a workflow, a typed name a link to the workspace's records or a person, a select a multi select, and a person people (script 4x copies a person into people by user name, measured). Fibery could convert those two in place, but it makes a new field of them: views, formulas and rules lose it until written again, and a report built on it reads the field that's gone and stays broken, since an extension doesn't edit reports (measured).
+- **Never** deletes anything (a field, option, state, view, rule, record or database), merges two into one, changes a field's type in place other than a number's or a date's, adds sample records or changes a value a record already has. It doesn't edit the team's documents, reports or apps either: the report says which of them still use an old field.
 
 A process added to a Space is designed from the process, as the design guide says, its databases new and linked to the Space's own.
 
 ## 1. Read
 
-Before any question, read this file, the build guide, `scripts.md` and `existing-space.md` in one message (for a process added to the Space, the design guide too), then run the read script from `existing-space.md` on the Space, with `TOUCH` holding every field the request renames, replaces or changes the options or states of (`"workflow/state"` for the states). The list (§2) is written from the read's log: what exists and in what order, how each touched field is filled and what its values match, and what uses it, since everything that uses a replaced field moves with it. What to link outside the Space: SKILL.md §2.
+Before any question, read this file, the build guide, `scripts.md` and `existing-space.md` in one message (for a process added to the Space, the design guide too), then run the read script from `existing-space.md` on the Space, with `TOUCH` holding every field the request renames, replaces, converts or changes the options or states of (`"workflow/state"` for the states). The list (§2) is written from the read's log: what exists and in what order, how each touched field is filled and what its values match, and what uses it, since everything that uses a replaced field moves with it. What to link outside the Space: SKILL.md §2. The Space must show `architect` access in `get_spaces` (`architect+` too): with any other, say which access the change needs, architect on that Space, which its owner can give, and change nothing.
 
 ## 2. The list
 
@@ -22,9 +22,9 @@ Ask only what changes what gets built (SKILL.md §3): often nothing, since "turn
 The list is in the person's words, a line per change, in four groups, leaving out a group with nothing in it:
 
 - **Adds**: a new database, what one record is and its fields in a few words; a new field and its type; states in order; a view and the question it answers; a rule, when and what it does.
-- **Changes**: before → after.
+- **Changes**: before → after; a conversion too ("Salary: whole numbers → two decimal places").
 - **Moves**: per replaced field, the new field; how many records get a value, by value; the values that match nothing, which stay empty unless the person asks for records to be created for them; what moves to the new field; the old field's new name.
-- **What the team will notice**, each only when it applies: integrations, scripts and API calls that use a renamed database, field, option or state by name stop working, while Fibery's own views, formulas and rules follow; while a workflow is added and its values copied, a minute or so, every record shows the first state; every record a copy writes to shows as changed by the person today; records created in a database run its rules on creation, named; a people field adds a field to every person in the workspace; a new field starts empty on existing records, and a formula reading it shows its empty case until it fills; an edited view loses what the read doesn't return, a board's card size; a report, app or document still uses an old field.
+- **What the team will notice**, each only when it applies: integrations, scripts and API calls that use a renamed database, field, option or state by name stop working, while Fibery's own views, formulas and rules follow; while a workflow is added and its values copied, a minute or so, every record shows the first state; every record a copy writes to shows as changed by the person today; records created in a database run its rules on creation, named; a people field adds a field to every person in the workspace; a new field starts empty on existing records, and a formula reading it shows its empty case until it fills; an edited view loses what the read doesn't return, a board's card size; a report, app or document still uses an old field. A conversion adds its own: a decimal made whole is rounded for good; a date's values become midnight UTC (measured).
 
 Example, from the read of a Hiring Space a team built by hand:
 
@@ -63,7 +63,7 @@ Then stop: the list is the turn's last message, never a question tool's, whose d
 
 The scripts of a new build, without the sample records, and three of an extension's own: script 0 changes what exists in place, script 4x copies values and moves the rules that read them, script 3x edits views, formulas and other rules. Each message once the one before has answered; a script with nothing to do is skipped:
 
-1. **Script 0** (below): renames, then options and states added, changed, reordered or given a default. A replaced field is renamed "<name> (old)" here, which frees its name. Every name after this, in this script and the next ones, is the name after the renames; renaming a database also renames the relation fields and the views named after it (measured: Job to Role turned the view Jobs into Roles).
+1. **Script 0** (below): renames, then conversions, then options and states added, changed, reordered or given a default. A replaced field is renamed "<name> (old)" here, which frees its name. Every name after this, in this script and the next ones, is the name after the renames and conversions; renaming a database also renames the relation fields and the views named after it (measured: Job to Role turned the view Jobs into Roles).
 2. **Script 1**: what's new in the structure. `spaces` lists the Space of every database it touches: a new Space as in a new build, the existing one by `name` alone, without `color`; an existing database holds only what's new, its new `fields` and, for one without states, its `workflow`, without `color` or `description`, and the script stops when no Space or database has that name, so a misspelt one is never created. `GUIDE` is the new process's guide, or `null`. `create_spaces` calls an existing field "unchanged" even when its type differs (measured), which is why a name is freed before it's reused.
 3. **Script 2**: the new formulas.
 4. **Script 4x** (below), only for Moves, alone, and again until it logs no "time is up": the copies, then the rules and buttons that used the old fields.
@@ -72,11 +72,13 @@ The scripts of a new build, without the sample records, and three of an extensio
 
 Fixes, reruns and "time is up" work as in a new build. Nothing is deleted to start over, the build's own additions included, unless the person asks.
 
+**A conversion's repairs.** A number or date converted keeps its field, and its views, formulas and rules follow it (measured). A date made a date-time doesn't by itself keep the time, though: a rule that stamps it with today still writes midnight, and a day count reading it needs its date part (build guide §2). When the person wants the time kept, both edits go on the list under Changes (measured: the rule's value became `Now()`, the formula `ToDays(Today() - Date(Year(…), Month(…), Day(…)))`).
+
 **Edits find their target by name and change it once.** Every edit in scripts 4x and 3x has `when`, text it runs only while the stored view, formula or rule holds it, or `unless`, text it skips once held, so a second run changes nothing twice. After script 0, whatever used a replaced field names it "(old)": views and rules by the full name, formulas as `[Status (old)]`, so a move's edits all take `when: f("Status (old)")`. An edit that moves nothing takes `unless` with what it adds (`unless: f("Priority")` for a view that gains Priority).
 
 ### Script 0: what exists, changed in place
 
-The data: `RENAME_DATABASES`, `RENAME_FIELDS` (full names, the replaced fields among them) and `RENAME_OPTIONS` (an option, or a state with `field: "workflow/state"`), each `{from, to}` as `rename_databases` and `rename_fields` take it; then `STATES` and `OPTIONS`, each `{database, add, update, order, defaultOption}`, with the select's `field` for an option. `add` appends `{name, color, icon}` (a state `{name, type, color}`) at the end; `update` changes an option's color or emoji, or a state's type or color, never a name; `order` is every name in the new order; `defaultOption` is the one new records get. `STATES` names only databases that already have states: a workflow the build adds comes from script 1. A new option takes an emoji only when the select's options have them.
+The data: `RENAME_DATABASES`, `RENAME_FIELDS` (full names, the replaced fields among them) and `RENAME_OPTIONS` (an option, or a state with `field: "workflow/state"`), each `{from, to}` as `rename_databases` and `rename_fields` take it; `CONVERT`, each `{database, field}` and the target, `numberPrecision: 2` (or `0`, which rounds) or `to: "date-time"` (`"date-time-range"` from a date range), a field already of the target kind logged as there before; the same code takes `to: "multi-select"` and `cardinality: "many-to-many"`, with `as` for the name after it, which an extension leaves to a replacement (What an extension does); then `STATES` and `OPTIONS`, each `{database, add, update, order, defaultOption}`, with the select's `field` for an option. `add` appends `{name, color, icon}` (a state `{name, type, color}`) at the end; `update` changes an option's color or emoji, or a state's type or color, never a name; `order` is every name in the new order; `defaultOption` is the one new records get. `STATES` names only databases that already have states: a workflow the build adds comes from script 1. A new option takes an emoji only when the select's options have them.
 
 ```js
 const S = "Hiring"; const f = n => `${S}/${n}`;
@@ -87,6 +89,7 @@ const RENAME_FIELDS = [
   {database: C, from: f("Referred by"), to: f("Referred by (old)")}
 ];
 const RENAME_OPTIONS = [{database: C, field: f("Seniority"), from: "Mid-level", to: "Mid"}];
+const CONVERT = [{database: J, field: f("Salary"), numberPrecision: 2}, {database: C, field: f("Applied on"), to: "date-time"}];
 const STATES = [{database: J, add: [{name: "On hold", type: "Started", color: "#FBA32F"}], order: ["Open", "On hold", "Filled", "Closed"]}];
 const OPTIONS = [{database: C, field: f("Seniority"), add: [{name: "Lead", color: "#9C2BAF"}], defaultOption: "Junior"}];
 
@@ -97,7 +100,7 @@ const rows = async (from, select) => (await query({query: {"q/from": from, "q/se
 const toon = text => {
   if (typeof text !== "string") return text;
   const L = text.split("\n").filter(l => l.trim()).map(l => [l.search(/\S/), l.trim()]), H = /^("(?:[^"\\]|\\.)*"|[^:"[]*?)(?:\[#?(\d+)([\t|]?)\](?:\{(.*)\})?)?:(?: (.*))?$/;
-  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
+  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : s === "[]" ? [] : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
   const cells = (s, dl) => { const a = []; let c = "", q = false; for (let k = 0; k < s.length; k++) { if (q && s[k] === "\\") { c += s[k] + s[++k]; continue; } if (s[k] === '"') q = !q; if (s[k] === dl && !q) { a.push(val(c)); c = ""; } else c += s[k]; } return [...a, val(c)]; };
   const key = k => k[0] === '"' ? JSON.parse(k) : k;
   let i = 0;
@@ -128,7 +131,7 @@ for (const x of RENAME_DATABASES) {
   else if (exists(x.from)) await run(`database ${x.from} → ${x.to}`, rename_databases({databases: [x]}));
   else fails.push(`database ${x.from}: not found`);
 }
-const dbs = [...new Set([...RENAME_FIELDS, ...RENAME_OPTIONS, ...STATES, ...OPTIONS].map(x => x.database))];
+const dbs = [...new Set([...RENAME_FIELDS, ...RENAME_OPTIONS, ...CONVERT, ...STATES, ...OPTIONS].map(x => x.database))];
 let has = await fieldsOf(dbs);
 for (const x of RENAME_FIELDS) {
   if (has[x.database].has(x.to)) seen.push(`field ${x.to}`);
@@ -136,6 +139,17 @@ for (const x of RENAME_FIELDS) {
   else fails.push(`field ${x.from}: not found`);
 }
 has = await fieldsOf(dbs);
+const converted = (x, t) => x.cardinality ? t.cardinality === x.cardinality : "numberPrecision" in x ? t.type === "number" && !t.numberPrecision === !x.numberPrecision : t.type === x.to;
+for (const {database, field, as = field, ...to} of CONVERT) {
+  const t = has[database].get(field) || has[database].get(as), kind = to.to || to.cardinality || to.numberPrecision + " places", label = `field ${field} → ${kind}${as !== field ? ", " + as : ""}`;
+  if (!t) { fails.push(`${label}: not found`); continue; }
+  if (converted(to, t)) { seen.push(`field ${t.name} (${kind})`); continue; }
+  const r = await run(label, (to.cardinality ? convert_relation_fields : "numberPrecision" in to ? convert_number_fields : /date/.test(to.to) ? convert_date_fields : convert_select_fields)({fields: [{database, name: field, ...to}]}));
+  // A select or relation comes back as a new field Fibery may rename ("Tag" became "Tags 1", measured): `as` fixes the name, so a rerun finds it.
+  const now = r && ((r.artefacts || [])[0] || {value: {}}).value["fibery/name"];
+  if (now && now !== as) await run(`field ${now} → ${as}`, rename_fields({fields: [{database, from: now, to: as}]}));
+}
+if (CONVERT.length) has = await fieldsOf(dbs);
 const enumOf = (db, field) => field === "workflow/state" ? `workflow/state_${db}` : `${field}_${db}`;
 const tool = (db, field) => field === "workflow/state" ? update_workflow_fields : (has[db].get(field) || {}).type === "multi-select" ? update_multi_select_fields : update_single_select_fields;
 const list = async (db, field) => (await rows(enumOf(db, field), {id: "fibery/id", n: "enum/name", c: "enum/color", r: "fibery/rank", ...(field === "workflow/state" ? {t: "workflow/Type"} : {i: "enum/icon"})})).sort((a, b) => a.r - b.r);
@@ -179,7 +193,7 @@ log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
 
 The data:
 
-- `STATES` and `OPTIONS` as in script 3, for the rules' filters and values.
+- `STATES`, the databases whose states the rules use, as in script 5, and `OPTIONS`, `[database, field]` per select, for the rules' filters and values, which take ids.
 - `MOVES`, `{database, from, to}`: the old field by its "(old)" name and the new one. A value goes by the new field's kind: a state or option by name; a person by user name or email; a link by the linked record's Name; all three ignoring case and spaces at the ends; anything else as it is. `map` translates first, an object (`{"In review": "Review"}`) or a function, which may return a list (`v => v.split(",")` for a text holding several options). For a link, `create: true` creates a record for each name that matches none, only when the person asked for it. A copy writes only where the new field is empty, and a state only while the record is in the first state, the one every record got when the workflow came, so a value someone set since stays.
 - `EDIT_RULES()`: the rules and buttons that used a replaced field, each `{automationType, database, name}`, its `when`, and the `triggers`, `filter` or `actions` that change. `actions` replace the stored ones in order, and `null` keeps the stored action in its place.
 
@@ -204,7 +218,7 @@ const rows = async (from, select) => (await query({query: {"q/from": from, "q/se
 const toon = text => {
   if (typeof text !== "string") return text;
   const L = text.split("\n").filter(l => l.trim()).map(l => [l.search(/\S/), l.trim()]), H = /^("(?:[^"\\]|\\.)*"|[^:"[]*?)(?:\[#?(\d+)([\t|]?)\](?:\{(.*)\})?)?:(?: (.*))?$/;
-  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
+  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : s === "[]" ? [] : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
   const cells = (s, dl) => { const a = []; let c = "", q = false; for (let k = 0; k < s.length; k++) { if (q && s[k] === "\\") { c += s[k] + s[++k]; continue; } if (s[k] === '"') q = !q; if (s[k] === dl && !q) { a.push(val(c)); c = ""; } else c += s[k]; } return [...a, val(c)]; };
   const key = k => k[0] === '"' ? JSON.parse(k) : k;
   let i = 0;
@@ -317,7 +331,7 @@ It logs each changed rule as Fibery stored it, to read as the build guide §5 sa
 
 ### Script 3x: views, formulas and other rules edited
 
-The data: `STATES` and `OPTIONS` as in script 3; `EDIT_VIEWS()`, each view to change with its whole config rebuilt from the read with the builders, since `update_view` replaces it, so what the list doesn't change stays as the team had it, in their order; `EDIT_FORMULAS`, `{database, name, description}`, the new expression as script 2 writes one; `EDIT_RULES()`, any rule edit that moves nothing, shaped as in script 4x (`actions: [null, {action: "Notify Assignee", args: {subject, message}}]` adds a notification after the stored action). Each edit with `when` or `unless`.
+The data: `STATES`, every database whose states an edited view or rule filters on, and `OPTIONS` as in script 4x, since this script's builders still turn names into ids, which views take as well as names; `EDIT_VIEWS()`, each view to change with its whole config written again with the builders from what the read shows, its filters retyped from their descriptions (or from the build's own data when this skill built the Space), since `update_view` replaces it, so what the list doesn't change stays as the team had it, in their order (a multi-select filter is `node("multi-select", f("Sources"), "contains-any-of", ["Referral"])`, measured in a view); `EDIT_FORMULAS`, `{database, name, description}`, the new expression as script 2 writes one; `EDIT_RULES()`, any rule edit that moves nothing, shaped as in script 4x (`actions: [null, {action: "Notify Assignee", args: {subject, message}}]` adds a notification after the stored action). Each edit with `when` or `unless`.
 
 ```js
 const S = "Hiring"; const f = n => `${S}/${n}`;
@@ -342,7 +356,7 @@ const rows = async (from, select) => (await query({query: {"q/from": from, "q/se
 const toon = text => {
   if (typeof text !== "string") return text;
   const L = text.split("\n").filter(l => l.trim()).map(l => [l.search(/\S/), l.trim()]), H = /^("(?:[^"\\]|\\.)*"|[^:"[]*?)(?:\[#?(\d+)([\t|]?)\](?:\{(.*)\})?)?:(?: (.*))?$/;
-  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
+  const val = s => (s = s.trim())[0] === '"' ? JSON.parse(s) : s === "true" ? true : s === "false" ? false : s === "null" ? null : s === "[]" ? [] : /^-?(0|[1-9]\d*)(\.\d+)?(e[+-]?\d+)?$/i.test(s) ? Number(s) : s;
   const cells = (s, dl) => { const a = []; let c = "", q = false; for (let k = 0; k < s.length; k++) { if (q && s[k] === "\\") { c += s[k] + s[++k]; continue; } if (s[k] === '"') q = !q; if (s[k] === dl && !q) { a.push(val(c)); c = ""; } else c += s[k]; } return [...a, val(c)]; };
   const key = k => k[0] === '"' ? JSON.parse(k) : k;
   let i = 0;
@@ -438,7 +452,7 @@ As SKILL.md §6 says, with these differences:
 > **Not copied:** Referred by Dana (2 candidates) and Sam K (1): no user has those names, so those candidates have none.
 
 - **Ready** says the Space is extended, and links the new guide, if any, and the view to start from.
-- **Your turn** adds the "(old)" fields to delete once checked, what still uses them that the build doesn't edit, and the integrations that use a renamed name.
+- **Your turn** adds the "(old)" fields to delete once checked, what still uses them that the build doesn't edit, and the integrations that use a renamed or converted field.
 - **Not copied** lists the values that matched nothing, with how many records hold each.
 - No line about examples: an extension writes none.
 

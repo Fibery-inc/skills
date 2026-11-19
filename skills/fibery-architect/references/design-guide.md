@@ -41,7 +41,7 @@ With a question tool, the playback is written just before the last round's call,
 
 A Space that duplicates what the team already tracks is worse than no Space: a second Customer database, a second People list, a vocabulary nobody uses. Everything here only reads, and comes before the first question, so what the workspace leaves open is asked with the rest (SKILL.md §3).
 
-1. **`get_spaces`** lists every Space and database. Skim it for databases this process would otherwise duplicate (people, customers, products, projects, teams, periods); a Space for the same process already (the questions say so); test or archived Spaces, never linked to; synced databases (Intercom, GitHub), fine to link to, never changed; and the workspace's vocabulary (Customer or Account, Task or To-do, Sprint or Cycle).
+1. **`get_spaces`** lists every Space and database. Skim it for databases this process would otherwise duplicate (people, customers, products, projects, teams, periods); a Space for the same process already (the questions say so); test or archived Spaces, never linked to; synced databases (Intercom, GitHub), fine to link to, never changed; and the workspace's vocabulary (Customer or Account, Task or To-do, Sprint or Cycle). It also shows the person's `access` on every Space and database: `architect` (or `architect+`) lets them add fields there, and `owner`, `editor`, `commenter`, `viewer` and the rest don't.
 2. **`get_databases`** for the candidates, to see what they really hold: a "Contact" may be a marketing list, an "Employee" database may be the real people directory while `fibery/user` is only who has a login. Keep the exact field names of anything you'll filter or compute through. Add two or three databases from other Spaces the team works in to the same call: their fields show how the workspace writes names (SKILL.md §2).
 3. **`get_databases` for `fibery/user`**, to read the `user/...` fields already there: every people field you add creates one more, and a taken name gets numbered ("Recruiting 2"). Note the taken ones in the design.
 
@@ -49,7 +49,8 @@ A Space that duplicates what the team already tracks is worse than no Space: a s
 
 | Situation | Do this |
 |---|---|
-| The workspace has the system of record for a noun the process needs (customers, employees, products, projects, countries) | **Link** to it, asked by name in the questions with yes as the guess (SKILL.md §3). Nobody re-enters customers. |
+| The workspace has the system of record for a noun the process needs (customers, employees, products, projects, countries) | **Link** to it, asked by name in the questions with yes as the guess (SKILL.md §3). Nobody re-enters customers. A link adds its inverse field to that database, so it needs `architect` or `architect+` access there |
+| The database to link shows other access for the person | Don't offer the link. The Assumptions say an architect of its Space can add it later. |
 | The noun is specific to this process (candidate, pitch, post, ticket, audit) | **Create** it in the new Space. |
 | The existing database is close but not the same thing (a synced Intercom Contact when the team means paying customers) | Ask about it by name in the questions, with no as the guess (a new database). Don't guess a link. |
 | The existing database is a test, an archive or one you can't understand from its fields | Don't link. Note it in the Assumptions as an option. |
@@ -113,7 +114,7 @@ Each part below states its rule, what to put in and how it appears in `design.md
   | see a fact computed from other fields or linked records | formula |
 
 - A default goes after the type where every new record should start with a value ("integer, default 1", "checkbox, default on"). The build sets it; only a date that starts as today is left to the person, on Your turn.
-- A field's name says what goes in it; a description is added only where the name leaves a question: a scale or a period, what counts, or that a rule fills it. Select and workflow fields can't carry one in Fibery, so their guidance goes into the option names and the database's description.
+- A field's name says what goes in it; a description is added only where the name leaves a question: a scale or a period, what counts, or that a rule fills it. A select carries one too; the workflow can't, so the states' guidance goes into their names and the database's description.
 
 In the spec, one subsection per database:
 
