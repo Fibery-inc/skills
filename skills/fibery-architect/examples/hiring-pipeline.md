@@ -1,6 +1,6 @@
 # Design: Hiring pipeline
 
-A finished design at the depth fibery-architect aims for, the 80% Space, cut to what shows the format: the assumptions, two databases in full and the rest in one line each, the complete views table, and the sample story. The full design has 5 databases, 36 fields, 6 formulas, 7 views plus the guide, 1 report, 4 automations and 36 sample records; it builds in about 10 minutes. It sits under most ceilings because the process needs no more, and what it leaves out is in the guide's Make it yours. The workspace it was written for has a `People/Person` database; if yours doesn't, the Referrer link is dropped. Dates are relative to the build day.
+A finished design at the depth fibery-architect aims for, the 80% Space, cut to what shows the format: the assumptions, two databases in full and the rest in one line each, the complete views table, and the sample story. The full design has 5 databases, 36 fields, 6 formulas, 7 views plus the guide, 1 report, 4 automations and 36 sample records; it builds in about 5 minutes. It sits under most ceilings because the process needs no more, and what it leaves out is in the guide's Make it yours. The workspace it was written for has a `People/Person` database; if yours doesn't, the Referrer link is dropped. Dates are relative to the build day.
 
 ## Assumptions
 
