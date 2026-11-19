@@ -1,11 +1,18 @@
 # Build reference
 
-Not for the questions. Read it before `design.md` is finished when the design has one of the things SKILL.md's table lists for this file; when you repair a failure; or when a script fails or logs something the build guide doesn't explain. Section numbers (§1 to §8) are the build guide's.
+Not for the questions. Read it before `design.md` is finished when the design has one of the things SKILL.md's table lists for this file, and when a script fails or logs something `build.md` doesn't explain. Section numbers are `build.md`'s.
 
 ## Rarer shapes
 
-**Views**, each item written as the build guide §8 writes one:
+**Structure.** A database the design gives no Description: after script 1, `delete_fields({fields: [{database, name: "<Space>/Description"}]})`. An option's icon stored as a random emoji is resent with `update_single_select_fields({fields: [{database, name, update: {updateOptions: [{name, icon}]}}]})`, a multi select's with `update_multi_select_fields`. A taken inverse (a people field's lands on every person) refuses the spec: rename it ("Recruiting 2"), and note it in the Build notes.
 
+**Sample records.** A location is `{latitude, longitude, fullAddress, addressParts}`, `addressParts` never left out (`{}`), in one real city.
+
+**Views**, `create_view {viewType, name, space, description, config}`, an item `{database, fields, filter, orderBy, colorCoding}`; a sort on a range takes `dateRangeSortBy: "start"` or `"end"`:
+
+- **calendar**: `{viewType: "calendar", name: "Interviews", description: "Who interviews when?", config: {items: [{database: C, fields: [fld("Name")], startDate: f("Next interview"), endDate: f("Next interview"), filter: wf(C, "is-any-of", ["Screening", "Interview"])}]}}`.
+- **timeline**: `y` lanes as a board's axes, `oneItemPerLane: false`, an item's `startDate` and `endDate` the same range field unless the design names two: `{viewType: "timeline", name: "Hiring windows", config: {y: [], oneItemPerLane: false, items: [{database: J, fields: [fld("Name"), fld("Open seats")], startDate: f("Hiring window"), endDate: f("Hiring window"), colorCoding: byState(J, {Open: "#2978FB", Filled: "#4FAF54"})}]}}`. `byState`'s third argument adds a condition to every state's rule.
+- **board axes**: one entry per items database, `{forDatabase, field, database, fields: []}`: `stateAxis(db)`, `selAxis(db, "Severity")`, the target database for a relation, `fibery/user` for people.
 - **Nesting:** a child item has `groupBy: {parentIndex, parentField}`, the parent's to-many field that targets the child. A database nests inside itself with one item pointing at its own index through its own to-many field: `{"database": "OKRs/Objective", "groupBy": {"parentIndex": 0, "parentField": "OKRs/Supported by"}}`, with Key Result's item under index 0. Listing the database twice builds two roots, not a tree. A child item's filter hides children only: filter the parent item too when only parents with such children should show.
 - **form**: any field may be on it, people, multi selects and the Description included, each with `required: true` when the spec marks it. Defaults: a string, number, boolean or ISO date; `{id}` for a select, state or to-one, since a name is stored as raw text (measured); `[{id}]` for a to-many; `hidden: true` keeps a defaulted field off the form. Nothing makes a form public: sharing it goes on Your turn. A new record takes the select's own default (`isDefault`, script 1); a form default that differs takes its option's id: `{field: f("Source"), defaultValue: {id: REFERRAL}}`.
 - **An option or a sample record by id.** A form's default, a rule's filter or value on a select (`node("single-select", f("Source"), "is-any-of", [REFERRAL])` inside `AUTOMATIONS`), and a view's filter on one sample record (`{nodeType: "reference", args: {fieldPath: [f("Job")], operator: "is", value: [DESIGNER]}}`, since a record's name is stored wrong there) take ids, looked up in the data of script 3 or 5, above `VIEWS` or `AUTOMATIONS` (measured: the form's default, the rule's filter and the view's filter were stored with the ids):
@@ -31,13 +38,68 @@ Not for the questions. Read it before `design.md` is finished when the design ha
   }
   ```
 
-**Reports:** `add_chart_tab {reportId, title, type: "stacked-bar" | "bar" | "line", x, y, color, fieldConditions, palette}`; a horizontal bar puts the count on `x` and the category on `y`. A single number is a metric tab, `{title, metrics: [{expression: "COUNT([Id])"}]}` in the report's `tabs`, which the template adds with `add_metric_tab`; a table is `add_table_tab {reportId, title, columns, groupBy, fieldConditions}`, its columns groupings and aggregates (`[Owner]`, `QUARTER([Close date])`, `SUM([Amount])`), `groupBy` folding rows under a grouping. Expressions: `COUNT([Id])`, `SUM([Amount])`, `AVG([Score])`, a date by `YEAR`, `QUARTER`, `MONTH`, `WEEK` or `DAY` (`QUARTER([Close date])`), `AUTO([Date])`. Conditions are `{field, operator, value}`, `value` always present: a state, select, relation, text or true-or-false field takes `is in` or `is not in` with a list (`["Won"]`, `["true"]`), and `exists` or `does not exist` with `null` ("has a Close date"); a number `equals`, `greater than`, `less than`, `equals or greater than`, `equals or less than`; a date `range` (`LAST 90 DAYS`, `THIS QUARTER`, `BETWEEN 8 WEEKS AGO AND TODAY`) or `exists`. Fibery's reports guide lists the rest. A historical report (time in state, change over time) is `mode: "historical"` in `REPORTS`, its chart's conditions starting with `{field: "Modification Date", operator: "range", value: "LAST 90 DAYS"}`; there a field that isn't part of the history is named "<Field> (current value)" (`{field: "Objective active (current value)", operator: "is in", value: ["true"]}`), as `display_report_schema({databases, sourceMode: "historical"})` lists. `display_report_schema({databases: [...], sourceMode})` only when a chart is rejected.
+**Filter nodes**, `{nodeType, args: {fieldPath, operator, value}}`, no `value` for `is-empty` and `contains-me`:
+
+| nodeType | operators | value |
+|---|---|---|
+| `workflow` | `is-any-of`, `is-none-of` | state names in a view, ids in a rule |
+| `single-select` | `is-any-of`, `is-none-of`, `is-empty` | option names in a view, ids in a rule, a list even for one |
+| `multi-select` | `contains-any-of` | the same |
+| `reference` (to-one) | `is`, `is-not`, `is-empty`, `is-not-empty` | record ids |
+| `collection` (to-many) | `is-empty`, `is-not-empty`, `contains-any-of`; `contains-me` on a to-many people field | record ids |
+| `number` | `equals`, `does-not-equal`, `greater-than`, `greater-than-or-equal`, `less-than`, `less-than-or-equal`, `is-empty`, `is-not-empty` | a number |
+| `bool` | `is` | true or false |
+| `text` | `is-empty`, `contains` | a string |
+| `date` | `is`, `is-before`, `is-after`, `is-on-or-before`, `is-on-or-after`, `is-empty` | "YYYY-MM-DD", or `{amount, unit, isBeforeNow}` with all three, `unit` `minute`, `hour`, `day` or `week` |
+
+"More than 14 days ago" is `is-before` `{14, "day", true}`. A to-one person field has no "me": a "My …" view needs a people field. A range's start or end is `["q/start", "Space/Dates"]` or `["q/end", …]`, the end a day after the last; a linked record's field chains, `["Space/Pitch", "workflow/state"]`.
+
+**Rules and buttons:**
+
+- **Triggers** besides `created`, `updated` and a schedule: `{trigger: "collection-item-added", args: {changedCollectionField: "Space/Seen in"}}` (`collection-item-removed` likewise), the rule's only trigger. A weekly schedule: `settings: {unit: "week", time: {hour: 9, minute: 0}, daysOfWeek: ["monday"]}`. In the log a schedule's `freq` 2 is weekly, 3 daily, `byweekday` 0 Monday.
+- **Actions:** "Create" a record of the same database, its `fields` the new record's; "Update <Relation>" the linked records, a to-many with a `filter` on the linked database's fields (`{action: "Update For repairs", args: {filter: wf(R, "is-any-of", ["Waiting for parts"]), fields: [{name: "workflow/state", value: stateValue(R, "Queued")}]}}`, `R` in `STATES`), a to-one with `fields` only and the condition in the rule's filter; "Add <Relation> Item" through a to-many, "Add <Relation>" through a to-one, their `fields` the linked database's; "Unlink <Relation>"; "Append content to <field>"; "Send Web Request". "Notify Users" never takes a formula through linked records' people ("Ouch, we can't calculate…"), which fails the whole rule.
+- **Values:** `{type: "value", value}` with a literal, `{"fibery/id"}` for a state, option or record, or a list of those. Prompts are plain words naming fields exactly, never code.
+
+**Reports:** a source filter stored wrong is resent with `update_report({reportId, sources: [{database, filterPrompt}]})`. `add_chart_tab {reportId, title, type: "stacked-bar" | "bar" | "line", x, y, color, fieldConditions, palette}`; a horizontal bar puts the count on `x` and the category on `y`. A single number is a metric tab, `{title, metrics: [{expression: "COUNT([Id])"}]}` in the report's `tabs`, which the template adds with `add_metric_tab`; a table is `add_table_tab {reportId, title, columns, groupBy, fieldConditions}`, its columns groupings and aggregates (`[Owner]`, `QUARTER([Close date])`, `SUM([Amount])`), `groupBy` folding rows under a grouping. Expressions: `COUNT([Id])`, `SUM([Amount])`, `AVG([Score])`, a date by `YEAR`, `QUARTER`, `MONTH`, `WEEK` or `DAY` (`QUARTER([Close date])`), `AUTO([Date])`. Conditions are `{field, operator, value}`, `value` always present: a state, select, relation, text or true-or-false field takes `is in` or `is not in` with a list (`["Won"]`, `["true"]`), and `exists` or `does not exist` with `null` ("has a Close date"); a number `equals`, `greater than`, `less than`, `equals or greater than`, `equals or less than`; a date `range` (`LAST 90 DAYS`, `THIS QUARTER`, `BETWEEN 8 WEEKS AGO AND TODAY`) or `exists`. Fibery's reports guide lists the rest. A historical report (time in state, change over time) is `mode: "historical"` in `REPORTS`, its chart's conditions starting with `{field: "Modification Date", operator: "range", value: "LAST 90 DAYS"}`; there a field that isn't part of the history is named "<Field> (current value)" (`{field: "Objective active (current value)", operator: "is in", value: ["true"]}`), as `display_report_schema({databases, sourceMode: "historical"})` lists. `display_report_schema({databases: [...], sourceMode})` only when a chart is rejected.
+
+**Checks** (§6): decimals come back as strings (`utils.number`); a single file as a path; a collection is a sub-query on the field's full name (`comments/comments` too): `{label: "Hired with no skills", from: C, select: {state: ["workflow/state", "enum/name"], skills: {"q/from": f("Skills"), "q/select": {n: "enum/name"}, "q/limit": "q/no-limit"}}, bad: r => r.state === "Hired" && !r.skills.length}`.
 
 ## The app
 
 The spec describes the app and never contains its code: the code is written now, from the spec's "how it works" and the built Space's real names and ids. `get_fibery_skill({skill: "custom-apps-dev"})`, a direct call, never in a script, is the source of truth for the stack, the `@/lib/fibery` API, theming, the files you may change, the token (`create_custom_app_dev_token({appId})`, from a one-line script or directly) and the download and upload requests; the three rules below are this build's own and stand. The download and upload need the web, which `execute_code` has no access to: this runs in Bash.
 
-The app script, `scripts.md` §7, comes first, in the message with scripts 3 and 5: `APPS`, `{name, kind: "view", spaceName}` for a page in the Space (without `spaceName` it lands in the private space) or `{name, kind: "layout", databaseName}` for a tab on every record page, and `APP_TOUCHES`, the databases (`C`) and fields (`[C, f("Days in stage")]`, `[C, "workflow/state"]`) its code uses. It makes the empty app and logs its id, a page app's url and mention, and those ids.
+The app script, below, comes first, in the message with scripts 3 and 5: `APPS`, `{name, kind: "view", spaceName}` for a page in the Space (without `spaceName` it lands in the private space) or `{name, kind: "layout", databaseName}` for a tab on every record page, and `APP_TOUCHES`, the databases (`C`) and fields (`[C, f("Days in stage")]`, `[C, "workflow/state"]`) its code uses. It makes the empty app and logs its id, a page app's url and mention, and those ids. A layout app is named in the guide as a tab on its database's records.
+
+```js
+const S = "Hiring"; const f = n => `${S}/${n}`;
+const C = f("Candidate");
+const APPS = [{name: "Offer desk", kind: "view", spaceName: S}];
+const APP_TOUCHES = [C, [C, "workflow/state"], [C, f("Stage changed on")], [C, f("Days in stage")]];
+
+const fails = [], made = [];
+const run = async (label, p) => { try { const r = await p; made.push(label); return r; } catch (e) { fails.push(`${label}: ${String(e.message || e).slice(0, 200)}`); return null; } };
+const appViews = async () => (await query_views({space: S, withConfig: false})).views.filter(v => v.viewType === "custom-app");
+const viewsBefore = await appViews(), appsBefore = (await get_custom_apps_list({})).result;
+for (const a of APPS.filter(a => a.kind === "view" ? !viewsBefore.some(v => v.name === a.name) : !appsBefore.some(x => x.name === a.name && x.databaseName === a.databaseName))) await run("app " + a.name, create_custom_app(a));
+// A custom app id is a UUIDv7: its first 48 bits are when it was created, just before its view.
+const time = id => parseInt(id.replace(/-/g, "").slice(0, 12), 16);
+const appsNow = (await get_custom_apps_list({})).result, viewsNow = await appViews();
+for (const a of APPS) {
+  const view = viewsNow.find(v => v.name === a.name), at = view ? Date.parse(view.creationDate) + 5000 : Infinity;
+  const app = (a.kind === "layout" || view) && appsNow.filter(x => x.name === a.name && x.kind === a.kind && (a.kind === "view" || x.databaseName === a.databaseName) && time(x.id) <= at).sort((p, q) => time(q.id) - time(p.id))[0];
+  const mention = view && await get_entity_mention({database: "fibery/view", entityId: view.id, label: a.name}).then(r => r.mention, e => "failed: " + e.message);
+  log(`app ${a.name}: ${app ? "id " + app.id : "not made yet"}${view ? `, ${view.url}, mention ${mention}` : ""}`);
+}
+const ids = {};
+for (const db of new Set(APP_TOUCHES.map(t => [].concat(t)[0]))) {
+  const t = (await query({query: {"q/from": "fibery/type", "q/select": {id: "fibery/id"}, "q/where": ["=", ["fibery/name"], db], "q/limit": 1}})).result[0];
+  if (t) ids[db] = t.id;
+  for (const r of (await query({query: {"q/from": "fibery/field", "q/select": {id: "fibery/id", n: "fibery/name"}, "q/where": ["=", ["fibery/holder-type", "fibery/name"], db], "q/limit": "q/no-limit"}})).result) ids[`${db}|${r.n}`] = r.id;
+}
+log("ids for the app: " + JSON.stringify(Object.fromEntries(APP_TOUCHES.map(t => [[].concat(t).join("|"), ids[[].concat(t).join("|")] || "not made yet"]))));
+log(`made: ${made.join(", ") || "nothing"}`);
+log(`failed ${fails.length}`); fails.forEach(x => log("FAIL " + x));
+```
 
 When your Agent tool can run a helper in the background, a helper of your own model then writes the app with this brief, started in a message of its own as soon as the app script has logged, while you go on to the guide. Otherwise you write it yourself after the guide: a helper call that waits holds up everything sent after it (measured in Cowork).
 
@@ -87,19 +149,7 @@ For repairs and calls beyond the templates:
 | Script 1 logs things "there before" on a new build | A Space of the design's name exists. Stop and tell the person the name is taken; with their word, the design takes a free one ("Hiring 2"), and script 1 goes again with it. |
 | A report keeps only its "Chart" tab | Every tab was rejected: fix the tabs' conditions (Reports, above), add them with `add_chart_tab` (or the metric or table call), then `remove_tab` the default one. |
 | `FAIL <database>` in script 4 | A name, state or option Fibery doesn't have, or a value of the wrong shape, failed that database's whole step, and the links to it with it: fix the data and send script 4 again with only the records not made. |
-| `Invalid input` on `query`'s `q/select` | A collection selected as a path, or a sub-query whose `q/from` is a list: §4. |
-| A view is rejected | Every state and option name in its filters must be spelled as stored, case included ("Value "high" is not a valid option id or name", with the valid ones listed), every record id must be real, and each node type must match its field (build guide §8); a nested item through a to-one is rejected too. "Unable to find axis config for …": every database in `items` needs its own `x` (and `y`) entry. |
+| `Invalid input` on `query`'s `q/select` | A collection selected as a path, or a sub-query whose `q/from` is a list: §6. |
+| A view is rejected | Every state and option name in its filters must be spelled as stored, case included ("Value "high" is not a valid option id or name", with the valid ones listed), every record id must be real, and each node type must match its field (Filter nodes, above); a nested item through a to-one is rejected too. "Unable to find axis config for …": every database in `items` needs its own `x` (and `y`) entry. |
 | A formula is rejected or comes back wrong | §2: a sharper description, or the exact expression. A wrong type means delete and recreate, and a recreated field is a new one: every view and report that used it is built again. |
 | An automation is rejected | A state or select value: the id, from `STATES` or `optionId`, not the name. An action that "doesn't exist": the error lists the ones there are, and `display_automations_schema` for that database gives their arguments. A formula value rejected or broken: §5. |
-
-An extension's scripts (`extend-scripts.md`, and scripts 0, 4x and 3x in `extend.md`) read what exists and do only what's missing, so they log what a new build's don't:
-
-| What happened | What to do |
-|---|---|
-| "time is up … run this script again" | Not a failure: the script stopped before Fibery's cut-off. Send it again at once, as it is, alone in its message. |
-| "connection lost" with no logs | Wait half a minute and send the same script again, alone in its message; it does only what's missing. |
-| "STOP, a Space with this name holds other databases" | The name is taken by a Space this build didn't make. Choose a free one, update the design and run script 1 again; nothing was created. |
-| "STOP, create_spaces: Nothing was changed. Fix these and call again" | Nothing was made: fix the data as each line says and run script 1 again. Another message after "STOP, create_spaces" is a call that failed: run script 1 again as it is. |
-| "STOP, nothing to extend named …" | A Space without `color` or a database without `description` is one to extend, and none has that name: a misspelt name, or a new one missing its `color` or `description`. Fix the data and run script 1 again; nothing was created. |
-| "Last tab cannot be deleted" | Every tab of a report was rejected: fix the tabs' conditions and run script 3 again; it adds the missing tabs, then removes the default one. |
-| "<Report> not read, left as it is" | Fibery didn't return that report, so script 3 changed nothing in it: run script 3 again. |
