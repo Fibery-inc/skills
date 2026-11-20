@@ -1,67 +1,100 @@
 ---
 name: "fibery-health"
-description: 'Check the health of a Fibery workspace or space. By default it reviews the structure: copied, test and empty spaces, databases and fields; missing descriptions; status kept in plain selects; wrongly typed workflow states, messy select options; formulas Fibery disabled or fixed to a date; text fields that should be relations; people lists that duplicate workspace users or leave access to people who left; failing, silent or never-run automations. On request it also checks the data: unused fields, missing links, text that should be a select, dormant databases, demo data. Returns a short ranked report with exact numbers and links, then applies only the safe fixes the person approves. Use whenever someone wants to health-check, audit, clean up or declutter a workspace or space, asks what is broken, stale, unused or badly modeled, wants to find unused fields or broken automations, or is preparing Fibery for Claude or other AI agents, even if they never say "health". Not for designing new spaces (fibery-architect).'
-compatibility: 'Needs the Fibery MCP server with its execute_code tool: the evidence comes from one script. It sees only what the running user can see, so run it as a workspace admin for full coverage. Applying fixes needs Creator or Admin rights.'
+description: 'Check the health of a Fibery workspace or Space: how it is built (copied, test and empty Spaces and databases, missing descriptions, status kept in selects, wrong state types, twin select options, formulas Fibery switched off or fixed to a date, text that should be a relation, people lists and accounts of people who left, failing or silent automations) and, on request, how its records fill their fields. Returns a short ranked report with exact numbers and links, then applies only the safe fixes the person approves. Use whenever someone wants to health-check, audit, clean up or declutter a workspace or Space, asks what is broken, stale, unused or badly modeled, or is preparing Fibery for AI agents. Not for designing new Spaces (fibery-architect).'
+compatibility: 'Needs the Fibery MCP server; its execute_code tool gives the exact counts. It sees only what the running user can see, so run it as a workspace admin for full coverage.'
 ---
 
 # Fibery health check
 
-Two passes, like a car inspection. The **structure pass** is the walk-around every check gets: how the workspace is built and wired, from the schema and the automations. The **data pass** puts chosen spaces on the lift, only when the person asks: how the records actually fill their fields and links. One script gathers the evidence, in one call for most workspaces; you judge it and hand back a short, ranked list with evidence.
-
-## What you need
-
-- **Fibery MCP with `execute_code`.** The evidence comes from the script in `references/scripts.md`. If the connected server has no `execute_code`, say that this check needs it and stop.
-- **Only `execute_code` until the report.** Every other tool runs inside the script, where it needs no loading. In a client that loads tools on demand, load `execute_code` alone; a fix loads what it needs later.
+Two passes. The **structure pass** is what every check gets: how the workspace is built and wired, from the schema and the automations. The **data pass** runs only when the person asks (a full or deep check, or a question about records): how the records fill their fields and links. You gather the evidence with Fibery MCP's own tools, in a few short scripts you write; this page says what to look for and how to read what Fibery won't show you otherwise.
 
 ## Ground rules
 
-- **Read-only until a yes**, a yes covers one batch, and records are never deleted.
-- **Evidence**: an exact number and a link in every finding. Links come only from the script's output, which carries the `url` of every Space, database, record and automation it mentions.
-- **At most five top fixes**; one line each for the rest.
-- **Say what you couldn't see.**
+- Read-only until a yes; a yes covers one batch; records are never deleted.
+- Every finding has an exact number and a link. Links come from Fibery, never built by hand: `display_schema_capabilities` gives the `url` of every Space and database, and every query row and every rule carries its own. A link is a `url`, never the `[[…]]` mention text `get_spaces` shows, and a finding about a field links its database.
+- At most five top fixes; one line each for the rest.
+- Say what you couldn't see.
 
-## 1. Passes and scope
+## The flow
 
-Decide from the request, before any call:
+1. **Scope.** The Spaces the person names, else the whole workspace; copies of a Space in scope are reported wherever they are. Over about 40 databases, start with the overview below.
+2. **Evidence**, in a few `execute_code` scripts you write, each reading every database in scope and logging compact lines (inside a script every Fibery tool is a function of the same name; a script is killed at 55 s). Who runs the check, for the report's first line, from `get_me`. The schema from `get_databases`: fields, types, descriptions, formulas, states with their types, select options, relations. The records and the rest as "How to read it" says. The rules from `query_automations`, one database and one type (`rule`, `button`) a call. Where tools load on demand, load `execute_code`, `get_spaces`, `get_databases` and `query_automations` in one search; the others are functions inside a script. Don't read the same thing twice.
+3. **If a script is refused** or `execute_code` is missing, go on with direct reads (`get_spaces`, `get_databases`, `query_automations`) and list under Not checked what needed the script.
+4. **Classify** each database, then judge it by the checks below.
+5. **Report**, then offer the safe fixes.
 
-- **Structure** is the default: a request to health-check, audit, clean up or review a workspace or space gets the structure pass, automations included. It covers the whole workspace unless the person names spaces; copies of an in-scope space are reported wherever they are.
-- **A big workspace starts with an overview.** For the whole workspace, first count its databases with one short `execute_code`: `const c = await display_schema_capabilities({}), s = Object.keys(c.accessInfo.spaces), a = (await display_schema_capabilities({spaces: s})).accessInfo; log(Object.keys(a.databases).filter(d => s.includes(d.slice(0, d.indexOf("/")))).length + " databases");`. Over about 40, a full check would take many runs: follow `references/overview.md` instead, one line per Space, and the Spaces the person then picks are the scope for everything else, the question they asked included.
-- **Data** runs only when the person asks for it: the data pass by name, a full or deep check, or a question about records (unused fields, missing links, whether records can be trusted). A full check runs both. Scope: the spaces the person names; otherwise every database when there are about 30 or fewer. With more and no space named, the structure pass or the overview comes first, then propose 3–5 spaces and ask once.
-- A question about one area (broken automations, missing descriptions, unused fields) gets just that area's checks, from the same script.
-- With more than one Fibery connector and no workspace named, ask which one.
+## A big workspace starts with an overview
 
-## 2. Gather the facts: one script
+- One line per Space, from counts and the schema only: databases, records, newest record, how many databases are described. Active has a new record in the last 30 days, quiet in the last 6 months, dormant none for longer.
+- Synced Spaces (named after an app, or half or more of their databases read-only) are listed apart: never a duplicate, never suggested for a full check. A test copy that still syncs is Tidy-up, Important when it holds tens of thousands of records.
+- A dormant Space gets one line: archive it or delete it?
+- Worth a look per Space, without severity: databases without a description, leftover names, empty databases, formulas switched off or fixed to a date, mixed alphabets.
+- Across the workspace: copied Spaces, same-name databases, people fields that come from dormant or copied Spaces, empty Spaces, the share of databases described.
+- Suggest three to five active Spaces for a full check, the biggest and most flagged first; never a synced one or a store a script fills (millions of records in a few databases). Ask once which to check, and whether with the data pass.
 
-Tell the person in one line what you'll check ("the structure and data of Mushroom Farm"). Then send the script in `references/scripts.md`, copied whole with only its first line changed: the spaces in scope, and `DATA = true` for the data pass. It reads, for every database in scope, its records, creation and fields with how often each is filled, formulas Fibery disabled or fixed to a date, states and select options with their counts, people lists against their users' accounts, and its rules and buttons with their last run, trigger, filter and actions; with `DATA`, more records and the links they're missing; across the workspace, same-named databases and copies, the fields on every user and spaces without databases.
+## Classify first
 
-It stops starting new work after 35 seconds or about 32,000 characters of output. When its last line says "run this script again", send the same script with the `SKIP` it gives: the rerun prints only what's left. A `failed` count above zero is a coverage gap: name what it couldn't read.
+- **Integration mirror**, when two of these hold: every field read-only; a "Deleted in …" field; records created by no one; a Space named after an app (Jira, Intercom, Slack, HubSpot, GitHub); a description that mentions syncing. Never change one or call it a duplicate; suggest relating it to the real database. Its automations are still checked; the data pass skips it.
+- **Archive**: a Space called Archive, Old or Legacy. Only ask whether it can go.
+- **Demo or test**: most records titled "(example)", every record of the Space created in the same minute, or a Space name that says demo, test or sandbox. One line per Space: keep it or delete it. Its automations are still checked; the data pass skips it.
+- **Regular**: everything else.
 
-`references/scripts.md` explains every key it logs. Don't query again what the facts already say; for one number they don't settle, send a short `execute_code` with that one `query`.
+## Structure checks
 
-## 3. Classify each database first
+Severity: **Critical** splits, hides or breaks data now; **Important** misleads people and agents or lets work rot; **Tidy-up** is clutter.
 
-From the facts:
+- **Copied Spaces**: another Space sharing most database names and fields with one in scope. Critical when both hold real records still being added to; else Tidy-up.
+- **Empty Spaces**: no databases, no views or documents. Tidy-up.
+- **Same concept twice**: regular databases with the same singular name in different Spaces and overlapping fields. Important. Generic names (Task, Note) serving different processes are fine, and so are two with no field in common.
+- **No description** on a database: agents read it first. Important for databases with relations, Tidy-up for lookup lists. The share described is the agent-readiness score; draft the missing ones.
+- **Leftovers**: names with v1, old, copy, test, temp, backup, a date or a trailing number beside the same name without it. Names in an integration's Space come from the app: skip them. Tidy-up. **Empty** leftover or unrelated databases: Tidy-up.
+- **Isolated or wide**: no relation where the name says it should connect (a Vacation whose Person is text), or more than about 60 fields of its own. A small reference list needs no relations. Tidy-up.
+- **Test fields**: the same markers in field names. Tidy-up.
+- **Text that should be a relation**: a text field named like a database or person whose values match that database's titles or user names, or that copies a field of a linked record (an order's Contact holding its customer's email). Important. A people list's own name and email match users by design: that is evidence for People lists, not for this check.
+- **Formulas switched off**: Fibery stopped calculating them, usually for a loop, so their values froze. Important when a formula, rule or view still reads one; otherwise a dead field: Tidy-up.
+- **Formulas fixed to a date**: a literal year or date inside. Read the expression and say which way it goes wrong and since when. Some are moved on by hand each period on purpose (a payroll month): then say what to edit and when. Important when people act on the result.
+- **Mixed alphabets**: a name mixing Latin with Cyrillic or Greek letters looks right but can't be found by typing it. Check names by code point. Tidy-up.
+- **Status in a select**: a database of work without a workflow whose select reads like a lifecycle (New, In progress, Done). Important. Ratings, priorities and two-value flags aren't status.
+- **Wrong state types**: done-like states (Done, Closed, Shipped, Cancelled) not Finished; states before work starts typed Started. Important; Tidy-up while no record is in the state. A parking state (Backlog, On hold) typed Started is a question, not a finding.
+- **Unused workflow**: every record of a database in one state. Ask whether it is parked.
+- **Select options**: two options whose names differ only by case, spacing or a plural split one value: Important when both hold records. When their icons differ they may mean different things (women's and men's sizes): suggest names that say so, not a merge. Unused options: Tidy-up, never on a scale.
+- **Names that contradict direction**: a plural name on a to-one relation, unless it is the target's own name. Important.
+- **Links into an archive or demo**: a regular database's relation into an Archive or demo Space. Either the archive is still in use or the field is clutter on every record. Tidy-up.
+- **People lists**: a database of people with emails or roles and no user field, while other fields point at workspace users. Important, unless kept on purpose for people without logins.
+- **People and their accounts**: on a people list whose person field links each person to their user. People in a final state (Left) whose user is still active can still sign in: Important. Current people with no user linked: Tidy-up, unless work should reach them.
+- **People-field clutter**: every people field adds a field to each user. Count the ones that come from copied, demo and retired Spaces. Tidy-up.
+- **Automations**: an enabled rule whose last run failed, Critical. A failed run has no error text: the likely cause is a field that no longer exists or, for another app's action, an account you can't see; otherwise say it is unconfirmed. A rule that never ran and is over 30 days old, Important. A scheduled rule proves nothing by an old last run, so count the records matching its filter now. Disabled rules are listed with a question; one whose last run failed was probably switched off because it broke. Read each message against the rule's trigger and filter: a text that contradicts them, a month or year typed into a text meant to repeat, a field or option that no longer exists, a Script action that is still Fibery's sample. Tidy-up, Important when people act on the wrong text. Another app's action sent through an account you can't see was connected by someone else, and only they can repair it: not a finding alone.
 
-- **Integration mirror**, when two hold: `readOnly` (every field read-only); a "Deleted in …" field (`deletedIn`); records created by no one (`by` shows `null`, which forms and the API also leave); a Space named after an app or service (Jira, Intercom, Slack, HubSpot, Zendesk, GitHub, Email, Discourse and the like); a description that mentions syncing. Never change one or call it a duplicate; suggest relating it to the canonical database. Its automations are checked; the data pass skips it.
-- **Archive**: a space called Archive, Old or Legacy. Only ask whether it can go.
-- **Demo or test**: most records in its space's main database are titled "(example)" (fibery-architect's sample data), all of the space's records were created within the same minute (every database's `made` shows that one minute), or the space name says demo, test or sandbox. One Tidy-up line per space: keep it or delete it. Its automations are still checked, since they notify real people; the data pass skips its records.
-- **Regular**: everything else, checked fully.
+## Data checks, on request
 
-## 4. The passes
+Under about 20 records give counts ("5 of 7"), not percentages. A number from a sample says so.
 
-- **Structure** (default): the checks in `references/structure.md`, over the facts and the `automation` lines.
-- **Data** (on request): the checks in `references/data.md`, over the facts the script gathered with `DATA = true`.
+- **Unused fields**: filled in 5% of records or fewer. Skip formulas, fields added this month, the Description and opt-in flags. A relation is in use when its other side is. Tidy-up.
+- **Retired fields**: filled in older records, empty on the newest: people stopped using it. Not when the field fills late in a record's life, was added recently, or is a collection whose other side still links new records. Name what still reads it: Important when a formula or rule people rely on does, since its results go stale.
+- **Missing links**: a to-one relation or person field empty in some records. Judge by state: open records without it matter (Important), finished ones don't, and some records don't need it (an idea without a campaign). A child whose parent has the value is covered only where the formulas and views reading the field look at the parent too. A person who is deactivated is as good as empty.
+- **Text that repeats a few values**: at most 15 distinct values, filled in a third of the records or more, should be a select. Tidy-up.
+- **Dormant**: no new record for 6 months in a database meant to keep getting them. Reference lists and people lists pause by nature.
 
-Severity everywhere: **Critical** splits, hides or breaks data now; **Important** misleads people and agents or lets work rot; **Tidy-up** is clutter.
+## How to read it
 
-## 5. Report
+- **Every Space and database, with links**: `display_schema_capabilities({})` gives `accessInfo.spaces`, and with `{spaces: [names]}` it gives `accessInfo.databases`, each entry with its `url` and your access. Take names from there, not from parsing a text listing.
+- **Records**: one paged query per database (`"q/limit": 1000` with `"q/offset"`, ordered by `fibery/creation-date`), selecting the creation date, the state as `["workflow/state", "enum/name"]`, each to-one as `["Space/Field", "fibery/id"]`, each select as `["Space/Field", "enum/name"]`, checkboxes and plain values as `["Space/Field"]`, and each to-many as `["q/count", ["Space/Field", "fibery/id"]]`; then tally in the script. 5,883 records in four databases, about 30 fields on the largest, took 3 s. Over about 20,000 records read the newest 1,000 and settle each number that matters with a count.
+- **A count** is `{"q/from": "Space/Database", "q/select": ["q/count", "fibery/id"], "q/where": …}`. It stands alone as the whole select: beside other fields, only a to-many count works. Never count empty values with `["=", [...], true]` inside a count: it returns the database total. Count the filled ones and subtract: text `["=", ["q/null-or-empty?", ["Space/Field"]], false]`; number or date `["=", ["q/null?", ["Space/Field"]], false]`; relation or select `["=", ["q/null?", ["Space/Field", "fibery/id"]], false]`. Unfinished records: `["=", ["workflow/state", "workflow/Final"], false]`; two conditions go in `["q/and", a, b]`.
+- **States with their counts**, without reading records: `{"q/from": "workflow/state_Space/Database", "q/select": {name: "enum/name", type: "workflow/Type", final: "workflow/Final", n: ["q/count", ["workflow/objects", "fibery/id"]]}}`.
+- **Fibery's field table** shows what `get_databases` doesn't: `{"q/from": "fibery/field", "q/select": {name: "fibery/name", meta: "fibery/meta", made: "fibery/creation-date", db: ["fibery/holder-type", "fibery/name"]}, "q/where": ["q/in", ["fibery/holder-type", "fibery/name"], [database names]], "q/limit": "q/no-limit"}`. In `meta`: `formula/disabled?` with `formula/disable-reason` (`loop-detected`) marks a formula Fibery switched off; `formula/formula` holds the formula with its literal values under `params`, where a year or date shows; `fibery/readonly?` marks an integration's fields. `made` is when the field was added (old fields have none). A name ending in `_deleted` is a deleted field.
+- **A deactivated user** on a person field: `["=", ["Space/Owner", "fibery/active?"], false]`.
+- **Who created the records**: `["fibery/created-by", "user/name"]`; `null` means no person: an integration, a form or the API.
+- **The other side of a relation** (`get_databases` names it as `relatedField`): count the records there that link back, and read the creation date of the newest one that does. That tells a collection in use from a retired one.
+- **Rules**: a filter and its values name states and options by id; match them to names from `get_databases`. `get_connected_app_accounts({})` lists the app accounts you can see; an action whose `appAccountId` isn't among them goes through someone else's. Fibery's sample script contains `'Field Name': newValue` and saves an empty update.
+
+## Report
 
 ```markdown
 # Health check: <workspace>, <scope>, <date>
-Run as <name> (<role>). <N> spaces, <N> databases (<N> regular, <N> integration, <N> demo or test), <N> records.
+Run as <name> (<role>). <N> Spaces, <N> databases, <N> records.
 
 ## Summary
-Three to five sentences: overall state, the fixes that matter most, any coverage caveat.
+Three to five sentences.
 
 ## Scorecard
 Rows only for the passes that ran.
@@ -75,25 +108,24 @@ Rows only for the passes that ran.
 1. <Finding with number and link>: why it matters. Fix. (I can do this / Needs you)
 
 ## All findings
-By area, one line each. Questions for the person (does a parking state mean paused, is a database parked) go last, under To confirm, outside the scorecard.
+By area, one line each, with its severity. Questions for the person go last.
 
 ## Agent readiness
-<X> of <Y> regular databases described. Drafts for the important rest (what one record is, its key relations, what not to confuse it with) for an admin to paste: the MCP can't write descriptions yet.
+<X> of <Y> databases described, with drafts for the rest.
 
 ## Not checked
-The pass not run; spaces the person can't read; fields the script couldn't read; formula results; stuck, overdue or duplicate records and deletions; permissions, view usage, field descriptions, automation runs before the last one.
 ```
 
-A number from a sample keeps "of the newest 1,000" wherever it appears, and the summary says what the findings say. An overview has its own report, in `references/overview.md`. Summary, scorecard and top fixes go in chat; offer to save the full report as a document in the person's Private space (load `get_fibery_skill` with `documents` first). After a structure-only check, offer the data pass in one line, naming the spaces you'd check.
+Summary, scorecard and top fixes go in chat; offer to save the full report as a document in the person's Private space. After a structure-only check, offer the data pass in one line, naming the Spaces you'd check.
 
-## 6. Safe fixes
+## Safe fixes
 
-The person names the findings. Per batch: restate the change, the records it touches and its undo; wait for a yes; apply; re-run the script for that space; report before and after.
+The person names the findings. Per batch: restate the change, the records it touches and its undo; wait for a yes; apply; read back and report before and after.
 
-- **State types**: `update_workflow_fields` with `fields: [{"database": "...", "update": {"updateOptions": [{"name": "...", "type": "Not started" | "Started" | "Finished"}]}}]`, every database in one call. A parking state only after the person confirms it means paused. Undo: the old type.
-- **Delete** an empty database or space, or an unused or test field (show its filled count and a few values first): only when no formula, automation or view uses it (formulas in `get_databases`, automations in the `automation` lines and, for a relation, in the database it points to, views in `query_views`), and never on an integration mirror. A relation field goes from both sides. Undo: the Activity Log.
-- **Disable a rule**: `update_automation` with `enabled: false`. Undo: enable it.
-- **Triage view** for judgment calls (records missing a link): a grid named "Health: <finding>", filtered to exactly those records, most important first. Load `get_fibery_skill` with `views` first. Undo: delete the view.
-- **Descriptions**: drafted in the report.
+- **State types.** A parking state only after the person confirms it means paused. Undo: the old type.
+- **Delete** an empty database or Space, or an unused or test field: show its filled count and a few values first; only when no formula, rule or view uses it; never on an integration mirror; a relation goes from both sides. Undo: the Activity Log.
+- **Switch a failing rule off.** Undo: switch it on.
+- **Write a drafted description.** Undo: the old text.
+- **A triage view** named "Health: <finding>", filtered to exactly those records. Undo: delete the view.
 
-Plans only, never applied here: renames (integrations, scripts and API calls using the old name break), merging copies, merging or removing select options, turning a status select into a workflow, replacing text with a relation, retiring a people list, deactivating users, repairing automations or formulas, deleting a demo space with records. When the person wants a plan's rename, conversion (a status select into a workflow, text into a relation, a people list into users) or repair applied, that's fibery-architect's: it extends the Space with their approval and keeps each replaced field, renamed "(old)".
+Plans only, never applied here: renames (integrations and API calls using the old name break), merging copies or options, turning a select into a workflow or text into a relation, retiring a people list, deactivating users, repairing rules or formulas, deleting a demo Space with records. fibery-architect applies renames, conversions and repairs when the person asks it to change that Space.

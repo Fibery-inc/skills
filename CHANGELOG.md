@@ -2,6 +2,10 @@
 
 One or two lines per version, newest first. Git keeps the full notes of every release.
 
+## 2.1.0 — 2026-11-20
+
+fibery-health is one page, 17K in place of 63K. The fixed facts script and the overview script are gone: the page says what to look for and how to read what Fibery doesn't show otherwise (formulas it switched off, when a field was added, deactivated owners, the other side of a relation), and the model writes a few short scripts for the Space in front of it. When a script can't run it goes on with direct reads. Drafted descriptions are now a safe fix.
+
 ## 2.0.1 — 2026-11-20
 
 fibery-architect asks its questions plainly, without a guess attached. An app finds its fields by title, and a Space's icon is left to Fibery.
