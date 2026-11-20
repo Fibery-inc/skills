@@ -1,0 +1,10 @@
+interface:
+  display_name: "Fibery Architect"
+  short_description: "Build or change a Fibery Space for any process"
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "fibery"
+      description: "Fibery MCP server, connected to the person's workspace"
+      transport: "streamable_http"
+      url: "https://mcp.fibery.io/mcp"

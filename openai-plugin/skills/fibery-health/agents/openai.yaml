@@ -1,0 +1,10 @@
+interface:
+  display_name: "Fibery Health"
+  short_description: "Check a Fibery workspace's health"
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "fibery"
+      description: "Fibery MCP server, connected to the person's workspace"
+      transport: "streamable_http"
+      url: "https://mcp.fibery.io/mcp"
