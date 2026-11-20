@@ -7,7 +7,7 @@ import yaml
 
 ALLOWED = {"name", "description", "license", "compatibility", "metadata", "allowed-tools"}
 NAME = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
-MANIFESTS = ["plugin.json", ".claude-plugin/plugin.json", "gemini-extension.json"]
+MANIFESTS = ["plugin.json", ".claude-plugin/plugin.json", "gemini-extension.json", "openai-plugin/.codex-plugin/plugin.json"]
 
 errors = []
 
