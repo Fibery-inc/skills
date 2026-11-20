@@ -1,21 +1,21 @@
 {
   "name": "fibery-skills",
   "version": "2.1.0",
-  "description": "Describe how your company, team, shop or club works and get it running in Fibery, from sales pipelines and OKRs to incident response, purchase approvals, repair orders, production queues and volunteer programs. fibery-architect builds a ready-to-run Space in your own workspace, with databases, workflows, views, reports, automations and sample data. fibery-health checks a workspace's health and applies the safe fixes you approve.",
+  "description": "Design and build Fibery Spaces for any process, write the recipes they start from, and health-check your workspace's structure and data. Works with the Fibery connector.",
   "author": {
     "name": "Fibery Inc.",
     "email": "support@fibery.io",
     "url": "https://fibery.com"
   },
-  "homepage": "https://github.com/Fibery-inc/skills",
+  "homepage": "https://fibery.com",
   "repository": "https://github.com/Fibery-inc/skills",
   "license": "MIT",
-  "keywords": ["fibery", "work management", "workflow", "templates", "automations", "crm", "okrs", "hiring", "workspace audit"],
+  "keywords": ["fibery", "workspace", "process", "space", "recipe", "cookbook", "templates", "structure", "health", "audit"],
   "skills": "./skills/",
   "interface": {
     "displayName": "Fibery Architect",
     "shortDescription": "Build and audit Fibery Spaces",
-    "longDescription": "Describe how your company, team, shop or club works and get it running in Fibery, from sales pipelines and OKRs to incident response, purchase approvals, repair orders, production queues and volunteer programs.\n\nfibery-architect turns how a team works (an idea, an interview, a process document or an existing Space) into a ready-to-run Fibery Space in your workspace: databases, fields, relations and links to what you already track, workflows, formulas, views, reports, the automations the process depends on, a guide and sample data. It asks at most four questions, once, then builds right away and tells you what it assumed. It also extends a Space you already run: a process added to it, new fields, states, views or automations, or a part rebuilt, such as a status select turned into a workflow. It deletes nothing of yours, and asks first when a change would lose or rewrite your data.\n\nfibery-health checks a workspace, or the Spaces you name: copied, test and empty Spaces, missing descriptions, status kept in plain selects, wrongly typed workflow states, formulas Fibery switched off, text fields that should be relations, people who left but can still sign in, and failing, silent or never-run automations. Ask for the data pass and it also reads how records fill their fields. It is read-only until you approve a specific fix, and never deletes records.\n\nTry \"set up our hiring process in Fibery\", \"track our repair shop's work orders in Fibery\", \"turn Status into a workflow\" or \"health-check our workspace\".\n\nNeeds the Fibery app connected to your workspace.",
+    "longDescription": "Describe how your company, team, shop or club works and get it running in Fibery, from sales pipelines and OKRs to incident response, purchase approvals, repair orders, production queues and volunteer programs.\n\nfibery-architect turns how a team works (an idea, an interview, a process document or an existing Space) into a ready-to-run Fibery Space in your workspace: databases, fields, relations and links to what you already track, workflows, formulas, views, reports, the automations the process depends on, a guide and sample data. It asks at most four questions, once, then builds right away and tells you what it assumed. It also extends a Space you already run: a process added to it, new fields, states, views or automations, or a part rebuilt, such as a status select turned into a workflow. It deletes nothing of yours, and asks first when a change would lose or rewrite your data.\n\nfibery-health checks a workspace, or the Spaces you name: copied, test and empty Spaces, missing descriptions, status kept in plain selects, wrongly typed workflow states, formulas Fibery switched off, text fields that should be relations, people who left but can still sign in, and failing, silent or never-run automations. Ask for the data pass and it also reads how records fill their fields. It is read-only until you approve a specific fix, and never deletes records.\n\nTry \"set up our hiring process in Fibery\", \"track our repair shop's work orders in Fibery\", \"turn Status into a workflow\" or \"health-check our workspace\".\n\nWorks with the Fibery connector, connected to your workspace.",
     "developerName": "Fibery Inc.",
     "category": "Productivity",
     "capabilities": [],
