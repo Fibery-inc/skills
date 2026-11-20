@@ -2,6 +2,10 @@
 
 One or two lines per version, newest first. Git keeps the full notes of every release.
 
+## 2.0.0 — 2026-11-20
+
+fibery-architect is one page, 18K in place of 139K: what a good Space has and the Fibery facts a model can't guess, with the call shapes left to Fibery MCP's own tool descriptions and guides. The script templates, the reference files, the example and `design.md` are gone. It asks one round of at most four questions, builds straight away and says in its last message what it assumed.
+
 ## 1.11.0 — 2026-11-19
 
 - fibery-architect has one change path, `references/change.md`, for every change to a Space that exists: read it with one small script, say in a few lines what will change, do it. New things go through the build's own scripts, edits are plain calls in one script. `extend.md`, `extend-scripts.md`, `tweaks.md` and `existing-space.md` are gone, with the extension's approval list, scripts 0, 4x and 3x and their rerun logic.
