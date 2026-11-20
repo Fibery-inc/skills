@@ -2,6 +2,10 @@
 
 One or two lines per version, newest first. Git keeps the full notes of every release.
 
+## 2.0.1 — 2026-11-20
+
+fibery-architect asks its questions plainly, without a guess attached. An app finds its fields by title, and a Space's icon is left to Fibery.
+
 ## 2.0.0 — 2026-11-20
 
 fibery-architect is one page, 18K in place of 139K: what a good Space has and the Fibery facts a model can't guess, with the call shapes left to Fibery MCP's own tool descriptions and guides. The script templates, the reference files, the example and `design.md` are gone. It asks one round of at most four questions, builds straight away and says in its last message what it assumed.
